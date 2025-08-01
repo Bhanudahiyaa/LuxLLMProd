@@ -1,30 +1,11 @@
+"use client";
+
+import { Brain, Zap, Shield, Smartphone, Database, Cpu } from "lucide-react";
+import { GlowingEffect } from "@/components/ui/glowing-effect";
+import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Brain, Lightning, Shield, DeviceMobile } from "phosphor-react";
 
 const FeaturesSection = () => {
-  const features = [
-    {
-      icon: <Brain size={48} weight="light" />,
-      title: "Multi-Model Intelligence",
-      description: "Access GPT-4, Claude, Gemini, and more AI models from a single interface. Compare responses and choose the best solution."
-    },
-    {
-      icon: <Lightning size={48} weight="light" />,
-      title: "Lightning Fast",
-      description: "Optimized infrastructure ensures sub-second response times. Get instant results from multiple AI models simultaneously."
-    },
-    {
-      icon: <Shield size={48} weight="light" />,
-      title: "Enterprise Security",
-      description: "Bank-grade encryption and privacy controls. Your data stays secure with SOC 2 compliance and GDPR protection."
-    },
-    {
-      icon: <DeviceMobile size={48} weight="light" />,
-      title: "Cross-Platform",
-      description: "Seamless experience across web, mobile, and API integrations. Access your AI tools anywhere, anytime."
-    }
-  ];
-
   return (
     <section id="features" className="py-24 relative">
       <div className="container mx-auto px-4">
@@ -39,34 +20,83 @@ const FeaturesSection = () => {
             Powerful <span className="text-primary">Features</span>
           </h2>
           <p className="text-xl text-foreground/70 font-light max-w-2xl mx-auto">
-            Everything you need to harness the full power of artificial intelligence
+            Everything you need to harness the power of multiple AI models
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="glass-card p-8 rounded-3xl hover:bg-white/10 transition-all duration-500 group"
-            >
-              <div className="text-primary mb-6 group-hover:scale-110 transition-transform duration-300">
-                {feature.icon}
-              </div>
-              <h3 className="text-xl font-light tracking-tighter mb-4">
-                {feature.title}
-              </h3>
-              <p className="text-foreground/70 font-light leading-relaxed">
-                {feature.description}
-              </p>
-            </motion.div>
-          ))}
-        </div>
+        <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-3 lg:gap-4 xl:max-h-[34rem] xl:grid-rows-2">
+          <GridItem
+            area="md:[grid-area:1/1/2/7] xl:[grid-area:1/1/2/5]"
+            icon={<Brain className="h-4 w-4" />}
+            title="Advanced AI Models"
+            description="Access the latest AI models from OpenAI, Anthropic, Google, and more in one unified platform."
+          />
+          <GridItem
+            area="md:[grid-area:1/7/2/13] xl:[grid-area:2/1/3/5]"
+            icon={<Zap className="h-4 w-4" />}
+            title="Lightning Fast Performance"
+            description="Optimized infrastructure ensures your queries are processed quickly and efficiently across all models."
+          />
+          <GridItem
+            area="md:[grid-area:2/1/3/7] xl:[grid-area:1/5/3/8]"
+            icon={<Shield className="h-4 w-4" />}
+            title="Enterprise Security"
+            description="Built with enterprise-grade security and privacy controls to protect your sensitive data and conversations."
+          />
+          <GridItem
+            area="md:[grid-area:2/7/3/13] xl:[grid-area:1/8/2/13]"
+            icon={<Smartphone className="h-4 w-4" />}
+            title="Mobile Ready Design"
+            description="Fully responsive interface that works seamlessly across all devices and platforms."
+          />
+          <GridItem
+            area="md:[grid-area:3/1/4/13] xl:[grid-area:2/8/3/13]"
+            icon={<Database className="h-4 w-4" />}
+            title="Smart Model Selection"
+            description="Intelligent routing automatically selects the best AI model for your specific use case and requirements."
+          />
+        </ul>
       </div>
     </section>
+  );
+};
+
+interface GridItemProps {
+  area: string;
+  icon: React.ReactNode;
+  title: string;
+  description: React.ReactNode;
+}
+
+const GridItem = ({ area, icon, title, description }: GridItemProps) => {
+  return (
+    <li className={cn("min-h-[14rem] list-none", area)}>
+      <div className="relative h-full rounded-[1.25rem] border-[0.75px] border-border p-2 md:rounded-[1.5rem] md:p-3">
+        <GlowingEffect
+          spread={40}
+          glow={true}
+          disabled={false}
+          proximity={64}
+          inactiveZone={0.01}
+          borderWidth={3}
+        />
+        <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border-[0.75px] bg-background/50 glass-card p-6 shadow-sm md:p-6">
+          <div className="relative flex flex-1 flex-col justify-between gap-3">
+            <div className="w-fit rounded-lg border-[0.75px] border-border bg-primary/20 p-2">
+              {icon}
+            </div>
+            <div className="space-y-3">
+              <h3 className="pt-0.5 text-xl leading-[1.375rem] font-light font-sans tracking-tighter md:text-2xl md:leading-[1.875rem] text-balance text-foreground">
+                {title}
+              </h3>
+              <h2 className="font-sans text-sm leading-[1.125rem] md:text-base md:leading-[1.375rem] text-foreground/70 font-light">
+                {description}
+              </h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
   );
 };
 

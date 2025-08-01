@@ -47,7 +47,7 @@ const HeroSection = () => {
           </motion.button>
         </motion.div>
 
-        {/* Beautiful 3D-like Product Demo */}
+        {/* Background Pattern */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
