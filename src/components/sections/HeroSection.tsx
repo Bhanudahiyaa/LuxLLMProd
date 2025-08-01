@@ -1,8 +1,4 @@
 import { motion } from "framer-motion";
-import { Suspense, lazy } from "react";
-
-// Lazy load Spline component
-const Spline = lazy(() => import('@splinetool/react-spline'));
 
 const HeroSection = () => {
   return (
@@ -51,7 +47,7 @@ const HeroSection = () => {
           </motion.button>
         </motion.div>
 
-        {/* Spline 3D Model */}
+        {/* Beautiful 3D-like Product Demo */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -59,13 +55,19 @@ const HeroSection = () => {
           className="relative w-full h-[600px] glass-card rounded-3xl overflow-hidden"
         >
           <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent z-10" />
-          <Suspense fallback={
-            <div className="w-full h-full bg-gradient-to-br from-primary/20 to-transparent rounded-3xl animate-pulse flex items-center justify-center">
-              <div className="text-foreground/50 text-lg">Loading 3D Experience...</div>
+          <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-3xl flex items-center justify-center relative">
+            {/* Floating AI Interface Elements */}
+            <div className="absolute inset-0 overflow-hidden">
+              <div className="absolute top-20 left-20 w-32 h-32 bg-primary/30 rounded-full blur-2xl animate-pulse" />
+              <div className="absolute bottom-20 right-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl animate-pulse delay-1000" />
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-primary/10 to-primary/5 rounded-full blur-3xl animate-pulse delay-500" />
             </div>
-          }>
-            <Spline scene="https://prod.spline.design/6Wq8RtCRzSBQnhar/scene.splinecode" />
-          </Suspense>
+            <div className="text-center z-10">
+              <div className="text-6xl font-light text-primary/60 mb-4">⚡</div>
+              <div className="text-foreground/60 text-lg">AI LLM Interface Preview</div>
+              <div className="text-foreground/40 text-sm mt-2">Experience coming soon</div>
+            </div>
+          </div>
         </motion.div>
       </div>
     </section>
