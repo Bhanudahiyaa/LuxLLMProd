@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-export default {
+const config: Config = {
   darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx}",
@@ -8,7 +8,6 @@ export default {
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
   ],
-  prefix: "",
   theme: {
     container: {
       center: true,
@@ -23,6 +22,9 @@ export default {
     extend: {
       fontFamily: {
         inter: ["Inter", "sans-serif"],
+        italianno: ["Italianno", "cursive"],
+        italiana: ["Italiana", "sans-serif"],
+        edu: ['"Edu VIC WA NT Hand"', "cursive"], // ✅ Custom font
       },
       colors: {
         border: "hsl(var(--border))",
@@ -58,6 +60,11 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        "color-1": "hsl(var(--color-1))",
+        "color-2": "hsl(var(--color-2))",
+        "color-3": "hsl(var(--color-3))",
+        "color-4": "hsl(var(--color-4))",
+        "color-5": "hsl(var(--color-5))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -115,6 +122,14 @@ export default {
             boxShadow: "0 0 40px hsl(122 90% 55% / 0.6)",
           },
         },
+        rainbow: {
+          "0%": {
+            backgroundPosition: "0%",
+          },
+          "100%": {
+            backgroundPosition: "200%",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -124,6 +139,7 @@ export default {
         "slide-in-right": "slide-in-right 0.3s ease-out",
         "slide-out-right": "slide-out-right 0.3s ease-out",
         glow: "glow 2s ease-in-out infinite",
+        rainbow: "rainbow var(--speed, 2s) infinite linear",
       },
       backdropBlur: {
         xs: "2px",
@@ -134,4 +150,6 @@ export default {
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config;
+};
+
+export default config;

@@ -1,6 +1,19 @@
 @tailwind base;
+@import url("https://fonts.googleapis.com/css2?family=Edu+VIC+WA+NT+Hand&display=swap");
 @tailwind components;
 @tailwind utilities;
+@font-face {
+  font-family: "Italianno";
+  src: url("/fonts/Italianno-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Italiana";
+  src: url("/fonts/Italiana-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
 
 @layer base {
   :root {
@@ -60,6 +73,11 @@
       rgba(255, 255, 255, 0.1),
       rgba(255, 255, 255, 0.05)
     );
+    --color-1: 0 100% 63%;
+    --color-2: 270 100% 63%;
+    --color-3: 210 100% 63%;
+    --color-4: 195 100% 63%;
+    --color-5: 90 100% 63%;
   }
 
   /* Force dark mode always */
@@ -92,7 +110,7 @@
   p,
   span,
   div {
-    @apply opacity-80;
+    @apply opacity-100;
   }
 
   /* Neumorphic button styles */
@@ -142,5 +160,28 @@
 
   ::-webkit-scrollbar-thumb:hover {
     background: hsl(122, 58%, 31%);
+  }
+  .theme {
+    --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@theme inline {
+  @keyframes rainbow {
+    0% {
+      background-position: 0%;
+    }
+    100% {
+      background-position: 200%;
+    }
   }
 }
