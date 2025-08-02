@@ -2,11 +2,14 @@ import { motion } from "framer-motion";
 
 const HeroSection = () => {
   return (
-    <section id="hero" className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+    <section
+      id="hero"
+      className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden"
+    >
       {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/50" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(34,197,94,0.1),transparent_50%)]" />
-      
+
       <div className="container mx-auto px-4 text-center z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -14,27 +17,33 @@ const HeroSection = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="max-w-4xl mx-auto mb-16"
         >
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-6xl md:text-8xl font-light tracking-tighter mb-6 bg-gradient-to-r from-foreground via-foreground to-foreground/60 bg-clip-text text-transparent"
-          >
-            AI LLM
-            <br />
-            <span className="text-primary">Aggregator</span>
-          </motion.h1>
-          
+          <div className="relative inline-block">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white mt-44 text-xs font-semibold px-2 py-1 rounded-full shadow">
+              BETA
+            </div>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-6xl md:text-8xl font-light tracking-tighter mt-52 mb-6 bg-gradient-to-r from-foreground via-foreground to-foreground/60 bg-clip-text text-transparent"
+            >
+              LuxLLM
+              <br />
+              <span className="text-primary">Aggregator</span>
+            </motion.h1>
+          </div>
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-xl md:text-2xl text-foreground/70 font-light leading-relaxed mb-12 max-w-2xl mx-auto"
           >
-            The ultimate platform that brings together all major AI models in one seamless interface. 
-            Experience the future of artificial intelligence today.
+            The ultimate platform that brings together all major AI models in
+            one seamless interface. Experience the future of artificial
+            intelligence today.
           </motion.p>
-          
+
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -64,8 +73,12 @@ const HeroSection = () => {
             </div>
             <div className="text-center z-10">
               <div className="text-6xl font-light text-primary/60 mb-4">⚡</div>
-              <div className="text-foreground/60 text-lg">AI LLM Interface Preview</div>
-              <div className="text-foreground/40 text-sm mt-2">Experience coming soon</div>
+              <div className="text-foreground/60 text-lg">
+                AI LLM Interface Preview
+              </div>
+              <div className="text-foreground/40 text-sm mt-2">
+                Experience coming soon
+              </div>
             </div>
           </div>
         </motion.div>

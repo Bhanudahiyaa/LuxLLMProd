@@ -14,11 +14,8 @@ const Navigation = () => {
 
   const navItems = [
     { href: "#hero", label: "Home" },
-    { href: "#featured", label: "Featured" },
-    { href: "#testimonials", label: "Testimonials" },
-    { href: "#how-it-works", label: "How it Works" },
     { href: "#features", label: "Features" },
-    { href: "#mission", label: "Mission" },
+    { href: "#how-it-works", label: "How it Works" },
     { href: "#pricing", label: "Pricing" },
     { href: "#faq", label: "FAQ" },
   ];
@@ -48,8 +45,8 @@ const Navigation = () => {
             animate={{ opacity: 1 }}
             className="font-bold text-2xl tracking-tighter"
           >
-            <span className="text-primary">t3</span>
-            <span className="text-foreground">Dotgg</span>
+            <span className="text-primary">Lux</span>
+            <span className="text-foreground">LLM</span>
           </motion.div>
 
           {/* Desktop Navigation */}

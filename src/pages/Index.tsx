@@ -21,11 +21,11 @@ const Index = () => {
       <Navigation />
       <HeroSection />
       <FeaturedSection />
-      <TestimonialsSection />
-      <HowItWorksSection />
       <FeaturesSection />
-      <MissionSection />
+      <HowItWorksSection />
+      <TestimonialsSection />
       <PricingSection />
+      <MissionSection />
       <FAQSection />
       <Footer />
     </motion.div>

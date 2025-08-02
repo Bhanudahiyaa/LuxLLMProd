@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Luxury Design System for t3Dotgg AI LLM Aggregator */
-
 @layer base {
   :root {
     /* Dark luxury theme colors */
@@ -47,9 +45,21 @@
     --neuro-shadow-dark: rgba(0, 0, 0, 0.3);
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(122 90% 55%), hsl(122 90% 45%));
-    --gradient-background: radial-gradient(ellipse at top, hsl(220 27% 6%), hsl(220 27% 4%));
-    --gradient-card: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(122 90% 55%),
+      hsl(122 90% 45%)
+    );
+    --gradient-background: radial-gradient(
+      ellipse at top,
+      hsl(220 27% 6%),
+      hsl(220 27% 4%)
+    );
+    --gradient-card: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, 0.05)
+    );
   }
 
   /* Force dark mode always */
@@ -64,33 +74,38 @@
   body {
     @apply bg-background text-foreground font-inter;
     background: var(--gradient-background);
-    font-feature-settings: 'cv11', 'ss01';
-    font-variation-settings: 'opsz' 32;
+    font-feature-settings: "cv11", "ss01";
+    font-variation-settings: "opsz" 32;
   }
 
   /* Typography system */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-light tracking-tighter;
     letter-spacing: -0.025em;
   }
 
-  p, span, div {
+  p,
+  span,
+  div {
     @apply opacity-80;
   }
 
   /* Neumorphic button styles */
   .neuro-button {
     background: linear-gradient(145deg, hsl(220 15% 12%), hsl(220 15% 8%));
-    box-shadow: 
-      8px 8px 16px var(--neuro-shadow-dark),
+    box-shadow: 8px 8px 16px var(--neuro-shadow-dark),
       -8px -8px 16px var(--neuro-shadow-light);
     border: 1px solid var(--glass-border);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .neuro-button:hover {
-    box-shadow: 
-      12px 12px 24px var(--neuro-shadow-dark),
+    box-shadow: 12px 12px 24px var(--neuro-shadow-dark),
       -12px -12px 24px var(--neuro-shadow-light),
       0 0 40px hsl(122 90% 55% / 0.3);
     transform: translateY(-2px);
@@ -101,8 +116,7 @@
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--glass-border);
-    box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.3),
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
@@ -121,11 +135,12 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: hsl(122 90% 55%);
+    background: hsl(122, 83%, 16%);
+    height: 10px;
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(122 90% 60%);
+    background: hsl(122, 58%, 31%);
   }
 }
