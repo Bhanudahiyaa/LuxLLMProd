@@ -18,6 +18,7 @@
   :root {
     /* Dark luxury theme colors */
     --background: 220 27% 4%;
+    --background-color: hsl(220 27% 4%);
     --foreground: 0 0% 98%;
 
     --card: 220 15% 8%;

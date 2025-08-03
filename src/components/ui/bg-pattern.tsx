@@ -27,10 +27,10 @@ type BGPatternProps = React.ComponentProps<"div"> & {
 };
 
 const maskClasses: Record<BGMaskType, string> = {
-  "fade-edges":
-    "[mask-image:radial-gradient(ellipse_at_center,var(--background),transparent)]",
   "fade-center":
-    "[mask-image:radial-gradient(ellipse_at_center,transparent,var(--background))]",
+    "[mask-image:radial-gradient(ellipse_at_center,transparent,var(--background-color))]",
+  "fade-edges":
+    "[mask-image:radial-gradient(ellipse_at_center,var(--background-color),transparent)]",
   "fade-top":
     "[mask-image:linear-gradient(to_bottom,transparent,var(--background))]",
   "fade-bottom":

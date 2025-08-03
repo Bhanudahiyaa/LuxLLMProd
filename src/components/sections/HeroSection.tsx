@@ -11,12 +11,13 @@ const HeroSection = () => {
       className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden"
     >
       {/* ✅ Dots Background with Fade Center */}
+
       <BGPattern
         variant="dots"
-        mask="none"
-        fill="white"
+        mask="fade-center"
+        fill="rgba(255,255,255,0.3)"
         size={20}
-        className="z-[-10]"
+        className="absolute inset-0 z-[10]"
       />
 
       {/* Gradient Overlay Layers */}
