@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
+import { Typewriter } from "react-simple-typewriter";
+import { BGPattern } from "@/components/ui/bg-pattern"; // ✅ Import the pattern
 
 const HeroSection = () => {
   return (
@@ -8,7 +10,16 @@ const HeroSection = () => {
       id="hero"
       className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden"
     >
-      {/* Background Elements */}
+      {/* ✅ Dots Background with Fade Center */}
+      <BGPattern
+        variant="dots"
+        mask="none"
+        fill="white"
+        size={20}
+        className="z-[-10]"
+      />
+
+      {/* Gradient Overlay Layers */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/50" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(34,197,94,0.1),transparent_50%)]" />
 
@@ -27,13 +38,23 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-8xl md:text-[8rem] font-light tracking-tighter mt-48 mb-4 bg-gradient-to-r from-foreground via-foreground to-foreground/60 bg-clip-text text-transparent"
+              className="text-8xl md:text-[8rem] font-light tracking-tighter mt-48 mb-4 bg-gradient-to-r from-foreground via-foreground/70 to-foreground/40 bg-clip-text text-transparent"
             >
-              LuxLLM
+              <span>
+                <Typewriter
+                  words={["LuxLLM"]}
+                  loop={2}
+                  cursor
+                  cursorStyle="|"
+                  typeSpeed={190}
+                  deleteSpeed={100}
+                  delaySpeed={1000}
+                />
+              </span>
               <br />
               <motion.div>
-                <div className=" font-italianno mt-7 tracking-tighter text-primary text-4xl md:text-7xl font-light ">
-                  𝘊𝘰𝘥𝘦-𝘍𝘳𝘦𝘦 𝘈𝘨𝘦𝘯𝘵 𝘉𝘶𝘪𝘭𝘥𝘪𝘯𝘨,<div> 𝘔𝘢𝘥𝘦 𝘌𝘢𝘴𝘺</div>
+                <div className=" font-italianno mt-7 tracking-tighter text-primary text-4xl md:text-7xl font-light opacity-90">
+                  𝘊𝘰𝘥𝘦 𝘍𝘳𝘦𝘦 𝘈𝘨𝘦𝘯𝘵 𝘉𝘶𝘪𝘭𝘥𝘪𝘯𝘨,<div> 𝘔𝘢𝘥𝘦 𝘌𝘢𝘴𝘺</div>
                 </div>
               </motion.div>
             </motion.h1>
@@ -43,44 +64,47 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-s md:text-xl text-foreground/70 font-light leading-relaxed mb-1 max-w-3xl mx-auto"
+            className="text-s md:text-lg text-foreground/70 font-light leading-relaxed mb-1 max-w-3xl mx-auto"
           >
-            The ultimate platform that brings together all major AI models in
-            one seamless interface. Experience the future of artificial
-            intelligence today.
+            The ultimate platform that unifies top AI models so you can
+            effortlessly build powerful, custom agents from plain language in
+            seconds.
           </motion.p>
 
           <div className="flex justify-center space-x-6 mt-8">
-            <InteractiveHoverButton className="px-10 py-2 text-sm  text-foreground rounded-2xl">
+            <InteractiveHoverButton className="px-10 py-2 text-sm text-foreground rounded-2xl">
               Get Started
             </InteractiveHoverButton>
-            <RainbowButton className=" px-8 py-2 text-sm  text-foreground rounded-2xl">
+            <RainbowButton className="px-8 py-2 text-sm text-foreground rounded-2xl">
               Get Unlimited Access
             </RainbowButton>
           </div>
+
+          <div className="absolute bottom-0 left-0 w-full h-80 bg-gradient-to-t from-background to-transparent z-20 pointer-events-none" />
         </motion.div>
 
-        {/* Background Pattern */}
+        {/* Floating visual */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.8 }}
-          className="relative w-full h-[600px] glass-card rounded-3xl overflow-hidden"
+          className="relative w-full h-full glass-card rounded-3xl overflow-hidden "
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent z-10" />
-          <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-3xl flex items-center justify-center relative">
-            {/* Floating AI Interface Elements */}
-            <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent z-10 " />
+          <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-3xl flex items-center justify-center relative opacity-70">
+            <div className="absolute inset-0 overflow-hidden ">
               <div className="absolute top-20 left-20 w-32 h-32 bg-primary/30 rounded-full blur-2xl animate-pulse" />
               <div className="absolute bottom-20 right-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl animate-pulse delay-1000" />
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-primary/10 to-primary/5 rounded-full blur-3xl animate-pulse delay-500" />
             </div>
-            <div className="text-center z-10  ">
-              <img
-                src="/images/interface-preview.png"
-                alt="LLM Interface Preview"
-                className="w-full h-auto max-w-full object-contain rounded-3xl mask-image-fade"
-              />
+            <div className="text-center z-10">
+              <div className="h-full w-full overflow-hidden rounded-2xl bg-grey-600 dark:bg-zinc-900 p-1 md:p-4">
+                <img
+                  src="/images/interface-preview.png"
+                  alt="LLM Interface Preview"
+                  className="w-full h-auto max-w-full object-contain rounded-3xl mask-image-fade"
+                />
+              </div>
             </div>
           </div>
         </motion.div>
