@@ -24,7 +24,7 @@ const config: Config = {
         inter: ["Inter", "sans-serif"],
         italianno: ["Italianno", "cursive"],
         italiana: ["Italiana", "sans-serif"],
-        edu: ['"Edu VIC WA NT Hand"', "cursive"], // ✅ Custom font
+        edu: ['"Edu VIC WA NT Hand"', "cursive"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -72,6 +72,9 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
+        marquee: {
+          to: { transform: "translateX(-50%)" },
+        },
         "accordion-down": {
           from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
@@ -130,8 +133,17 @@ const config: Config = {
             backgroundPosition: "200%",
           },
         },
+        shimmer: {
+          "0%, 90%, 100%": {
+            backgroundPosition: "calc(-100% - var(--shimmer-width)) 0",
+          },
+          "30%, 60%": {
+            backgroundPosition: "calc(100% + var(--shimmer-width)) 0",
+          },
+        },
       },
       animation: {
+        marquee: "marquee var(--duration, 30s) linear infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-up": "fade-up 0.8s ease-out",
@@ -140,6 +152,7 @@ const config: Config = {
         "slide-out-right": "slide-out-right 0.3s ease-out",
         glow: "glow 2s ease-in-out infinite",
         rainbow: "rainbow var(--speed, 2s) infinite linear",
+        shimmer: "shimmer 8s infinite linear",
       },
       backdropBlur: {
         xs: "2px",

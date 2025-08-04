@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/sections/HeroSection";
-import FeaturedSection from "@/components/sections/FeaturedSection";
+
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import HowItWorksSection from "@/components/sections/HowItWorksSection";
 import FeaturesSection from "@/components/sections/FeaturesSection";
@@ -19,7 +19,7 @@ const Index = () => {
     >
       <Navigation />
       <HeroSection />
-      <FeaturedSection />
+
       <FeaturesSection />
       <HowItWorksSection />
       <TestimonialsSection />

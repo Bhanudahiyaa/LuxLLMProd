@@ -6,19 +6,21 @@ const HowItWorksSection = () => {
     {
       icon: <Gear size={48} weight="light" />,
       title: "Set up your AI assistant",
-      description: "Connect your preferred AI models and customize your workspace in minutes. Our intuitive setup process makes it effortless.",
-      image: "🤖"
+      description:
+        "Connect your preferred AI models and customize your workspace in minutes. Our intuitive setup process makes it effortless.",
+      image: "🤖",
     },
     {
       icon: <ChatCircle size={48} weight="light" />,
       title: "Ask anything",
-      description: "Start conversations with multiple AI models simultaneously. Compare responses, get diverse perspectives, and find the best solutions.",
-      image: "💬"
-    }
+      description:
+        "Start conversations with multiple AI models simultaneously. Compare responses, get diverse perspectives, and find the best solutions.",
+      image: "💬",
+    },
   ];
 
   return (
-    <section id="how-it-works" className="py-24 relative">
+    <section id="how-it-works" className="py-16 relative">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

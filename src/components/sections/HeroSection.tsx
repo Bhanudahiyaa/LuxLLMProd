@@ -2,7 +2,9 @@ import { motion } from "framer-motion";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { Typewriter } from "react-simple-typewriter";
-import { BGPattern } from "@/components/ui/bg-pattern"; // ✅ Import the pattern
+import { BGPattern } from "@/components/ui/bg-pattern";
+import { Badge } from "@/components/ui/badge";
+import { ArrowRightIcon } from "lucide-react";
 
 const HeroSection = () => {
   return (
@@ -29,24 +31,47 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="max-w-4xl mx-auto mb-14"
+          className="max-w-4xl mx-auto mb-11"
         >
           <div className="relative inline-block">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white mt-44 text-xs font-semibold px-2 py-1 rounded-full shadow">
-              BETA
-            </div>
+            <Badge
+              variant="outline"
+              className="absolute top-4 sm:-top-6 left-1/2 -translate-x-1/2 mt-32 sm:mt-44 text-[10px] sm:text-sm font-medium px-4 sm:px-5 py-1 rounded-full shadow flex items-center gap-1.5 sm:gap-2 animate-shimmer bg-zinc-600 max-w-[95%] sm:max-w-fit whitespace-nowrap"
+              style={
+                {
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  color: "transparent",
+                  backgroundImage:
+                    "linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0.7) 100%)",
+                  backgroundSize: "200% auto",
+                  "--shimmer-width": "80px",
+                } as React.CSSProperties
+              }
+            >
+              <span className="text-muted-foregrounda ">
+                ✨ Explore AI Agents
+              </span>
+              <a
+                href="#link"
+                className="flex items-center gap-1 text-primary font-light 
+
+ transition-colors duration-200"
+              >
+                Learn more
+                <ArrowRightIcon className="size-3" />
+              </a>
+            </Badge>
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-8xl md:text-[8rem] font-light tracking-tighter mt-48 mb-4 bg-gradient-to-r from-foreground via-foreground/70 to-foreground/40 bg-clip-text text-transparent"
+              className="text-8xl md:text-[8rem] font-semibold tracking-tighter mt-48 mb-3 bg-gradient-to-r from-foreground via-foreground/90 to-foreground/40 bg-clip-text text-transparent"
             >
               <span>
                 <Typewriter
                   words={["LuxLLM"]}
                   loop={2}
-                  cursor
-                  cursorStyle="|"
                   typeSpeed={190}
                   deleteSpeed={100}
                   delaySpeed={1000}
@@ -54,8 +79,8 @@ const HeroSection = () => {
               </span>
               <br />
               <motion.div>
-                <div className=" font-italianno mt-7 tracking-tighter text-primary text-4xl md:text-7xl font-light opacity-90">
-                  𝘊𝘰𝘥𝘦 𝘍𝘳𝘦𝘦 𝘈𝘨𝘦𝘯𝘵 𝘉𝘶𝘪𝘭𝘥𝘪𝘯𝘨,<div> 𝘔𝘢𝘥𝘦 𝘌𝘢𝘴𝘺</div>
+                <div className=" font-italianno mt-7 tracking-tight text-primary text-4xl sm:text-5xl md:text-7xl font-light opacity-80 text-center">
+                  𝘊𝘰𝘥𝘦 𝘍𝘳𝘦𝘦 𝘈𝘨𝘦𝘯𝘵 𝘉𝘶𝘪𝘭𝘥𝘪𝘯𝘨,<div>𝘔𝘢𝘥𝘦 𝘌𝘢𝘴𝘺</div>
                 </div>
               </motion.div>
             </motion.h1>
@@ -64,12 +89,14 @@ const HeroSection = () => {
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-s md:text-lg text-foreground/70 font-light leading-relaxed mb-1 max-w-3xl mx-auto"
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-base sm:text-lg text-foreground/50 font-light leading-relaxed mb-4 max-w-3xl mx-auto text-center tracking-tight px-4"
           >
             The ultimate platform that unifies top AI models so you can
-            effortlessly build powerful, custom agents from plain language in
-            seconds.
+            effortlessly{" "}
+            <span>
+              build powerful, custom agents from plain language in seconds.
+            </span>
           </motion.p>
 
           <div className="flex justify-center space-x-6 mt-8">
@@ -92,14 +119,14 @@ const HeroSection = () => {
           className="relative w-full h-full glass-card rounded-3xl overflow-hidden "
         >
           <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent z-10 " />
-          <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-3xl flex items-center justify-center relative opacity-70">
+          <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-3xl flex items-center justify-center relative opacity-80">
             <div className="absolute inset-0 overflow-hidden ">
               <div className="absolute top-20 left-20 w-32 h-32 bg-primary/30 rounded-full blur-2xl animate-pulse" />
               <div className="absolute bottom-20 right-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl animate-pulse delay-1000" />
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-primary/10 to-primary/5 rounded-full blur-3xl animate-pulse delay-500" />
             </div>
             <div className="text-center z-10">
-              <div className="h-full w-full overflow-hidden rounded-2xl bg-grey-600 dark:bg-zinc-900 p-1 md:p-4">
+              <div className="h-full w-full overflow-hidden rounded-2xl bg-grey-600 dark:bg-zinc-900 p-1 md:p-3">
                 <img
                   src="/images/interface-preview.png"
                   alt="LLM Interface Preview"

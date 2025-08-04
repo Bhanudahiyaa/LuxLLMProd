@@ -13,10 +13,10 @@ const PricingSection = () => {
         "Access to 3 AI models",
         "Basic chat interface",
         "Community support",
-        "Standard response time"
+        "Standard response time",
       ],
       isRecommended: false,
-      buttonText: "Get Started"
+      buttonText: "Get Started",
     },
     {
       name: "Pro",
@@ -31,10 +31,10 @@ const PricingSection = () => {
         "Faster response times",
         "API access",
         "Custom integrations",
-        "Analytics dashboard"
+        "Analytics dashboard",
       ],
       isRecommended: true,
-      buttonText: "Start Pro Trial"
+      buttonText: "Start Pro Trial",
     },
     {
       name: "Enterprise",
@@ -49,15 +49,15 @@ const PricingSection = () => {
         "SLA guarantees",
         "On-premise deployment",
         "Advanced security features",
-        "Custom training"
+        "Custom training",
       ],
       isRecommended: false,
-      buttonText: "Contact Sales"
-    }
+      buttonText: "Contact Sales",
+    },
   ];
 
   return (
-    <section id="pricing" className="py-24 relative">
+    <section id="pricing" className="py-16 relative">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -70,7 +70,8 @@ const PricingSection = () => {
             Simple <span className="text-primary">Pricing</span>
           </h2>
           <p className="text-xl text-foreground/70 font-light max-w-2xl mx-auto">
-            Choose the perfect plan for your AI journey. Upgrade or downgrade at any time.
+            Choose the perfect plan for your AI journey. Upgrade or downgrade at
+            any time.
           </p>
         </motion.div>
 
@@ -83,7 +84,7 @@ const PricingSection = () => {
               transition={{ duration: 0.8, delay: index * 0.1 }}
               viewport={{ once: true }}
               className={`relative glass-card p-8 rounded-3xl hover:bg-white/10 transition-all duration-500 ${
-                plan.isRecommended ? 'border-primary border-2' : ''
+                plan.isRecommended ? "border-primary border-2" : ""
               }`}
             >
               {plan.isRecommended && (
@@ -113,7 +114,11 @@ const PricingSection = () => {
               <ul className="space-y-4 mb-8">
                 {plan.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-start gap-3">
-                    <Check size={20} weight="bold" className="text-primary mt-0.5 flex-shrink-0" />
+                    <Check
+                      size={20}
+                      weight="bold"
+                      className="text-primary mt-0.5 flex-shrink-0"
+                    />
                     <span className="text-foreground/80 font-light">
                       {feature}
                     </span>
@@ -126,8 +131,8 @@ const PricingSection = () => {
                 whileTap={{ scale: 0.98 }}
                 className={`w-full py-4 rounded-2xl font-medium transition-all duration-300 ${
                   plan.isRecommended
-                    ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                    : 'neuro-button hover:text-primary'
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "neuro-button hover:text-primary"
                 }`}
               >
                 {plan.buttonText}

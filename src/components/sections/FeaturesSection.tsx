@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 
 const FeaturesSection = () => {
   return (
-    <section id="features" className="py-24 relative">
+    <section id="features" className="py-16 relative">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -28,8 +28,8 @@ const FeaturesSection = () => {
           <GridItem
             area="md:[grid-area:1/1/2/7] xl:[grid-area:1/1/2/5]"
             icon={<Brain className="h-4 w-4" />}
-            title="Advanced AI Models"
-            description="Access the latest AI models from OpenAI, Anthropic, Google, and more in one unified platform."
+            title="Universal AI Model Access"
+            description="Instant access to top LLMs like OpenAI, Anthropic, and Google via a unified abstraction layer."
           />
           <GridItem
             area="md:[grid-area:1/7/2/13] xl:[grid-area:2/1/3/5]"
@@ -47,13 +47,14 @@ const FeaturesSection = () => {
             area="md:[grid-area:2/7/3/13] xl:[grid-area:1/8/2/13]"
             icon={<Smartphone className="h-4 w-4" />}
             title="Mobile Ready Design"
-            description="Fully responsive interface that works seamlessly across all devices and platforms."
+            description="Fully responsive interface that works seamlessly across all devices and platforms, all agent components remain mobile accessible and responsive.
+"
           />
           <GridItem
             area="md:[grid-area:3/1/4/13] xl:[grid-area:2/8/3/13]"
             icon={<Database className="h-4 w-4" />}
-            title="Smart Model Selection"
-            description="Intelligent routing automatically selects the best AI model for your specific use case and requirements."
+            title="Smart Model Routing"
+            description="Context-aware router dynamically selects the optimal model per prompt, maximizing relevance and speed."
           />
         </ul>
       </div>
