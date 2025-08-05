@@ -1,3 +1,5 @@
+"use client";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
@@ -5,15 +7,26 @@ import { Typewriter } from "react-simple-typewriter";
 import { BGPattern } from "@/components/ui/bg-pattern";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRightIcon } from "lucide-react";
+import { useTheme } from "next-themes";
 
 const HeroSection = () => {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  const fillColor =
+    resolvedTheme === "dark" ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.15)";
+
   return (
     <section
       id="hero"
       className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden"
     >
-      {/* ✅ Dots Background with Fade Center */}
-
       <BGPattern
         variant="dots"
         mask="fade-center"
@@ -21,10 +34,8 @@ const HeroSection = () => {
         size={20}
         className="absolute inset-0 z-[10]"
       />
-
-      {/* Gradient Overlay Layers */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/50" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(34,197,94,0.1),transparent_50%)]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/50 z-[5]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(34,197,94,0.1),transparent_50%)] z-[5]" />
 
       <div className="container mx-auto px-4 text-center z-10">
         <motion.div
@@ -37,31 +48,29 @@ const HeroSection = () => {
             <Badge
               variant="outline"
               className="absolute top-4 sm:-top-6 left-1/2 -translate-x-1/2 mt-32 sm:mt-44 text-[10px] sm:text-sm font-medium px-4 sm:px-5 py-1 rounded-full shadow flex items-center gap-1.5 sm:gap-2 animate-shimmer bg-zinc-600 max-w-[95%] sm:max-w-fit whitespace-nowrap"
-              style={
-                {
-                  WebkitBackgroundClip: "text",
-                  backgroundClip: "text",
-                  color: "transparent",
-                  backgroundImage:
-                    "linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0.7) 100%)",
-                  backgroundSize: "200% auto",
-                  "--shimmer-width": "80px",
-                } as React.CSSProperties
-              }
+              style={{
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+                backgroundImage:
+                  "linear-gradient(90deg, #555 0%, #aaa 45%, #eee 50%, #aaa 55%, #555 100%)",
+                backgroundSize: "200% auto",
+                animation: "shimmer 4.5s linear infinite",
+              }}
             >
               <span className="text-muted-foregrounda ">
                 ✨ Explore AI Agents
               </span>
+
               <a
                 href="#link"
-                className="flex items-center gap-1 text-primary font-light 
-
- transition-colors duration-200"
+                className="flex items-center gap-1 text-primary font-light transition-colors duration-200"
               >
                 Learn more
                 <ArrowRightIcon className="size-3" />
               </a>
             </Badge>
+
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -103,7 +112,7 @@ const HeroSection = () => {
             <InteractiveHoverButton className="px-10 py-2 text-sm text-foreground rounded-2xl">
               Get Started
             </InteractiveHoverButton>
-            <RainbowButton className="px-8 py-2 text-sm text-foreground rounded-2xl">
+            <RainbowButton className="px-8 py-2 text-sm rounded-2xl">
               Get Unlimited Access
             </RainbowButton>
           </div>
@@ -111,7 +120,6 @@ const HeroSection = () => {
           <div className="absolute bottom-0 left-0 w-full h-80 bg-gradient-to-t from-background to-transparent z-20 pointer-events-none" />
         </motion.div>
 
-        {/* Floating visual */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}

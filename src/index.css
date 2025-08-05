@@ -1,12 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom Fonts */
 @font-face {
   font-family: "Italianno";
   src: url("/fonts/Italianno-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
+
 @font-face {
   font-family: "Italiana";
   src: url("/fonts/Italiana-Regular.ttf") format("truetype");
@@ -16,7 +19,7 @@
 
 @layer base {
   :root {
-    /* Dark luxury theme colors */
+    /* Dark Theme */
     --background: 220 27% 4%;
     --background-color: hsl(220 27% 4%);
     --foreground: 0 0% 98%;
@@ -48,12 +51,12 @@
 
     --radius: 1rem;
 
-    /* Glassmorphic variables */
+    /* Glassmorphic */
     --glass-bg: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-blur: 20px;
 
-    /* Neumorphic shadows */
+    /* Neumorphism */
     --neuro-shadow-light: rgba(255, 255, 255, 0.05);
     --neuro-shadow-dark: rgba(0, 0, 0, 0.3);
 
@@ -73,6 +76,8 @@
       rgba(255, 255, 255, 0.1),
       rgba(255, 255, 255, 0.05)
     );
+
+    /* Accent colors */
     --color-1: 0 100% 63%;
     --color-2: 270 100% 63%;
     --color-3: 210 100% 63%;
@@ -80,13 +85,66 @@
     --color-5: 90 100% 63%;
   }
 
-  /* Force dark mode always */
-  * {
-    @apply border-border;
+  :root.light {
+    /* Light Theme */
+    --background: 0 0% 100%;
+    --background-color: hsl(0 0% 100%);
+    --foreground: 220 27% 5%;
+
+    --card: 0 0% 98%;
+    --card-foreground: 220 27% 5%;
+
+    --popover: 0 0% 98%;
+    --popover-foreground: 220 27% 5%;
+
+    --primary: 122 90% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 90%;
+    --secondary-foreground: 220 27% 5%;
+
+    --muted: 0 0% 85%;
+    --muted-foreground: 220 15% 30%;
+
+    --accent: 122 90% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 80%;
+    --input: 0 0% 90%;
+    --ring: 122 90% 40%;
+
+    --radius: 1rem;
+
+    --glass-bg: rgba(0, 0, 0, 0.04);
+    --glass-border: rgba(0, 0, 0, 0.1);
+    --glass-blur: 20px;
+
+    --neuro-shadow-light: rgba(255, 255, 255, 0.6);
+    --neuro-shadow-dark: rgba(0, 0, 0, 0.1);
+
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(122 90% 50%),
+      hsl(122 90% 40%)
+    );
+    --gradient-background: radial-gradient(
+      ellipse at top,
+      hsl(0 0% 98%),
+      hsl(0 0% 100%)
+    );
+    --gradient-card: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.05),
+      rgba(0, 0, 0, 0.02)
+    );
   }
 
   html {
     color-scheme: dark;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -96,7 +154,6 @@
     font-variation-settings: "opsz" 32;
   }
 
-  /* Typography system */
   h1,
   h2,
   h3,
@@ -113,37 +170,11 @@
     @apply opacity-100;
   }
 
-  /* Neumorphic button styles */
-  .neuro-button {
-    background: linear-gradient(145deg, hsl(220 15% 12%), hsl(220 15% 8%));
-    box-shadow: 8px 8px 16px var(--neuro-shadow-dark),
-      -8px -8px 16px var(--neuro-shadow-light);
-    border: 1px solid var(--glass-border);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  * {
+    @apply border-border;
   }
 
-  .neuro-button:hover {
-    box-shadow: 12px 12px 24px var(--neuro-shadow-dark),
-      -12px -12px 24px var(--neuro-shadow-light),
-      0 0 40px hsl(122 90% 55% / 0.3);
-    transform: translateY(-2px);
-  }
-
-  /* Glassmorphic card styles */
-  .glass-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  }
-
-  /* Smooth scrolling */
-  html {
-    scroll-behavior: smooth;
-  }
-
-  /* Custom scrollbar */
+  /* Scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
   }
@@ -154,34 +185,69 @@
 
   ::-webkit-scrollbar-thumb {
     background: hsl(122, 83%, 16%);
-    height: 10px;
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
     background: hsl(122, 58%, 31%);
   }
-  .theme {
-    --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
+}
+
+/* === Custom Utility Classes === */
+.mask-fade-center {
+  -webkit-mask-image: radial-gradient(
+    circle at center,
+    black 0%,
+    transparent 70%
+  );
+  mask-image: radial-gradient(circle at center, black 0%, transparent 70%);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: cover;
+  mask-size: cover;
+}
+
+.theme {
+  --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
+}
+
+/* === Keyframes === */
+@keyframes rainbow {
+  0% {
+    background-position: 0%;
+  }
+  100% {
+    background-position: 200%;
+  }
+}
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+/* === Components === */
+.neuro-button {
+  background: linear-gradient(145deg, hsl(220 15% 12%), hsl(220 15% 8%));
+  box-shadow: 8px 8px 16px var(--neuro-shadow-dark),
+    -8px -8px 16px var(--neuro-shadow-light);
+  border: 1px solid var(--glass-border);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@theme inline {
-  @keyframes rainbow {
-    0% {
-      background-position: 0%;
-    }
-    100% {
-      background-position: 200%;
-    }
-  }
+.neuro-button:hover {
+  box-shadow: 12px 12px 24px var(--neuro-shadow-dark),
+    -12px -12px 24px var(--neuro-shadow-light), 0 0 40px hsl(122 90% 55% / 0.3);
+  transform: translateY(-2px);
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }

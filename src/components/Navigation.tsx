@@ -1,6 +1,9 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { List, X } from "phosphor-react";
+import ThemeToggle from "@/components/ThemeToggle"; // make sure this path is correct
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -63,6 +66,9 @@ const Navigation = () => {
                 {item.label}
               </motion.button>
             ))}
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
           </div>
 
           {/* Mobile Menu Button */}
@@ -96,8 +102,8 @@ const Navigation = () => {
               <div className="p-6">
                 <div className="flex items-center justify-between mb-8">
                   <div className="font-bold text-xl tracking-tighter">
-                    <span className="text-primary">t3</span>
-                    <span className="text-foreground">Dotgg</span>
+                    <span className="text-primary">Lux</span>
+                    <span className="text-foreground">LLM</span>
                   </div>
                   <button
                     onClick={() => setIsOpen(false)}
@@ -121,6 +127,11 @@ const Navigation = () => {
                     </motion.button>
                   ))}
                 </nav>
+
+                {/* Theme Toggle in mobile */}
+                <div className="mt-8">
+                  <ThemeToggle />
+                </div>
               </div>
             </motion.div>
           </>
