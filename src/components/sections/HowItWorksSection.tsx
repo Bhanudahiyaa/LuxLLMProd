@@ -43,19 +43,18 @@ const features = [
     step: "Step 1",
     content:
       "Describe your AI agent in plain English and let LuxLLM do the rest.",
-    highlight: "Describe",
+    highlight: "AI agent",
   },
   {
     step: "Step 2",
     content:
       "Instantly receive the .env, logic, and demo files to run your agent.",
-    highlight: "import",
+    highlight: "run your agent",
   },
   {
     step: "Step 3",
-    content:
-      "Activate your agent across your workflows, instantly and seamlessly.",
-    highlight: "decentralized",
+    content: "Use your agent in real-time in chat, apps, or anywhere you like.",
+    highlight: "real-time",
   },
 ];
 
@@ -63,10 +62,10 @@ const HowItWorksSection = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
-    <section id="how-it-works" className="py-12 relative">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-8">
-          <h2 className="text-4xl md:text-6xl font-light tracking-tighter mb-6">
+    <section id="how-it-works" className="py-16 relative">
+      <div className="container mx-auto px-6">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-6xl font-light tracking-tighter mb-4">
             How it <span className="text-primary">Works</span>
           </h2>
           <p className="text-xl text-foreground/70 font-light max-w-2xl mx-auto">
@@ -74,9 +73,9 @@ const HowItWorksSection = () => {
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-12 items-start">
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
           {/* Left - Display Cards */}
-          <div className="w-full max-w-2xl mx-auto lg:mx-0 lg:ml-[-60px]">
+          <div className="w-full lg:pt-16 lg:w-1/2">
             <DisplayCards
               cards={defaultCards.map((card, index) => ({
                 ...card,
@@ -86,8 +85,8 @@ const HowItWorksSection = () => {
             />
           </div>
 
-          {/* Right - Feature Steps with full text width */}
-          <div className="w-full lg:flex-1">
+          {/* Right - Feature Steps */}
+          <div className="w-full lg:w-1/2 pt-8 lg:pt-2">
             <FeatureSteps
               features={features}
               autoPlayInterval={4000}
