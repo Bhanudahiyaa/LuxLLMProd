@@ -31,7 +31,7 @@ const HeroSection = () => {
         variant="dots"
         mask="fade-center"
         fill="rgba(255,255,255,0.3)"
-        size={20}
+        size={24}
         className="absolute inset-0 z-[10]"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/50 z-[5]" />
@@ -124,21 +124,30 @@ const HeroSection = () => {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.8 }}
-          className="relative w-full h-full glass-card rounded-3xl overflow-hidden "
+          className="relative w-full h-full rounded-2xl overflow-hidden border border-primary/10 shadow-lg backdrop-blur-lg"
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent z-10 " />
-          <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-3xl flex items-center justify-center relative opacity-80">
-            <div className="absolute inset-0 overflow-hidden ">
-              <div className="absolute top-20 left-20 w-32 h-32 bg-primary/30 rounded-full blur-2xl animate-pulse" />
-              <div className="absolute bottom-20 right-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl animate-pulse delay-1000" />
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-primary/10 to-primary/5 rounded-full blur-3xl animate-pulse delay-500" />
+          {/* Full green-fade background behind everything */}
+          <div className="absolute inset-0 z-0 bg-gradient-to-br from-primary/30 via-primary/10 to-transparent" />
+
+          {/* Optional fade mask (shifted lower) */}
+          <div className="absolute inset-0 z-10 [mask-image:linear-gradient(to_top,black_40%,transparent_100%)]" />
+
+          {/* Foreground content layer */}
+          <div className="w-full h-full rounded-3xl flex items-center justify-center relative z-20">
+            {/* Pulse bubble effects */}
+            <div className="absolute inset-0 overflow-hidden">
+              <div className="absolute top-20 left-20 w-32 h-32 bg-primary/20 dark:bg-primary/30 rounded-full blur-2xl animate-pulse" />
+              <div className="absolute bottom-20 right-20 w-40 h-40 bg-primary/10 dark:bg-primary/20 rounded-full blur-3xl animate-pulse delay-1000" />
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-primary/5 to-primary/10 rounded-full blur-3xl animate-pulse delay-500" />
             </div>
-            <div className="text-center z-10">
-              <div className="h-full w-full overflow-hidden rounded-2xl bg-grey-600 dark:bg-zinc-900 p-1 md:p-3">
+
+            {/* Main content box */}
+            <div className="text-center z-30">
+              <div className="h-full w-full overflow-hidden rounded-2xl border border-grey-400 bg-primary/20 dark:bg-primary/5 p-1 md:p-3">
                 <img
                   src="/images/interface-preview.png"
                   alt="LLM Interface Preview"
-                  className="w-full h-auto max-w-full object-contain rounded-3xl mask-image-fade"
+                  className="w-full h-auto max-w-full object-contain rounded-2xl mask-image-fade"
                 />
               </div>
             </div>
