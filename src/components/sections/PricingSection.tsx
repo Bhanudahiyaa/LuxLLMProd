@@ -57,7 +57,7 @@ const PricingSection = () => {
   ];
 
   return (
-    <section id="pricing" className="py-16 relative">
+    <section id="pricing" className="py-12 relative">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -83,7 +83,7 @@ const PricingSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className={`relative glass-card p-8 rounded-3xl hover:bg-white/10 transition-all duration-500 ${
+              className={`relative glass-card p-8 rounded-3xl hover:bg-white/5 transition-all duration-500 ${
                 plan.isRecommended ? "border-primary border-2" : ""
               }`}
             >
@@ -111,7 +111,7 @@ const PricingSection = () => {
                 </p>
               </div>
 
-              <ul className="space-y-4 mb-8">
+              <ul className="space-y-3 mb-8">
                 {plan.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-start gap-3">
                     <Check

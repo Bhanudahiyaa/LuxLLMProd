@@ -52,14 +52,16 @@
     --radius: 1rem;
 
     /* Glassmorphic */
-    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-bg: rgba(130, 121, 121, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-blur: 20px;
 
     /* Neumorphism */
-    --neuro-shadow-light: rgba(255, 255, 255, 0.05);
-    --neuro-shadow-dark: rgba(0, 0, 0, 0.3);
-
+    --neuro-bg: hsl(220 15% 10%);
+    --neuro-shadow-dark: hsl(220 15% 8%);
+    --neuro-shadow-light: hsl(220 15% 12%);
+    --neuro-border: hsl(220 15% 18%);
+    --neuro-glow: hsl(122 90% 55% / 0.3);
     /* Gradients */
     --gradient-primary: linear-gradient(
       135deg,
@@ -122,8 +124,11 @@
     --glass-border: rgba(0, 0, 0, 0.1);
     --glass-blur: 20px;
 
-    --neuro-shadow-light: rgba(255, 255, 255, 0.6);
-    --neuro-shadow-dark: rgba(0, 0, 0, 0.1);
+    --neuro-bg: hsl(0 0% 98%);
+    --neuro-shadow-dark: hsl(0 0% 90%);
+    --neuro-shadow-light: hsl(0 0% 100%);
+    --neuro-border: hsl(0 0% 85%);
+    --neuro-glow: hsl(122 90% 55% / 0.3);
 
     --gradient-primary: linear-gradient(
       135deg,
@@ -180,7 +185,7 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: hsl(220 15% 8%);
+    background: var(--background-color);
   }
 
   ::-webkit-scrollbar-thumb {
@@ -231,7 +236,11 @@
 
 /* === Components === */
 .neuro-button {
-  background: linear-gradient(145deg, hsl(220 15% 12%), hsl(220 15% 8%));
+  background: linear-gradient(
+    145deg,
+    var(--neuro-shadow-light),
+    var(--neuro-shadow-dark)
+  );
   box-shadow: 8px 8px 16px var(--neuro-shadow-dark),
     -8px -8px 16px var(--neuro-shadow-light);
   border: 1px solid var(--glass-border);
@@ -239,11 +248,10 @@
 }
 
 .neuro-button:hover {
-  box-shadow: 12px 12px 24px var(--neuro-shadow-dark),
-    -12px -12px 24px var(--neuro-shadow-light), 0 0 40px hsl(122 90% 55% / 0.3);
+  box-shadow: 1px 1px 10px var(--neuro-shadow-dark),
+    -1px -1px 10px var(--neuro-shadow-light), 0 0 5px var(--neuro-glow);
   transform: translateY(-2px);
 }
-
 .glass-card {
   background: var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur));
