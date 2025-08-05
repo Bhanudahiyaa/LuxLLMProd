@@ -1,82 +1,100 @@
-import { motion } from "framer-motion";
-import { Gear, ChatCircle } from "phosphor-react";
+"use client";
+
+import { useState } from "react";
+import { Sparkles } from "lucide-react";
+import DisplayCards from "@/components/ui/display-cards";
+import { FeatureSteps } from "../ui/feature-section";
+
+const defaultCards = [
+  {
+    icon: <Sparkles className="size-4 text-primary" />,
+    title: "Prompt",
+    description: "Describe your agent",
+    date: "Just now",
+    iconClassName: "text-primary",
+    titleClassName: "text-foreground",
+    className:
+      "[grid-area:stack] hover:-translate-y-10 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
+  },
+  {
+    icon: <Sparkles className="size-4 text-primary" />,
+    title: "Import",
+    description: "Import your agent ",
+    date: "2 days ago",
+    iconClassName: "text-primary",
+    titleClassName: "text-foreground",
+    className:
+      "[grid-area:stack] translate-x-12 translate-y-10 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
+  },
+  {
+    icon: <Sparkles className="size-4 text-primary" />,
+    title: "Deploy",
+    description: "Deploy your agent",
+    date: "Today",
+    iconClassName: "text-primary",
+    titleClassName: "text-foreground",
+    className:
+      "[grid-area:stack] translate-x-24 translate-y-20 hover:translate-y-10",
+  },
+];
+
+const features = [
+  {
+    step: "Step 1",
+    content:
+      "Describe your AI agent in plain English and let LuxLLM do the rest.",
+    highlight: "Describe",
+  },
+  {
+    step: "Step 2",
+    content:
+      "Instantly receive the .env, logic, and demo files to run your agent.",
+    highlight: "import",
+  },
+  {
+    step: "Step 3",
+    content:
+      "Activate your agent across your workflows, instantly and seamlessly.",
+    highlight: "decentralized",
+  },
+];
 
 const HowItWorksSection = () => {
-  const steps = [
-    {
-      icon: <Gear size={48} weight="light" />,
-      title: "Set up your AI assistant",
-      description:
-        "Connect your preferred AI models and customize your workspace in minutes. Our intuitive setup process makes it effortless.",
-      image: "🤖",
-    },
-    {
-      icon: <ChatCircle size={48} weight="light" />,
-      title: "Ask anything",
-      description:
-        "Start conversations with multiple AI models simultaneously. Compare responses, get diverse perspectives, and find the best solutions.",
-      image: "💬",
-    },
-  ];
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
-    <section id="how-it-works" className="py-16 relative">
+    <section id="how-it-works" className="py-12 relative">
       <div className="container mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-8">
           <h2 className="text-4xl md:text-6xl font-light tracking-tighter mb-6">
             How it <span className="text-primary">Works</span>
           </h2>
           <p className="text-xl text-foreground/70 font-light max-w-2xl mx-auto">
-            Get started with t3Dotgg in just two simple steps
+            Explore the key highlights and offerings of LuxLLM
           </p>
-        </motion.div>
-
-        <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
-          {steps.map((step, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: index * 0.2 }}
-              viewport={{ once: true }}
-              className="relative group"
-            >
-              <div className="glass-card p-8 rounded-3xl hover:bg-white/10 transition-all duration-500 h-full">
-                {/* Step Number */}
-                <div className="absolute -top-4 -left-4 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-lg">
-                  {index + 1}
-                </div>
-
-                {/* Image/Emoji */}
-                <div className="text-8xl mb-8 text-center group-hover:scale-110 transition-transform duration-300">
-                  {step.image}
-                </div>
-
-                {/* Icon */}
-                <div className="text-primary mb-6 flex justify-center">
-                  {step.icon}
-                </div>
-
-                {/* Content */}
-                <h3 className="text-2xl font-light tracking-tighter mb-4 text-center">
-                  {step.title}
-                </h3>
-                <p className="text-foreground/70 font-light leading-relaxed text-center">
-                  {step.description}
-                </p>
-              </div>
-            </motion.div>
-          ))}
         </div>
 
-        {/* Connection Line */}
-        <div className="hidden md:block absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-px h-32 bg-gradient-to-b from-primary/50 to-transparent"></div>
+        <div className="flex flex-col lg:flex-row gap-12 items-start">
+          {/* Left - Display Cards */}
+          <div className="w-full max-w-2xl mx-auto lg:mx-0 lg:ml-[-60px]">
+            <DisplayCards
+              cards={defaultCards.map((card, index) => ({
+                ...card,
+                onMouseEnter: () => setHoveredIndex(index),
+                onMouseLeave: () => setHoveredIndex(null),
+              }))}
+            />
+          </div>
+
+          {/* Right - Feature Steps with full text width */}
+          <div className="w-full lg:flex-1">
+            <FeatureSteps
+              features={features}
+              autoPlayInterval={4000}
+              hoveredIndex={hoveredIndex}
+            />
+          </div>
+        </div>
       </div>
     </section>
   );
