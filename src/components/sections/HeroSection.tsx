@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
+
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
@@ -8,15 +9,22 @@ import { BGPattern } from "@/components/ui/bg-pattern";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRightIcon } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useClerk } from "@clerk/clerk-react";
 
 const HeroSection = () => {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Open Clerk’s SignUp modal (user can switch to Sign In)
+  const { openSignUp } = useClerk();
+  const openAuth = useCallback(() => {
+    openSignUp({
+      afterSignUpUrl: "/",
+      afterSignInUrl: "/",
+    });
+  }, [openSignUp]);
 
+  useEffect(() => setMounted(true), []);
   if (!mounted) return null;
 
   const fillColor =
@@ -30,7 +38,7 @@ const HeroSection = () => {
       <BGPattern
         variant="dots"
         mask="fade-center"
-        fill="rgba(255,255,255,0.3)"
+        fill={fillColor}
         size={24}
         className="absolute inset-0 z-[10]"
       />
@@ -58,10 +66,9 @@ const HeroSection = () => {
                 animation: "shimmer 4.5s linear infinite",
               }}
             >
-              <span className="text-muted-foregrounda ">
+              <span className="text-muted-foreground">
                 ✨ Explore AI Agents
               </span>
-
               <a
                 href="#link"
                 className="flex items-center gap-1 text-primary font-light transition-colors duration-200"
@@ -88,7 +95,7 @@ const HeroSection = () => {
               </span>
               <br />
               <motion.div>
-                <div className=" font-italianno mt-7 tracking-tight text-primary text-4xl sm:text-5xl md:text-7xl font-light opacity-80 text-center">
+                <div className="font-italianno mt-7 tracking-tight text-primary text-4xl sm:text-5xl md:text-7xl font-light opacity-80 text-center">
                   𝘊𝘰𝘥𝘦 𝘍𝘳𝘦𝘦 𝘈𝘨𝘦𝘯𝘵 𝘉𝘶𝘪𝘭𝘥𝘪𝘯𝘨,<div>𝘔𝘢𝘥𝘦 𝘌𝘢𝘴𝘺</div>
                 </div>
               </motion.div>
@@ -109,9 +116,15 @@ const HeroSection = () => {
           </motion.p>
 
           <div className="flex justify-center space-x-6 mt-8">
-            <InteractiveHoverButton className="px-10 py-2 text-sm text-foreground rounded-2xl">
+            {/* Same behavior as navbar Get started */}
+            <InteractiveHoverButton
+              onClick={openAuth}
+              className="px-10 py-2 text-sm text-foreground rounded-2xl"
+              aria-label="Get started"
+            >
               Get Started
             </InteractiveHoverButton>
+
             <RainbowButton className="px-8 py-2 text-sm rounded-2xl">
               Get Unlimited Access
             </RainbowButton>
@@ -126,22 +139,20 @@ const HeroSection = () => {
           transition={{ duration: 1, delay: 0.8 }}
           className="relative w-full h-full rounded-2xl overflow-hidden border border-primary/10 shadow-lg backdrop-blur-lg"
         >
-          {/* Full green-fade background behind everything */}
+          {/* Full green-fade background */}
           <div className="absolute inset-0 z-0 bg-gradient-to-br from-primary/30 via-primary/10 to-transparent" />
 
-          {/* Optional fade mask (shifted lower) */}
+          {/* Optional fade mask */}
           <div className="absolute inset-0 z-10 [mask-image:linear-gradient(to_top,black_40%,transparent_100%)]" />
 
           {/* Foreground content layer */}
           <div className="w-full h-full rounded-3xl flex items-center justify-center relative z-20">
-            {/* Pulse bubble effects */}
             <div className="absolute inset-0 overflow-hidden">
               <div className="absolute top-20 left-20 w-32 h-32 bg-primary/20 dark:bg-primary/30 rounded-full blur-2xl animate-pulse" />
               <div className="absolute bottom-20 right-20 w-40 h-40 bg-primary/10 dark:bg-primary/20 rounded-full blur-3xl animate-pulse delay-1000" />
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-primary/5 to-primary/10 rounded-full blur-3xl animate-pulse delay-500" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-primary/5 to-primary/10 rounded-full blur-3xl animate-pulse delay-500" />
             </div>
 
-            {/* Main content box */}
             <div className="text-center z-30">
               <div className="h-full w-full overflow-hidden rounded-2xl border border-grey-400 bg-primary/20 dark:bg-primary/5 p-1 md:p-3">
                 <img
