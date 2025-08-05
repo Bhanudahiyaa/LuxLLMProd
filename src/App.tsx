@@ -13,7 +13,8 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Blog from "./pages/Blog";
 import NotFound from "./pages/NotFound";
-
+// add this with your other page imports
+import Build from "./pages/Build";
 const queryClient = new QueryClient();
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -69,7 +70,7 @@ export default function App() {
                       routing="path"
                       path="/auth/sign-in"
                       signUpUrl="/auth/sign-up"
-                      redirectUrl="/app"
+                      redirectUrl="/build"
                       appearance={{
                         elements: {
                           card: "bg-transparent shadow-none border-0",
@@ -113,7 +114,7 @@ export default function App() {
                       routing="path"
                       path="/auth/sign-up"
                       signInUrl="/auth/sign-in"
-                      redirectUrl="/app"
+                      redirectUrl="/build"
                       appearance={{
                         elements: {
                           card: "bg-transparent shadow-none border-0",
@@ -148,10 +149,10 @@ export default function App() {
 
             {/* Post-login route */}
             <Route
-              path="/app"
+              path="/build"
               element={
                 <RequireAuth>
-                  <AppHome />
+                  <Build />
                 </RequireAuth>
               }
             />

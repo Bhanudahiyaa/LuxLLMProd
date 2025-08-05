@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { List, X } from "phosphor-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import WrapButton from "@/components/ui/wrap-button";
+import { useNavigate, useLocation } from "react-router-dom"; // ✅ NEW
 
 // Clerk (React SDK)
 import { SignedIn, SignedOut, UserButton, useClerk } from "@clerk/clerk-react";
@@ -47,6 +48,10 @@ const Navigation = () => {
   const { openSignUp } = useClerk();
   const isDark = useIsDark();
 
+  // ✅ Router hooks
+  const navigate = useNavigate();
+  const location = useLocation();
+
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", handleScroll);
@@ -61,10 +66,22 @@ const Navigation = () => {
     { href: "#faq", label: "FAQ" },
   ];
 
+  // ✅ Works on any route: go to "/" then scroll
   const handleNavClick = (href: string) => {
     setIsOpen(false);
-    const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+
+    const scrollTo = () => {
+      const el = document.querySelector(href);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    };
+
+    if (location.pathname !== "/") {
+      navigate("/");
+      // wait for landing DOM to render before scrolling
+      setTimeout(scrollTo, 350);
+    } else {
+      scrollTo();
+    }
   };
 
   // Dark/light aware appearance for Clerk UserButton
@@ -95,9 +112,8 @@ const Navigation = () => {
 
   const openAuth = () =>
     openSignUp({
-      // opens Clerk’s modal; user can switch to Sign in
-      afterSignUpUrl: "/",
-      afterSignInUrl: "/",
+      afterSignUpUrl: "/build",
+      afterSignInUrl: "/build",
     });
 
   return (
@@ -112,14 +128,24 @@ const Navigation = () => {
         }`}
       >
         <div className="container mx-auto px-3 py-3 flex items-center justify-between">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="font-bold text-2xl tracking-tighter"
+          {/* ✅ Make the logo navigate home from any route */}
+          <button
+            onClick={() => {
+              if (location.pathname !== "/") navigate("/");
+              else handleNavClick("#hero");
+            }}
+            className="text-left"
+            aria-label="Go to home"
           >
-            <span className="text-primary">Lux</span>
-            <span className="text-foreground">LLM</span>
-          </motion.div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="font-bold text-2xl tracking-tighter"
+            >
+              <span className="text-primary">Lux</span>
+              <span className="text-foreground">LLM</span>
+            </motion.div>
+          </button>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-5">

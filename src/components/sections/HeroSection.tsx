@@ -9,20 +9,27 @@ import { BGPattern } from "@/components/ui/bg-pattern";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRightIcon } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useClerk } from "@clerk/clerk-react";
+import { useClerk, useUser } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // Open Clerk’s SignUp modal (user can switch to Sign In)
+  const { isSignedIn } = useUser();
   const { openSignUp } = useClerk();
-  const openAuth = useCallback(() => {
-    openSignUp({
-      afterSignUpUrl: "/",
-      afterSignInUrl: "/",
-    });
-  }, [openSignUp]);
+  const navigate = useNavigate();
+
+  const handleGetStarted = useCallback(() => {
+    if (isSignedIn) {
+      navigate("/build");
+    } else {
+      openSignUp({
+        afterSignUpUrl: "/build",
+        afterSignInUrl: "/build",
+      });
+    }
+  }, [isSignedIn, navigate, openSignUp]);
 
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
@@ -116,9 +123,8 @@ const HeroSection = () => {
           </motion.p>
 
           <div className="flex justify-center space-x-6 mt-8">
-            {/* Same behavior as navbar Get started */}
             <InteractiveHoverButton
-              onClick={openAuth}
+              onClick={handleGetStarted}
               className="px-10 py-2 text-sm text-foreground rounded-2xl"
               aria-label="Get started"
             >
@@ -139,13 +145,8 @@ const HeroSection = () => {
           transition={{ duration: 1, delay: 0.8 }}
           className="relative w-full h-full rounded-2xl overflow-hidden border border-primary/10 shadow-lg backdrop-blur-lg"
         >
-          {/* Full green-fade background */}
           <div className="absolute inset-0 z-0 bg-gradient-to-br from-primary/30 via-primary/10 to-transparent" />
-
-          {/* Optional fade mask */}
           <div className="absolute inset-0 z-10 [mask-image:linear-gradient(to_top,black_40%,transparent_100%)]" />
-
-          {/* Foreground content layer */}
           <div className="w-full h-full rounded-3xl flex items-center justify-center relative z-20">
             <div className="absolute inset-0 overflow-hidden">
               <div className="absolute top-20 left-20 w-32 h-32 bg-primary/20 dark:bg-primary/30 rounded-full blur-2xl animate-pulse" />
