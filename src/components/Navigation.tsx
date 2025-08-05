@@ -1,13 +1,51 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { List, X } from "phosphor-react";
-import ThemeToggle from "@/components/ThemeToggle"; // make sure this path is correct
+import ThemeToggle from "@/components/ThemeToggle";
+import WrapButton from "@/components/ui/wrap-button";
+
+// Clerk (React SDK)
+import { SignedIn, SignedOut, UserButton, useClerk } from "@clerk/clerk-react";
+import { dark } from "@clerk/themes";
+
+const useIsDark = () => {
+  const getIsDark = () => document.documentElement.classList.contains("dark");
+  const [isDark, setIsDark] = useState<boolean>(() => getIsDark());
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const onChange = () => setIsDark(getIsDark());
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "theme") onChange();
+    };
+
+    media.addEventListener?.("change", onChange);
+    window.addEventListener("storage", onStorage);
+
+    // MutationObserver catches manual class changes on <html>
+    const mo = new MutationObserver(onChange);
+    mo.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => {
+      media.removeEventListener?.("change", onChange);
+      window.removeEventListener("storage", onStorage);
+      mo.disconnect();
+    };
+  }, []);
+
+  return isDark;
+};
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const { openSignUp } = useClerk();
+  const isDark = useIsDark();
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -25,11 +63,42 @@ const Navigation = () => {
 
   const handleNavClick = (href: string) => {
     setIsOpen(false);
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+    const el = document.querySelector(href);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
   };
+
+  // Dark/light aware appearance for Clerk UserButton
+  const userButtonAppearance = useMemo(
+    () => ({
+      baseTheme: isDark ? dark : undefined,
+      variables: {
+        colorBackground: "hsl(var(--card))",
+        colorText: "hsl(var(--foreground))",
+        colorPrimary: "hsl(var(--primary))",
+        colorInputBackground: "hsl(var(--muted))",
+        colorAlphaShade: "hsl(var(--muted-foreground))",
+        borderRadius: "0.75rem",
+      },
+      elements: {
+        avatarBox: "size-9",
+        userButtonPopoverCard:
+          "bg-[hsl(var(--card))] text-[hsl(var(--foreground))] border border-[hsl(var(--border))] shadow-lg",
+        userButtonPopoverActionButton:
+          "hover:bg-[hsl(var(--muted))] hover:text-[hsl(var(--foreground))]",
+        userButtonPopoverFooter: "border-t border-[hsl(var(--border))]",
+        userButtonTrigger__open:
+          "ring-2 ring-[hsl(var(--primary))]/30 rounded-xl",
+      },
+    }),
+    [isDark]
+  );
+
+  const openAuth = () =>
+    openSignUp({
+      // opens Clerk’s modal; user can switch to Sign in
+      afterSignUpUrl: "/",
+      afterSignInUrl: "/",
+    });
 
   return (
     <>
@@ -42,7 +111,7 @@ const Navigation = () => {
             : "bg-transparent"
         }`}
       >
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="container mx-auto px-3 py-3 flex items-center justify-between">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -53,7 +122,7 @@ const Navigation = () => {
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center gap-5">
             {navItems.map((item, index) => (
               <motion.button
                 key={item.href}
@@ -67,16 +136,32 @@ const Navigation = () => {
               </motion.button>
             ))}
 
-            {/* Theme Toggle */}
-            <ThemeToggle />
+            {/* Right-side controls */}
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
+
+              {/* Signed-out: single CTA */}
+              <SignedOut>
+                <WrapButton onClick={openAuth}>Get started</WrapButton>
+              </SignedOut>
+
+              {/* Signed-in: avatar w/ dropdown (includes Sign out) */}
+              <SignedIn>
+                <UserButton
+                  afterSignOutUrl="/"
+                  appearance={userButtonAppearance}
+                />
+              </SignedIn>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 text-foreground hover:text-primary transition-colors"
+            className="md:hidden p-2 text-foreground hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/30 rounded-lg transition-colors"
+            aria-label="Toggle navigation menu"
           >
-            <List size={24} weight="light" />
+            <List size={16} weight="light" />
           </button>
         </div>
       </motion.nav>
@@ -107,7 +192,8 @@ const Navigation = () => {
                   </div>
                   <button
                     onClick={() => setIsOpen(false)}
-                    className="p-2 text-foreground hover:text-primary transition-colors"
+                    className="p-2 text-foreground hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/30 rounded-lg transition-colors"
+                    aria-label="Close menu"
                   >
                     <X size={24} weight="light" />
                   </button>
@@ -128,9 +214,23 @@ const Navigation = () => {
                   ))}
                 </nav>
 
-                {/* Theme Toggle in mobile */}
-                <div className="mt-8">
+                {/* Mobile auth controls */}
+                <div className="mt-6 flex items-center justify-between">
                   <ThemeToggle />
+                  <div className="flex items-center gap-3">
+                    <SignedOut>
+                      <WrapButton className="w-full" onClick={openAuth}>
+                        Get started
+                      </WrapButton>
+                    </SignedOut>
+
+                    <SignedIn>
+                      <UserButton
+                        afterSignOutUrl="/"
+                        appearance={userButtonAppearance}
+                      />
+                    </SignedIn>
+                  </div>
                 </div>
               </div>
             </motion.div>

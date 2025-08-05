@@ -181,7 +181,7 @@
 
   /* Scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
 
   ::-webkit-scrollbar-track {
@@ -189,12 +189,12 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: hsl(122, 83%, 16%);
+    background: hsl(122, 81%, 36%);
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(122, 58%, 31%);
+    background: hsl(122, 98%, 17%);
   }
 }
 
