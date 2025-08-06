@@ -23,14 +23,16 @@ type BGPatternProps = React.ComponentProps<"div"> & {
   variant?: BGVariantType;
   mask?: BGMaskType;
   size?: number;
-  fill?: string;
+  fill?: string; // fallback
+  fillLight?: string; // overrides in light
+  fillDark?: string; // overrides in dark
 };
 
 const maskClasses: Record<BGMaskType, string> = {
-  "fade-center":
-    "[mask-image:radial-gradient(ellipse_at_center,transparent,var(--background-color))]",
   "fade-edges":
-    "[mask-image:radial-gradient(ellipse_at_center,var(--background-color),transparent)]",
+    "[mask-image:radial-gradient(ellipse_at_center,var(--background),transparent)]",
+  "fade-center":
+    "[mask-image:radial-gradient(ellipse_at_center,transparent,var(--background))]",
   "fade-top":
     "[mask-image:linear-gradient(to_bottom,transparent,var(--background))]",
   "fade-bottom":

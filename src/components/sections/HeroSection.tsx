@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { Typewriter } from "react-simple-typewriter";
-import { BGPattern } from "@/components/ui/bg-pattern";
+// ❌ removed: BGPattern
 import { Badge } from "@/components/ui/badge";
 import { ArrowRightIcon } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -34,23 +34,40 @@ const HeroSection = () => {
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
 
-  const fillColor =
-    resolvedTheme === "dark" ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.15)";
-
   return (
     <section
       id="hero"
-      className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden"
+      className="relative flex flex-col items-center justify-center min-h-screen text-center"
     >
-      <BGPattern
-        variant="dots"
-        mask="fade-center"
-        fill={fillColor}
-        size={24}
-        className="absolute inset-0 z-[10]"
+      {/* ---- Custom GRID with FADE-CENTER (no BGPattern) ---- */}
+      {/* ---- Custom GRID with FADE-CENTER (fixed) ---- */}
+      {/* Light mode */}
+      <div
+        className="absolute inset-0 z-0 dark:hidden pointer-events-none"
+        style={{
+          backgroundImage: `
+      radial-gradient(ellipse at center, hsl(var(--background)) 0%, hsl(var(--background)) 35%, rgba(0,0,0,0) 80%),
+      linear-gradient(to right, rgba(0,0,0,0.12) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,0,0,0.12) 1px, transparent 1px)
+    `,
+          backgroundSize: "100% 100%, 44px 44px, 44px 44px",
+          backgroundPosition: "0 0, 0 0, 0 0",
+        }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/50 z-[5]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(34,197,94,0.1),transparent_50%)] z-[5]" />
+
+      {/* Dark mode */}
+      <div
+        className="absolute inset-0 z-0 hidden dark:block pointer-events-none"
+        style={{
+          backgroundImage: `
+      radial-gradient(ellipse at center, hsl(var(--background)) 0%, hsl(var(--background)) 35%, rgba(0,0,0,0) 80%),
+      linear-gradient(to right, rgba(255,255,255,0.18) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.18) 1px, transparent 1px)
+    `,
+          backgroundSize: "100% 100%, 44px 44px, 44px 44px",
+          backgroundPosition: "0 0, 0 0, 0 0",
+        }}
+      />
 
       <div className="container mx-auto px-4 text-center z-10">
         <motion.div
