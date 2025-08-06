@@ -79,20 +79,20 @@ const HeroSection = () => {
           <div className="relative inline-block">
             <Badge
               variant="outline"
-              className="absolute top-4 sm:-top-6 left-1/2 -translate-x-1/2 mt-32 sm:mt-44 text-[10px] sm:text-sm font-medium px-4 sm:px-5 py-1 rounded-full shadow flex items-center gap-1.5 sm:gap-2 animate-shimmer bg-zinc-600 max-w-[95%] sm:max-w-fit whitespace-nowrap"
-              style={{
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                color: "transparent",
-                backgroundImage:
-                  "linear-gradient(90deg, #555 0%, #aaa 45%, #eee 50%, #aaa 55%, #555 100%)",
-                backgroundSize: "200% auto",
-                animation: "shimmer 4.5s linear infinite",
-              }}
+              className="absolute top-4 sm:-top-6 left-1/2 -translate-x-1/2 mt-32 sm:mt-44 
+             text-[10px] sm:text-sm font-medium px-4 sm:px-5 py-1 rounded-full shadow
+             flex items-center gap-1.5 sm:gap-2 max-w-[95%] sm:max-w-fit whitespace-nowrap"
             >
-              <span className="text-muted-foreground">
+              <span
+                className="animate-shimmer"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(90deg, #333 0%, #777 45%, #ddd 50%, #777 55%, #333 100%)",
+                }}
+              >
                 ✨ Explore AI Agents
               </span>
+
               <a
                 href="#link"
                 className="flex items-center gap-1 text-primary font-light transition-colors duration-200"
