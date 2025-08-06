@@ -1,29 +1,48 @@
 import { motion } from "framer-motion";
-import { TwitterLogo, GithubLogo, LinkedinLogo, DiscordLogo } from "phosphor-react";
+import {
+  TwitterLogo,
+  GithubLogo,
+  LinkedinLogo,
+  DiscordLogo,
+} from "phosphor-react";
 
 const Footer = () => {
   const socialLinks = [
-    { icon: <TwitterLogo size={24} weight="light" />, href: "#", label: "Twitter" },
-    { icon: <GithubLogo size={24} weight="light" />, href: "#", label: "GitHub" },
-    { icon: <LinkedinLogo size={24} weight="light" />, href: "#", label: "LinkedIn" },
-    { icon: <DiscordLogo size={24} weight="light" />, href: "#", label: "Discord" }
+    {
+      icon: <TwitterLogo size={24} weight="light" />,
+      href: "#",
+      label: "Twitter",
+    },
+    {
+      icon: <GithubLogo size={24} weight="light" />,
+      href: "#",
+      label: "GitHub",
+    },
+    {
+      icon: <LinkedinLogo size={24} weight="light" />,
+      href: "#",
+      label: "LinkedIn",
+    },
+    {
+      icon: <DiscordLogo size={24} weight="light" />,
+      href: "#",
+      label: "Discord",
+    },
   ];
 
   const quickLinks = [
+    { label: "Build AI Agents", href: "/build" },
+    { label: "PreMade Agents", href: "/" },
     { label: "Features", href: "#features" },
     { label: "Pricing", href: "#pricing" },
-    { label: "Documentation", href: "#" },
-    { label: "API Reference", href: "#" },
-    { label: "Status", href: "#" }
   ];
 
   const companyLinks = [
     { label: "About", href: "/about" },
     { label: "Blog", href: "/blog" },
-    { label: "Careers", href: "#" },
     { label: "Contact", href: "/contact" },
     { label: "Privacy", href: "#" },
-    { label: "Terms", href: "#" }
+    { label: "Terms", href: "#" },
   ];
 
   return (
@@ -39,11 +58,11 @@ const Footer = () => {
             className="col-span-1"
           >
             <div className="font-bold text-2xl tracking-tighter mb-4">
-              <span className="text-primary">t3</span>
-              <span className="text-foreground">Dotgg</span>
+              <span className="text-primary">Lux</span>
+              <span className="text-foreground">LLM</span>
             </div>
             <p className="text-foreground/70 font-light leading-relaxed mb-6">
-              The ultimate AI LLM aggregator platform for the next generation of intelligent applications.
+              Generate AI agents in minutes from plain language.
             </p>
             <div className="flex space-x-4">
               {socialLinks.map((link, index) => (
@@ -70,7 +89,9 @@ const Footer = () => {
             transition={{ duration: 0.8, delay: 0.1 }}
             viewport={{ once: true }}
           >
-            <h4 className="text-lg font-light tracking-tighter mb-6">Product</h4>
+            <h4 className="text-lg font-light tracking-tighter mb-6">
+              Product
+            </h4>
             <ul className="space-y-3">
               {quickLinks.map((link, index) => (
                 <li key={index}>
@@ -92,7 +113,9 @@ const Footer = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            <h4 className="text-lg font-light tracking-tighter mb-6">Company</h4>
+            <h4 className="text-lg font-light tracking-tighter mb-6">
+              Company
+            </h4>
             <ul className="space-y-3">
               {companyLinks.map((link, index) => (
                 <li key={index}>
@@ -114,7 +137,9 @@ const Footer = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             viewport={{ once: true }}
           >
-            <h4 className="text-lg font-light tracking-tighter mb-6">Stay Updated</h4>
+            <h4 className="text-lg font-light tracking-tighter mb-6">
+              Stay Updated
+            </h4>
             <p className="text-foreground/70 font-light mb-4">
               Get the latest updates on new AI models and features.
             </p>
@@ -144,16 +169,25 @@ const Footer = () => {
           className="pt-8 border-t border-border/30 flex flex-col md:flex-row justify-between items-center"
         >
           <p className="text-foreground/60 font-light mb-4 md:mb-0">
-            © 2024 t3Dotgg. All rights reserved.
+            © 2025 LuxLLM ❤️. All rights reserved.
           </p>
           <div className="flex space-x-6">
-            <a href="#" className="text-foreground/60 hover:text-primary transition-colors duration-300 font-light text-sm">
+            <a
+              href="#"
+              className="text-foreground/60 hover:text-primary transition-colors duration-300 font-light text-sm"
+            >
               Privacy Policy
             </a>
-            <a href="#" className="text-foreground/60 hover:text-primary transition-colors duration-300 font-light text-sm">
+            <a
+              href="#"
+              className="text-foreground/60 hover:text-primary transition-colors duration-300 font-light text-sm"
+            >
               Terms of Service
             </a>
-            <a href="#" className="text-foreground/60 hover:text-primary transition-colors duration-300 font-light text-sm">
+            <a
+              href="#"
+              className="text-foreground/60 hover:text-primary transition-colors duration-300 font-light text-sm"
+            >
               Cookie Policy
             </a>
           </div>

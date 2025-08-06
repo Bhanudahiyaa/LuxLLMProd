@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: ["class"], // ✅ Class-based dark mode toggle
+  darkMode: ["class"], // ✅ class-based dark mode
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -11,13 +11,8 @@ const config: Config = {
   theme: {
     container: {
       center: true,
-      padding: {
-        DEFAULT: "1rem",
-        sm: "2rem",
-      },
-      screens: {
-        "2xl": "1400px",
-      },
+      padding: { DEFAULT: "1rem", sm: "2rem" },
+      screens: { "2xl": "1400px" },
     },
     extend: {
       fontFamily: {
@@ -71,10 +66,10 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+
+      // ✅ Keyframes
       keyframes: {
-        marquee: {
-          to: { transform: "translateX(-50%)" },
-        },
+        marquee: { to: { transform: "translateX(-50%)" } },
         "accordion-down": {
           from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
@@ -87,10 +82,7 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(30px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
-        "fade-in": {
-          from: { opacity: "0" },
-          to: { opacity: "1" },
-        },
+        "fade-in": { from: { opacity: "0" }, to: { opacity: "1" } },
         "slide-in-right": {
           from: { opacity: "0", transform: "translateX(100%)" },
           to: { opacity: "1", transform: "translateX(0)" },
@@ -100,20 +92,12 @@ const config: Config = {
           to: { opacity: "0", transform: "translateX(100%)" },
         },
         glow: {
-          "0%, 100%": {
-            boxShadow: "0 0 20px hsl(122 90% 55% / 0.3)",
-          },
-          "50%": {
-            boxShadow: "0 0 40px hsl(122 90% 55% / 0.6)",
-          },
+          "0%, 100%": { boxShadow: "0 0 20px hsl(122 90% 55% / 0.3)" },
+          "50%": { boxShadow: "0 0 40px hsl(122 90% 55% / 0.6)" },
         },
         rainbow: {
-          "0%": {
-            backgroundPosition: "0%",
-          },
-          "100%": {
-            backgroundPosition: "200%",
-          },
+          "0%": { backgroundPosition: "0%" },
+          "100%": { backgroundPosition: "200%" },
         },
         shimmer: {
           "0%, 90%, 100%": {
@@ -123,7 +107,30 @@ const config: Config = {
             backgroundPosition: "calc(100% + var(--shimmer-width)) 0",
           },
         },
+
+        // ✅ NEW: animated background gradient (from snippet you shared)
+        "background-gradient": {
+          "0%, 100%": {
+            transform: "translate(0, 0)",
+            animationDelay: "var(--background-gradient-delay, 0s)",
+            backgroundImage: `
+      linear-gradient(
+        135deg,
+        rgba(6, 194, 16, 0.3), /* subtle green */
+        rgba(0, 0, 0, 0),       /* fully transparent */
+        rgba(6, 194, 16, 0.1)  /* subtle green again */
+      )
+    `,
+            backgroundSize: "200% 200%",
+          },
+          "20%": { transform: "translate(100%, 100%)" },
+          "40%": { transform: "translate(-100%, 100%)" },
+          "60%": { transform: "translate(100%, -100%)" },
+          "80%": { transform: "translate(-100%, -100%)" },
+        },
       },
+
+      // ✅ Animations
       animation: {
         marquee: "marquee var(--duration, 30s) linear infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -135,13 +142,14 @@ const config: Config = {
         glow: "glow 2s ease-in-out infinite",
         rainbow: "rainbow var(--speed, 2s) infinite linear",
         shimmer: "shimmer 8s infinite linear",
+
+        // ✅ NEW
+        "background-gradient":
+          "background-gradient var(--background-gradient-speed, 20s) ease-in-out infinite",
       },
-      backdropBlur: {
-        xs: "2px",
-      },
-      letterSpacing: {
-        tighter: "-0.025em",
-      },
+
+      backdropBlur: { xs: "2px" },
+      letterSpacing: { tighter: "-0.025em" },
     },
   },
   plugins: [require("tailwindcss-animate")],

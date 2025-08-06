@@ -1,89 +1,157 @@
+import React from "react";
 import { motion } from "framer-motion";
+import { AnimatedGradient } from "@/components/ui/animated-gradient-with-svg";
 
-const MissionSection = () => {
+interface BentoCardProps {
+  title: string;
+  value: string | number;
+  subtitle?: string;
+  colors: string[];
+  delay: number;
+}
+
+const BentoCard: React.FC<BentoCardProps> = ({
+  title,
+  value,
+  subtitle,
+  colors,
+  delay,
+}) => {
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: delay + 0.3 },
+    },
+  };
+
+  const item = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { duration: 0.5 } },
+  };
+
   return (
-    <section id="mission" className="py-16 relative">
-      {/* Background Elements */}
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" />
-
-      <div className="container mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="max-w-4xl mx-auto text-center"
+    <motion.div
+      className="relative overflow-hidden h-full bg-background dark:bg-background/50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, delay }}
+    >
+      <AnimatedGradient colors={colors} speed={0.05} blur="medium" />
+      <motion.div
+        className="relative z-10 p-4 sm:p-6 md:p-8 text-foreground backdrop-blur-sm"
+        variants={container}
+        initial="hidden"
+        animate="show"
+      >
+        <motion.h3 className="text-sm sm:text-base md:text-lg" variants={item}>
+          {title}
+        </motion.h3>
+        <motion.p
+          className="text-3xl sm:text-4xl md:text-5xl font-medium mb-3"
+          variants={item}
         >
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="text-4xl md:text-6xl font-light tracking-tighter mb-8"
-          >
+          {value}
+        </motion.p>
+        {subtitle && (
+          <motion.p className="text-sm text-foreground/80" variants={item}>
+            {subtitle}
+          </motion.p>
+        )}
+      </motion.div>
+    </motion.div>
+  );
+};
+
+const MissionSection: React.FC = () => {
+  return (
+    <section id="mission" className="py-10 relative">
+      <div className="container mx-auto px-4">
+        {/* Heading */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-10"
+        >
+          <h2 className="text-4xl md:text-6xl font-light tracking-tighter">
             Our <span className="text-primary">Mission</span>
-          </motion.h2>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            viewport={{ once: true }}
-            className="glass-card p-12 rounded-3xl"
-          >
-            <p className="text-2xl md:text-3xl font-light leading-relaxed text-foreground/90 mb-8">
-              "We believe that artificial intelligence should be accessible,
-              transparent, and empowering for everyone."
-            </p>
-
-            <div className="grid md:grid-cols-3 gap-8 mt-12">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
-                viewport={{ once: true }}
-                className="text-center"
-              >
-                <div className="text-4xl mb-4">🌍</div>
-                <h3 className="text-lg font-medium mb-2">Democratize AI</h3>
-                <p className="text-foreground/70 font-light">
-                  Making cutting-edge AI accessible to creators, developers, and
-                  businesses worldwide.
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.8 }}
-                viewport={{ once: true }}
-                className="text-center"
-              >
-                <div className="text-4xl mb-4">🔬</div>
-                <h3 className="text-lg font-medium mb-2">Drive Innovation</h3>
-                <p className="text-foreground/70 font-light">
-                  Pushing the boundaries of what's possible with collaborative
-                  AI development.
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 1.0 }}
-                viewport={{ once: true }}
-                className="text-center"
-              >
-                <div className="text-4xl mb-4">🚀</div>
-                <h3 className="text-lg font-medium mb-2">Shape the Future</h3>
-                <p className="text-foreground/70 font-light">
-                  Building the foundation for the next generation of intelligent
-                  applications.
-                </p>
-              </motion.div>
-            </div>
-          </motion.div>
+          </h2>
+          <p className="mt-6 text-foreground/70 max-w-xl mx-auto">
+            Empower everyone to build AI agents in minutes - code free,
+            scalable, and production ready.
+          </p>
         </motion.div>
+
+        {/* Bento grid with animated gradients + demo numbers */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto">
+          <div className="md:col-span-2">
+            <BentoCard
+              title="AI Agents Deployed"
+              value="22"
+              subtitle="Built and launched by our community this year"
+              colors={[
+                "rgba(6, 194, 16, 0.08)",
+                "transparent",
+                "rgba(6, 194, 16, 0.06)",
+              ]}
+              delay={0.2}
+            />
+          </div>
+
+          <BentoCard
+            title="Avg. Setup Time"
+            value="2.5 min"
+            subtitle="From idea to a live AI agent"
+            colors={[
+              "rgba(6, 194, 16, 0.08)",
+              "transparent",
+              "rgba(6, 194, 16, 0.06)",
+            ]}
+            delay={0.35}
+          />
+
+          <BentoCard
+            title="Customer Satisfaction"
+            value="4.8/5"
+            subtitle="Rated by hundreds of users"
+            colors={[
+              "rgba(6, 194, 16, 0.08)",
+              "transparent",
+              "rgba(6, 194, 16, 0.06)",
+            ]}
+            delay={0.45}
+          />
+
+          <div className="md:col-span-2">
+            <BentoCard
+              title="Energy Efficiency"
+              value="30% Less"
+              subtitle="Reduced compute energy usage"
+              colors={[
+                "rgba(6, 194, 16, 0.08)",
+                "transparent",
+                "rgba(6, 194, 16, 0.06)",
+              ]}
+              delay={0.55}
+            />
+          </div>
+
+          <div className="md:col-span-3">
+            <BentoCard
+              title="Uptime SLA"
+              value="99.9%"
+              subtitle="Enterprise‑grade reliability and security"
+              colors={[
+                "rgba(6, 194, 16, 0.08)",
+                "transparent",
+                "rgba(6, 194, 16, 0.06)",
+              ]}
+              delay={0.7}
+            />
+          </div>
+        </div>
       </div>
     </section>
   );

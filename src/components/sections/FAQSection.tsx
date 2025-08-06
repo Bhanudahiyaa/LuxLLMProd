@@ -7,29 +7,31 @@ const FAQSection = () => {
 
   const faqs = [
     {
-      question: "What AI models are supported?",
-      answer: "t3Dotgg supports all major AI models including GPT-4, Claude, Gemini, LLaMA, and many others. We continuously add new models as they become available."
+      question: "What AI models does LuxLLM support?",
+      answer:
+        "LuxLLM unifies access to top-performing AI models including GPT-4, Claude, Gemini, LLaMA, Mistral, and more. We continuously integrate the latest models as they are released, so your agents stay ahead of the curve.",
     },
     {
-      question: "How does the pricing work?",
-      answer: "Our pricing is based on the number of queries you make per month. Each plan includes access to different AI models and features. You can upgrade or downgrade at any time."
+      question: "How does LuxLLM pricing work?",
+      answer:
+        "Our pricing is based on active AI agent usage and the number of queries per month. All plans include access to multiple models, no-code agent building, and core integrations. You can scale up or down anytime as your needs change.",
     },
     {
-      question: "Is my data secure?",
-      answer: "Absolutely. We use bank-grade encryption, comply with SOC 2 standards, and follow GDPR regulations. Your conversations and data are never stored longer than necessary."
+      question: "How does LuxLLM handle my data?",
+      answer:
+        "We use end-to-end encryption for all data in transit and at rest. Your inputs and outputs remain private, are never used for model training without explicit consent, and can be instantly deleted from our systems at your request.",
+    },
+
+    {
+      question: "Does LuxLLM offer enterprise features?",
+      answer:
+        "We offer enterprise-ready solutions including role-based access control, SSO/SAML authentication, private deployments, and priority support. Our infrastructure is designed to meet the compliance needs of regulated industries.",
     },
     {
-      question: "Can I integrate t3Dotgg with my existing tools?",
-      answer: "Yes! We offer comprehensive API access, webhooks, and integrations with popular platforms like Slack, Discord, and custom applications."
+      question: "How fast will my AI agents respond?",
+      answer:
+        "Most LuxLLM agents respond in under 2 seconds. Pro and Enterprise plans include priority infrastructure to ensure low latency even during peak traffic.",
     },
-    {
-      question: "Do you offer enterprise solutions?",
-      answer: "We provide custom enterprise solutions including on-premise deployment, white-label options, and dedicated support with SLA guarantees."
-    },
-    {
-      question: "How fast are the responses?",
-      answer: "Most queries receive responses within 1-3 seconds. Pro and Enterprise users get priority access to our infrastructure for even faster response times."
-    }
   ];
 
   const toggleFAQ = (index: number) => {
@@ -37,7 +39,7 @@ const FAQSection = () => {
   };
 
   return (
-    <section id="faq" className="py-24 relative">
+    <section id="faq" className="py-10 relative">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -50,7 +52,7 @@ const FAQSection = () => {
             Frequently Asked <span className="text-primary">Questions</span>
           </h2>
           <p className="text-xl text-foreground/70 font-light max-w-2xl mx-auto">
-            Everything you need to know about t3Dotgg
+            Everything you need to know about LuxLLM
           </p>
         </motion.div>
 
@@ -80,12 +82,12 @@ const FAQSection = () => {
                     )}
                   </div>
                 </div>
-                
+
                 <motion.div
                   initial={false}
                   animate={{
                     height: openIndex === index ? "auto" : 0,
-                    opacity: openIndex === index ? 1 : 0
+                    opacity: openIndex === index ? 1 : 0,
                   }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
                   className="overflow-hidden"

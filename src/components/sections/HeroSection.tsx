@@ -5,12 +5,12 @@ import { motion } from "framer-motion";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { Typewriter } from "react-simple-typewriter";
-// ❌ removed: BGPattern
 import { Badge } from "@/components/ui/badge";
 import { ArrowRightIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useClerk, useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
+import AIBuilderFlow from "../ai-builder-flow";
 
 const HeroSection = () => {
   const { resolvedTheme } = useTheme();
@@ -39,49 +39,47 @@ const HeroSection = () => {
       id="hero"
       className="relative flex flex-col items-center justify-center min-h-screen text-center"
     >
-      {/* ---- Custom GRID with FADE-CENTER (no BGPattern) ---- */}
-      {/* ---- Custom GRID with FADE-CENTER (fixed) ---- */}
-      {/* Light mode */}
+      {/* Light mode background */}
       <div
         className="absolute inset-0 z-0 dark:hidden pointer-events-none"
         style={{
           backgroundImage: `
-      radial-gradient(ellipse at center, hsl(var(--background)) 0%, hsl(var(--background)) 35%, rgba(0,0,0,0) 80%),
-      linear-gradient(to right, rgba(0,0,0,0.12) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0,0,0,0.12) 1px, transparent 1px)
-    `,
+            radial-gradient(ellipse at center, hsl(var(--background)) 0%, hsl(var(--background)) 35%, rgba(0,0,0,0) 80%),
+            linear-gradient(to right, rgba(0,0,0,0.12) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(0,0,0,0.12) 1px, transparent 1px)
+          `,
           backgroundSize: "100% 100%, 44px 44px, 44px 44px",
           backgroundPosition: "0 0, 0 0, 0 0",
         }}
       />
 
-      {/* Dark mode */}
+      {/* Dark mode background */}
       <div
         className="absolute inset-0 z-0 hidden dark:block pointer-events-none"
         style={{
           backgroundImage: `
-      radial-gradient(ellipse at center, hsl(var(--background)) 0%, hsl(var(--background)) 35%, rgba(0,0,0,0) 80%),
-      linear-gradient(to right, rgba(255,255,255,0.18) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.18) 1px, transparent 1px)
-    `,
+            radial-gradient(ellipse at center, hsl(var(--background)) 0%, hsl(var(--background)) 35%, rgba(0,0,0,0) 80%),
+            linear-gradient(to right, rgba(255,255,255,0.18) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.18) 1px, transparent 1px)
+          `,
           backgroundSize: "100% 100%, 44px 44px, 44px 44px",
           backgroundPosition: "0 0, 0 0, 0 0",
         }}
       />
 
-      <div className="container mx-auto px-4 text-center z-10">
+      <div className="container mx-auto px-6 text-center z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="max-w-4xl mx-auto mb-11"
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="max-w-4xl mx-auto mb-11 flex flex-col items-center justify-center text-center"
         >
           <div className="relative inline-block">
             <Badge
               variant="outline"
               className="absolute top-4 sm:-top-6 left-1/2 -translate-x-1/2 mt-32 sm:mt-44 
-             text-[10px] sm:text-sm font-medium px-4 sm:px-5 py-1 rounded-full shadow
-             flex items-center gap-1.5 sm:gap-2 max-w-[95%] sm:max-w-fit whitespace-nowrap"
+              text-[10px] sm:text-sm font-medium px-4 sm:px-5 py-1 rounded-full shadow
+              flex items-center gap-1.5 sm:gap-2 max-w-[95%] sm:max-w-fit whitespace-nowrap"
             >
               <span
                 className="animate-shimmer"
@@ -111,56 +109,63 @@ const HeroSection = () => {
               <span>
                 <Typewriter
                   words={["LuxLLM"]}
-                  loop={2}
-                  typeSpeed={190}
+                  loop={1}
+                  typeSpeed={180}
                   deleteSpeed={100}
                   delaySpeed={1000}
                 />
               </span>
               <br />
-              <motion.div>
-                <div className="font-italianno mt-7 tracking-tight text-primary text-4xl sm:text-5xl md:text-7xl font-light opacity-80 text-center">
-                  𝘊𝘰𝘥𝘦 𝘍𝘳𝘦𝘦 𝘈𝘨𝘦𝘯𝘵 𝘉𝘶𝘪𝘭𝘥𝘪𝘯𝘨,<div>𝘔𝘢𝘥𝘦 𝘌𝘢𝘴𝘺</div>
-                </div>
-              </motion.div>
+              <div className="font-italianno mt-7 tracking-tight text-primary text-4xl sm:text-5xl md:text-7xl font-light opacity-80 text-center">
+                𝘊𝘰𝘥𝘦 𝘍𝘳𝘦𝘦 𝘈𝘨𝘦𝘯𝘵 𝘉𝘶𝘪𝘭𝘥𝘪𝘯𝘨,
+                <br />
+                𝘔𝘢𝘥𝘦 𝘌𝘢𝘴𝘺
+              </div>
             </motion.h1>
           </div>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-base sm:text-lg text-foreground/50 font-light leading-relaxed mb-4 max-w-3xl mx-auto text-center tracking-tight px-4"
+            className="text-base sm:text-lg text-foreground/60 font-light leading-relaxed mb-8 max-w-2xl"
           >
-            The ultimate platform that unifies top AI models so you can
+            The ultimate platform that unifies all top AI models so that you can
             effortlessly{" "}
-            <span>
-              build powerful, custom agents from plain language in seconds.
-            </span>
+            <span className="text-foreground">
+              build powerful, custom agents
+            </span>{" "}
+            from plain english in seconds.
           </motion.p>
 
-          <div className="flex justify-center space-x-6 mt-8">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="flex items-center justify-center space-x-6 mt-2 "
+          >
             <InteractiveHoverButton
               onClick={handleGetStarted}
-              className="px-10 py-2 text-sm text-foreground rounded-2xl"
+              className="px-10 py-2 text-sm text-foreground rounded-2xl opacity-90"
               aria-label="Get started"
             >
               Get Started
             </InteractiveHoverButton>
 
-            <RainbowButton className="px-8 py-2 text-sm rounded-2xl">
+            <RainbowButton className="px-8 py-2 text-sm rounded-2xl opacity-90">
               Get Unlimited Access
             </RainbowButton>
-          </div>
+          </motion.div>
 
           <div className="absolute bottom-0 left-0 w-full h-80 bg-gradient-to-t from-background to-transparent z-20 pointer-events-none" />
         </motion.div>
 
+        {/* AI Builder Flow Section */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.8 }}
-          className="relative w-full h-full rounded-2xl overflow-hidden border border-primary/10 shadow-lg backdrop-blur-lg"
+          className="relative w-full h-full rounded-2xl overflow-hidden border border-primary/10  backdrop-blur-lg"
         >
           <div className="absolute inset-0 z-0 bg-gradient-to-br from-primary/30 via-primary/10 to-transparent" />
           <div className="absolute inset-0 z-10 [mask-image:linear-gradient(to_top,black_40%,transparent_100%)]" />
@@ -171,14 +176,8 @@ const HeroSection = () => {
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-primary/5 to-primary/10 rounded-full blur-3xl animate-pulse delay-500" />
             </div>
 
-            <div className="text-center z-30">
-              <div className="h-full w-full overflow-hidden rounded-2xl border border-grey-400 bg-primary/20 dark:bg-primary/5 p-1 md:p-3">
-                <img
-                  src="/images/interface-preview.png"
-                  alt="LLM Interface Preview"
-                  className="w-full h-auto max-w-full object-contain rounded-2xl mask-image-fade"
-                />
-              </div>
+            <div className="relative z-30 h-[500px] w-full rounded-2xl border border-gray-400 bg-primary/20 dark:bg-primary/5 p-1 md:p-3 overflow-hidden">
+              <AIBuilderFlow />
             </div>
           </div>
         </motion.div>

@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 
 const FeaturesSection = () => {
   return (
-    <section id="features" className="py-16 relative">
+    <section id="features" className="py-1 relative">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

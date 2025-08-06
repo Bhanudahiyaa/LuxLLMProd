@@ -1,15 +1,13 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { List, X } from "phosphor-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import WrapButton from "@/components/ui/wrap-button";
-import { useNavigate, useLocation } from "react-router-dom"; // ✅ NEW
-
-// Clerk (React SDK)
+import { useNavigate, useLocation } from "react-router-dom";
 import { SignedIn, SignedOut, UserButton, useClerk } from "@clerk/clerk-react";
-import { dark } from "@clerk/themes";
+import { dark, light } from "@clerk/themes";
 
 const useIsDark = () => {
   const getIsDark = () => document.documentElement.classList.contains("dark");
@@ -25,7 +23,6 @@ const useIsDark = () => {
     media.addEventListener?.("change", onChange);
     window.addEventListener("storage", onStorage);
 
-    // MutationObserver catches manual class changes on <html>
     const mo = new MutationObserver(onChange);
     mo.observe(document.documentElement, {
       attributes: true,
@@ -42,13 +39,36 @@ const useIsDark = () => {
   return isDark;
 };
 
+const generateClerkAppearance = (isDark: boolean) => ({
+  baseTheme: isDark ? dark : light,
+  variables: {
+    colorBackground: "hsl(var(--card))",
+    colorText: "hsl(var(--foreground))",
+    colorPrimary: "hsl(var(--primary))",
+    colorInputBackground: "hsl(var(--muted))",
+    colorAlphaShade: "hsl(var(--muted-foreground))",
+    borderRadius: "0.75rem",
+  },
+  elements: {
+    avatarBox: "size-9",
+    userButtonPopoverCard:
+      "bg-[hsl(var(--card))] text-[hsl(var(--foreground))] border border-[hsl(var(--border))] shadow-lg",
+    userButtonPopoverActionButton:
+      "text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))] hover:text-[hsl(var(--foreground))]",
+    userButtonPopoverFooter: "border-t border-[hsl(var(--border))]",
+    userButtonTrigger__open: "ring-2 ring-[hsl(var(--primary))]/30 rounded-xl",
+    socialButtonsBlockButton:
+      "bg-[hsl(var(--muted))] text-[hsl(var(--foreground))] border border-[hsl(var(--border))] hover:bg-[hsl(var(--muted)/90)] transition-all duration-200",
+    socialButtonsBlockButton__github:
+      "bg-[hsl(var(--muted))] text-[hsl(var(--foreground))] [&>svg]:fill-[hsl(var(--foreground))]",
+  },
+});
+
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const { openSignUp } = useClerk();
   const isDark = useIsDark();
-
-  // ✅ Router hooks
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -66,54 +86,25 @@ const Navigation = () => {
     { href: "#faq", label: "FAQ" },
   ];
 
-  // ✅ Works on any route: go to "/" then scroll
   const handleNavClick = (href: string) => {
     setIsOpen(false);
-
     const scrollTo = () => {
       const el = document.querySelector(href);
       if (el) el.scrollIntoView({ behavior: "smooth" });
     };
-
     if (location.pathname !== "/") {
       navigate("/");
-      // wait for landing DOM to render before scrolling
       setTimeout(scrollTo, 350);
     } else {
       scrollTo();
     }
   };
 
-  // Dark/light aware appearance for Clerk UserButton
-  const userButtonAppearance = useMemo(
-    () => ({
-      baseTheme: isDark ? dark : undefined,
-      variables: {
-        colorBackground: "hsl(var(--card))",
-        colorText: "hsl(var(--foreground))",
-        colorPrimary: "hsl(var(--primary))",
-        colorInputBackground: "hsl(var(--muted))",
-        colorAlphaShade: "hsl(var(--muted-foreground))",
-        borderRadius: "0.75rem",
-      },
-      elements: {
-        avatarBox: "size-9",
-        userButtonPopoverCard:
-          "bg-[hsl(var(--card))] text-[hsl(var(--foreground))] border border-[hsl(var(--border))] shadow-lg",
-        userButtonPopoverActionButton:
-          "hover:bg-[hsl(var(--muted))] hover:text-[hsl(var(--foreground))]",
-        userButtonPopoverFooter: "border-t border-[hsl(var(--border))]",
-        userButtonTrigger__open:
-          "ring-2 ring-[hsl(var(--primary))]/30 rounded-xl",
-      },
-    }),
-    [isDark]
-  );
-
   const openAuth = () =>
     openSignUp({
       afterSignUpUrl: "/build",
       afterSignInUrl: "/build",
+      appearance: generateClerkAppearance(isDark),
     });
 
   return (
@@ -168,14 +159,16 @@ const Navigation = () => {
 
               {/* Signed-out: single CTA */}
               <SignedOut>
-                <WrapButton onClick={openAuth}>Get started</WrapButton>
+                <WrapButton className="opacity-85" onClick={openAuth}>
+                  Get started
+                </WrapButton>
               </SignedOut>
 
               {/* Signed-in: avatar w/ dropdown (includes Sign out) */}
               <SignedIn>
                 <UserButton
                   afterSignOutUrl="/"
-                  appearance={userButtonAppearance}
+                  appearance={generateClerkAppearance(isDark)}
                 />
               </SignedIn>
             </div>
@@ -253,7 +246,7 @@ const Navigation = () => {
                     <SignedIn>
                       <UserButton
                         afterSignOutUrl="/"
-                        appearance={userButtonAppearance}
+                        appearance={generateClerkAppearance(isDark)}
                       />
                     </SignedIn>
                   </div>

@@ -122,7 +122,7 @@ const thirdColumn = testimonials.slice(6, 9);
 
 const Testimonials = () => {
   return (
-    <section className="bg-background my-20 relative">
+    <section className="bg-background my-5 relative">
       <div className="container z-10 mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -145,7 +145,7 @@ const Testimonials = () => {
           </p>
         </motion.div>
 
-        <div className="flex justify-center gap-6 mt-10 [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)] max-h-[740px] overflow-hidden">
+        <div className="flex justify-center gap-6 mt-12 [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)] max-h-[740px] overflow-hidden">
           <TestimonialsColumn testimonials={firstColumn} duration={15} />
           <TestimonialsColumn
             testimonials={secondColumn}
