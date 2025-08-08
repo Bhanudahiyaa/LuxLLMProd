@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Calendar } from "phosphor-react";
+import { ArrowRight, Calendar } from "phosphor-react";
 
 interface Template {
   id: string;
@@ -38,6 +38,7 @@ const TemplatesSection: React.FC<Props> = ({
   return (
     <section className="pb-24">
       <div className="container mx-auto px-4">
+        {/* Category filters */}
         <div className="flex flex-wrap gap-3 mb-6">
           <button
             onClick={() => setActiveCategory(null)}
@@ -64,6 +65,7 @@ const TemplatesSection: React.FC<Props> = ({
           ))}
         </div>
 
+        {/* Template cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTemplates.map((template, index) => (
             <motion.article
@@ -88,7 +90,9 @@ const TemplatesSection: React.FC<Props> = ({
               <h3 className="text-lg font-thin text-foreground mb-3 group-hover:text-primary transition-colors duration-200">
                 {template.title}
               </h3>
-              <p className="text-sm text-muted-foreground mb-4">
+
+              {/* Excerpt */}
+              <p className="text-sm text-muted-foreground mb-2">
                 {template.excerpt}
               </p>
 
@@ -97,13 +101,17 @@ const TemplatesSection: React.FC<Props> = ({
                 {template.description}
               </p>
 
-              {/* Date */}
-              {template.date && (
-                <div className="flex items-center font-thin  text-xs text-muted-foreground space-x-2">
+              {/* Date + Arrow */}
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex items-center space-x-2">
                   <Calendar size={12} />
                   <span>{template.date}</span>
                 </div>
-              )}
+                <ArrowRight
+                  size={16}
+                  className="transition group-hover:text-primary"
+                />
+              </div>
             </motion.article>
           ))}
         </div>
