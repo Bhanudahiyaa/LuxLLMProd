@@ -130,12 +130,12 @@ const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-base sm:text-lg text-foreground/60 font-light leading-relaxed mb-8 max-w-2xl"
           >
-            The ultimate platform that unifies all top AI models so that you can
-            effortlessly{" "}
+            The ultimate platform that lets you seamlessly integrate AI into
+            your stack so you can{" "}
             <span className="text-foreground">
-              build powerful, custom agents
+              Build Production Ready, AI Agents
             </span>{" "}
-            from plain english in seconds.
+            with editable UI in seconds.
           </motion.p>
 
           <motion.div

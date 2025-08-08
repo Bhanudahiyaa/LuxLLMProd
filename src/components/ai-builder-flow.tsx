@@ -56,7 +56,7 @@ const PromptNode = ({ data }: NodeProps) => {
           className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1.5 sm:px-4 sm:py-3 text-xs sm:text-base text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
         />
         <p className="text-xs text-zinc-500 hidden sm:block">
-          Enter your requirements and let AI build your custom agent
+          Enter your requirements and let AI build your Custom Agent
         </p>
       </div>
     </div>
@@ -94,7 +94,7 @@ const GeneratingNode = ({ data }: NodeProps) => {
           />
         </div>
         <h3 className="text-xs sm:text-lg font-semibold text-zinc-100 leading-tight">
-          Generating Your Custom AI Agent
+          Generating Your AI Agent
         </h3>
       </div>
 

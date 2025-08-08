@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles } from "lucide-react";
+import { Wand, Plug, Code2 } from "lucide-react";
 import DisplayCards from "@/components/ui/display-cards";
 import { FeatureSteps } from "../ui/feature-section";
 
 const defaultCards = [
   {
-    icon: <Sparkles className="size-4 text-primary" />,
+    icon: <Wand className="size-4 text-primary" />,
     title: "Prompt",
     description: "Describe your agent",
     date: "Just now",
@@ -17,7 +17,7 @@ const defaultCards = [
       "[grid-area:stack] hover:-translate-y-10 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
   },
   {
-    icon: <Sparkles className="size-4 text-primary" />,
+    icon: <Plug className="size-4 text-primary" />,
     title: "Import",
     description: "Import your agent ",
     date: "2 days ago",
@@ -27,7 +27,7 @@ const defaultCards = [
       "[grid-area:stack] translate-x-12 translate-y-10 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
   },
   {
-    icon: <Sparkles className="size-4 text-primary" />,
+    icon: <Code2 className="size-4 text-primary" />,
     title: "Deploy",
     description: "Deploy your agent",
     date: "Today",
@@ -42,18 +42,19 @@ const features = [
   {
     step: "Step 1",
     content:
-      "Describe your AI agent in plain English and let LuxLLM do the rest.",
-    highlight: "AI agent",
+      "Describe what your agent should do, LuxLLM turns your prompt into Code, UI, and Logic.",
+    highlight: "Code, UI, and Logic",
   },
   {
     step: "Step 2",
     content:
-      "Instantly receive the .env, logic, and demo files to run your agent.",
+      "Instantly receive the .env, logic, and demo files to run your AI Agent.",
     highlight: "run your agent",
   },
   {
     step: "Step 3",
-    content: "Use your agent in real-time in chat, apps, or anywhere you like.",
+    content:
+      "Use your agent in real-time in chat, apps, or workflows and deploy anywhere.",
     highlight: "real-time",
   },
 ];
@@ -69,7 +70,7 @@ const HowItWorksSection = () => {
             How it <span className="text-primary">Works</span>
           </h2>
           <p className="text-xl text-foreground/70 font-light max-w-2xl mx-auto">
-            Explore the key highlights and offerings of LuxLLM
+            Build, preview, and deploy AI agents in seconds.
           </p>
         </div>
 

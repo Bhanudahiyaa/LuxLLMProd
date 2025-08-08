@@ -160,7 +160,7 @@ const Navigation = () => {
               {/* Signed-out: single CTA */}
               <SignedOut>
                 <WrapButton className="opacity-85" onClick={openAuth}>
-                  Get started
+                  Try Free Demo
                 </WrapButton>
               </SignedOut>
 

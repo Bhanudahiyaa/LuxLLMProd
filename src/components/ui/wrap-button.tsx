@@ -20,21 +20,21 @@ const WrapButton: React.FC<WrapButtonProps> = ({
   const Inner = (
     <div
       className={cn(
-        "group cursor-pointer border border-border bg-background gap-2 h-[50px] flex items-center p-[8px] rounded-full",
+        "group cursor-pointer border border-border bg-background gap-2 h-[45px] flex items-center p-[8px] rounded-full",
         className
       )}
     >
       {/* Inner colored capsule */}
-      <div className="border border-border bg-primary h-[30px] rounded-full flex items-center justify-center text-primary-foreground px-2">
+      <div className="border border-border bg-primary h-[25px] rounded-full flex items-center justify-center text-primary-foreground px-2">
         {/* Optional spinning globe for non-link version */}
-        {!href && <Globe className="mx-1 animate-spin" />}
+        {!href && <Globe className="mr-1 animate-spin" />}
         <p className="font-medium tracking-tight flex items-center gap-1 justify-center">
           {children ?? "Get Started"}
         </p>
       </div>
 
       {/* Arrow */}
-      <div className="text-muted-foreground group-hover:ml-2 ease-in-out transition-all size-[26px] flex items-center justify-center rounded-full border-2 border-border">
+      <div className="text-muted-foreground group-hover:ml-1 ease-in-out transition-all size-[26px] flex items-center justify-center rounded-full border-2 border-border">
         <ArrowRight
           size={18}
           className="group-hover:rotate-45 ease-in-out transition-all"
