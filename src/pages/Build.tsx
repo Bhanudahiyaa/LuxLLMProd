@@ -67,7 +67,7 @@ const templates: Template[] = [
     excerpt: "Your friendly guide to all things LuxLLM.",
     date: "March 15, 2024",
     category: "Productivity",
-    logo: <Bot className="text-black" />,
+    logo: <Bot />,
     featured: false,
   },
   {
@@ -76,7 +76,7 @@ const templates: Template[] = [
     excerpt: "Create documents like PDF, Word, Excel, and PPT.",
     date: "March 16, 2024",
     category: "Productivity",
-    logo: <ClipboardList className="text-black" />,
+    logo: <ClipboardList />,
     featured: false,
   },
   {
@@ -85,7 +85,7 @@ const templates: Template[] = [
     excerpt: "Prepare meeting insights and briefs.",
     date: "March 17, 2024",
     category: "Productivity",
-    logo: <CalendarCheck className="text-black" />,
+    logo: <CalendarCheck />,
     featured: false,
   },
   {
@@ -94,7 +94,7 @@ const templates: Template[] = [
     excerpt: "Generate polished documents including reports and slides.",
     date: "March 18, 2024",
     category: "Productivity",
-    logo: <FileText className="text-black" />,
+    logo: <FileText />,
     featured: false,
   },
   {
@@ -103,7 +103,7 @@ const templates: Template[] = [
     excerpt: "Get insights on cryptocurrencies, blockchains, and NFTs.",
     date: "March 19, 2024",
     category: "Finance",
-    logo: <DollarSign className="text-black" />,
+    logo: <DollarSign />,
     featured: false,
   },
   {
@@ -112,7 +112,7 @@ const templates: Template[] = [
     excerpt: "Deliver in-depth financial research on companies and sectors.",
     date: "March 20, 2024",
     category: "Finance",
-    logo: <LineChart className="text-black" />,
+    logo: <LineChart />,
     featured: false,
   },
   {
@@ -121,7 +121,7 @@ const templates: Template[] = [
     excerpt: "Find the most active stocks using real-time data.",
     date: "March 21, 2024",
     category: "Finance",
-    logo: <TrendingUp className="text-black" />,
+    logo: <TrendingUp />,
     featured: false,
   },
   {
@@ -130,7 +130,7 @@ const templates: Template[] = [
     excerpt: "Write SEO-optimized blog posts tailored to your topic.",
     date: "March 22, 2024",
     category: "Marketing",
-    logo: <PenTool className="text-black" />,
+    logo: <PenTool />,
     featured: false,
   },
   {
@@ -139,7 +139,7 @@ const templates: Template[] = [
     excerpt: "Generate keyword-rich descriptions for content or products.",
     date: "March 23, 2024",
     category: "Marketing",
-    logo: <StickyNote className="text-black" />,
+    logo: <StickyNote />,
     featured: false,
   },
   {
@@ -148,7 +148,7 @@ const templates: Template[] = [
     excerpt: "Craft warm, professional intro emails.",
     date: "March 24, 2024",
     category: "Marketing",
-    logo: <Mail className="text-black" />,
+    logo: <Mail />,
     featured: false,
   },
   {
@@ -157,7 +157,7 @@ const templates: Template[] = [
     excerpt: "Monitor competitors and gain actionable insights.",
     date: "March 25, 2024",
     category: "Market Research",
-    logo: <Radar className="text-black" />,
+    logo: <Radar />,
     featured: false,
   },
   {
@@ -166,7 +166,7 @@ const templates: Template[] = [
     excerpt: "Conduct expert research on any topic.",
     date: "March 26, 2024",
     category: "Market Research",
-    logo: <BookOpenCheck className="text-black" />,
+    logo: <BookOpenCheck />,
     featured: false,
   },
   {
@@ -175,7 +175,7 @@ const templates: Template[] = [
     excerpt: "Find sketchy legal terms in contracts and policies.",
     date: "March 27, 2024",
     category: "Legal & Compliance",
-    logo: <FileWarning className="text-black" />,
+    logo: <FileWarning />,
     featured: false,
   },
   {
@@ -184,7 +184,7 @@ const templates: Template[] = [
     excerpt: "Help with patent research and risk assessment.",
     date: "March 28, 2024",
     category: "Legal & Compliance",
-    logo: <Stamp className="text-black" />,
+    logo: <Stamp />,
     featured: false,
   },
   {
@@ -193,7 +193,7 @@ const templates: Template[] = [
     excerpt: "Turn PDFs into interactive quiz sessions.",
     date: "March 29, 2024",
     category: "Education",
-    logo: <FileQuestion className="text-black" />,
+    logo: <FileQuestion />,
     featured: false,
   },
   {
@@ -202,7 +202,7 @@ const templates: Template[] = [
     excerpt: "Reveal if a text was written by a human or AI.",
     date: "March 30, 2024",
     category: "Education",
-    logo: <ScanLine className="text-black" />,
+    logo: <ScanLine />,
     featured: false,
   },
   {
@@ -211,7 +211,7 @@ const templates: Template[] = [
     excerpt: "Interactive quiz agent with instant feedback.",
     date: "March 31, 2024",
     category: "Education",
-    logo: <Gamepad className="text-black" />,
+    logo: <Gamepad />,
     featured: false,
   },
   {
@@ -220,7 +220,7 @@ const templates: Template[] = [
     excerpt: "Reply to any text using only emojis.",
     date: "April 1, 2024",
     category: "Entertainment",
-    logo: <Smile className="text-black" />,
+    logo: <Smile />,
     featured: false,
   },
   {
@@ -229,7 +229,7 @@ const templates: Template[] = [
     excerpt: "Generate photorealistic human portraits.",
     date: "April 2, 2024",
     category: "Entertainment",
-    logo: <ImagePlus className="text-black" />,
+    logo: <ImagePlus />,
     featured: false,
   },
   {
@@ -238,7 +238,7 @@ const templates: Template[] = [
     excerpt: "Emotional check-ins and mindful prompts for self-growth.",
     date: "April 3, 2024",
     category: "Mental Health",
-    logo: <HeartHandshake className="text-black" />,
+    logo: <HeartHandshake />,
     featured: false,
   },
   {
@@ -247,7 +247,7 @@ const templates: Template[] = [
     excerpt: "Plan trips, find attractions, and check prices.",
     date: "April 4, 2024",
     category: "Travel",
-    logo: <MapPin className="text-black" />,
+    logo: <MapPin />,
     featured: false,
   },
   {
@@ -256,7 +256,7 @@ const templates: Template[] = [
     excerpt: "Generate daily plans based on your meetings and goals.",
     date: "April 5, 2024",
     category: "Time Management",
-    logo: <Clock3 className="text-black" />,
+    logo: <Clock3 />,
     featured: false,
   },
   {
@@ -265,7 +265,7 @@ const templates: Template[] = [
     excerpt: "Guide you through Pomodoro-style focused work sessions.",
     date: "April 6, 2024",
     category: "Time Management",
-    logo: <Timer className="text-black" />,
+    logo: <Timer />,
     featured: false,
   },
   {
@@ -274,7 +274,7 @@ const templates: Template[] = [
     excerpt: "Craft professional resumes tailored to job titles.",
     date: "April 7, 2024",
     category: "HR",
-    logo: <FileSignature className="text-black" />,
+    logo: <FileSignature />,
     featured: false,
   },
   {
@@ -283,7 +283,7 @@ const templates: Template[] = [
     excerpt: "Conduct mock interviews and provide personalized feedback.",
     date: "April 8, 2024",
     category: "HR",
-    logo: <Mic className="text-black" />,
+    logo: <Mic />,
     featured: false,
   },
   {
@@ -292,7 +292,7 @@ const templates: Template[] = [
     excerpt: "Track habits and help you stay consistent daily.",
     date: "April 9, 2024",
     category: "Productivity",
-    logo: <Repeat className="text-black" />,
+    logo: <Repeat />,
     featured: false,
   },
   {
@@ -301,7 +301,7 @@ const templates: Template[] = [
     excerpt: "Write high-converting cold emails in your tone.",
     date: "April 10, 2024",
     category: "Sales",
-    logo: <Send className="text-black" />,
+    logo: <Send />,
     featured: false,
   },
   {
@@ -310,7 +310,7 @@ const templates: Template[] = [
     excerpt: "Summarize long support threads and suggest replies.",
     date: "April 11, 2024",
     category: "Customer Support",
-    logo: <MessagesSquare className="text-black" />,
+    logo: <MessagesSquare />,
     featured: false,
   },
   {
@@ -319,7 +319,7 @@ const templates: Template[] = [
     excerpt: "Fetch and explain your most important metrics.",
     date: "April 12, 2024",
     category: "Analytics",
-    logo: <BarChart3 className="text-black" />,
+    logo: <BarChart3 />,
     featured: false,
   },
   {
@@ -328,7 +328,7 @@ const templates: Template[] = [
     excerpt: "Generate cohesive color schemes for any brand or UI.",
     date: "April 13, 2024",
     category: "Design",
-    logo: <Palette className="text-black" />,
+    logo: <Palette />,
     featured: false,
   },
 ];
@@ -353,17 +353,10 @@ interface Tool {
   category: string;
 }
 
-const models = [
-  { label: "GPT-3.5 Turbo", value: "gpt-3.5-turbo" },
-  { label: "GPT-4", value: "gpt-4" },
-  { label: "Claude 3", value: "claude-3" },
-  { label: "Mixtral 8x7B", value: "mixtral-8x7b" },
-];
-
 export default function Build() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState("custom-ai-agent");
-  const [selectedModel, setSelectedModel] = useState(models[0].value);
+
   const [prompt, setPrompt] = useState("");
   const [agentName, setAgentName] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);

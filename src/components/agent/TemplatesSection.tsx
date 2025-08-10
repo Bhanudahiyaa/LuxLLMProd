@@ -39,10 +39,10 @@ const TemplatesSection: React.FC<Props> = ({
     <section className="pb-24">
       <div className="container mx-auto px-4">
         {/* Category filters */}
-        <div className="flex flex-wrap gap-3 mb-6">
+        <div className="flex flex-wrap gap-2 mb-6">
           <button
             onClick={() => setActiveCategory(null)}
-            className={`px-3 py-1 text-sm font-medium rounded-full border ${
+            className={`px-3 py-1 text-xs font-thin rounded-full border ${
               !activeCategory
                 ? "bg-primary text-white"
                 : "text-muted-foreground border-muted"
@@ -54,7 +54,7 @@ const TemplatesSection: React.FC<Props> = ({
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-3 py-1 text-sm font-thin rounded-full border ${
+              className={`px-3 py-1 text-xs font-thin rounded-full border ${
                 activeCategory === cat
                   ? "bg-primary text-white"
                   : "text-muted-foreground border-muted"
@@ -71,17 +71,17 @@ const TemplatesSection: React.FC<Props> = ({
             <motion.article
               key={template.id}
               onClick={() => handleTemplateSelect(template)}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.05 }}
+              transition={{ duration: 0.2, delay: index * 0.02 }}
               className="group relative rounded-2xl border bg-card text-card-foreground p-6 shadow-sm hover:shadow-md transition cursor-pointer"
             >
               {/* Top badge and icon */}
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
+              <div className="flex items-center justify-between mb-4 ">
+                <span className="text-xs bg-muted/50 text-muted-foreground px-2 py-0.5 rounded-full">
                   {template.category}
                 </span>
-                <div className="text-xl text-muted-foreground">
+                <div className="text-xl text-muted-foreground transition-colors duration-200 group-hover:text-green-500">
                   {template.logo}
                 </div>
               </div>
@@ -92,7 +92,7 @@ const TemplatesSection: React.FC<Props> = ({
               </h3>
 
               {/* Excerpt */}
-              <p className="text-sm text-muted-foreground mb-2">
+              <p className="text-sm font-thin text-muted-foreground mb-2">
                 {template.excerpt}
               </p>
 
