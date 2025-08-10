@@ -1,15 +1,10 @@
 "use client";
 import Sidebar from "@/components/Sidebar";
-
 import { useState, useRef } from "react";
-
 import Navigation from "@/components/Navigation";
-
 import TemplatesSection from "@/components/agent/TemplatesSection";
-import AgentsSection from "@/components/agent/AgentsSection";
-import ToolsSection from "@/components/agent/ToolsSection";
-import ChatSection from "@/components/agent/ChatSection";
 
+import ChatSection from "@/components/agent/ChatSection";
 import {
   Bot,
   ClipboardList,
@@ -43,6 +38,7 @@ import {
   Palette,
 } from "lucide-react";
 
+// --- types
 interface Message {
   id: string;
   content: string;
@@ -60,6 +56,27 @@ interface Template {
   featured: boolean;
 }
 
+interface Agent {
+  id: string;
+  name: string;
+  description: string;
+  model: string;
+  prompt: string;
+  tools: string[];
+  lastRun: string;
+  lastModified: string;
+  created: string;
+  tasksDone: number;
+}
+
+interface Tool {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+}
+
+// --- templates data (shortened for brevity here, keep your full array)
 const templates: Template[] = [
   {
     id: "1",
@@ -333,45 +350,34 @@ const templates: Template[] = [
   },
 ];
 
-interface Agent {
-  id: string;
-  name: string;
-  description: string;
-  model: string;
-  prompt: string;
-  tools: string[];
-  lastRun: string;
-  lastModified: string;
-  created: string;
-  tasksDone: number;
-}
-
-interface Tool {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-}
-
+// --- main component
 export default function Build() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [activeTab, setActiveTab] = useState("custom-ai-agent");
+  const [activeTab, setActiveTab] = useState("templates");
 
   const [prompt, setPrompt] = useState("");
-  const [agentName, setAgentName] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(
     null
   );
   const [agents, setAgents] = useState<Agent[]>([]);
-  const stepsRef = useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [selectedToolCategory, setSelectedToolCategory] = useState("All tools");
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // handle template click → go to playground
   const handleTemplateSelect = (template: Template) => {
     setSelectedTemplate(template);
     setPrompt(template.excerpt);
+    setActiveTab("agents");
   };
+
+  const filteredTemplates = templates.filter(
+    t =>
+      t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="relative min-h-screen flex">
@@ -388,23 +394,29 @@ export default function Build() {
           sidebarOpen ? "ml-64 max-w-6xl mx-auto p-6" : "ml-16 w-full p-6"
         }`}
       >
+        {/* Templates Tab */}
         {activeTab === "templates" && (
-          <TemplatesSection
-            templates={templates}
-            handleTemplateSelect={handleTemplateSelect}
-          />
+          <>
+            <div className="mb-5 ml-4 mr-4">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search templates..."
+                className="w-full px-3 py-1 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+            </div>
+            <TemplatesSection
+              templates={filteredTemplates}
+              handleTemplateSelect={handleTemplateSelect}
+            />
+          </>
         )}
 
-        {activeTab === "agents" && <AgentsSection agents={agents} />}
+        {/* Agents Tab → Builder Playground */}
+        {activeTab === "builder-playground" && <BuilderPlayground />}
 
-        {activeTab === "tools" && (
-          <ToolsSection
-            tools={[]} // Plug in your tools array
-            selectedToolCategory={selectedToolCategory}
-            setSelectedToolCategory={setSelectedToolCategory}
-          />
-        )}
-
+        {/* Chat Section if messages exist */}
         {messages.length > 0 && <ChatSection messages={messages} />}
       </main>
     </div>

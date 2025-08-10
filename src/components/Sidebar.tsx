@@ -12,6 +12,7 @@ import {
   Settings,
   Code2,
   LayoutDashboard,
+  BrainCircuit,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -36,16 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           label: "Templates",
           icon: <Sparkles className="w-4 h-4" />,
         },
-        {
-          id: "builder-playground",
-          label: "Builder Playground",
-          icon: <LayoutDashboard className="w-4 h-4" />,
-        },
-        {
-          id: "live-agent-preview",
-          label: "Live Agent Preview",
-          icon: <Eye className="w-4 h-4" />,
-        },
+
         {
           id: "agent-settings",
           label: "Agent Settings",
@@ -56,6 +48,11 @@ const Sidebar: React.FC<SidebarProps> = ({
           label: "Embed Generator",
           icon: <Code2 className="w-4 h-4" />,
         },
+        {
+          id: "analytics",
+          label: "Analytics",
+          icon: <LayoutDashboard className="w-4 h-4" />,
+        },
       ],
     },
     {
@@ -65,6 +62,11 @@ const Sidebar: React.FC<SidebarProps> = ({
           id: "my-agents",
           label: "My Agents",
           icon: <Bot className="w-4 h-4" />,
+        },
+        {
+          id: "integrations",
+          label: "Integrations",
+          icon: <BrainCircuit className="w-4 h-4" />,
         },
       ],
     },
