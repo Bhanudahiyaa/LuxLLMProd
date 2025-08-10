@@ -156,6 +156,8 @@ export default function App() {
                 </RequireAuth>
               }
             />
+            <Route path="/build/*" element={<Build />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
 
             {/* 404 */}
             <Route path="*" element={<NotFound />} />
