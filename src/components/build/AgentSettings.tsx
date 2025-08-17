@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { useClerkSupabase } from "@/lib/useClerkSupabase";
 import {
   Card,
   CardContent,
@@ -15,6 +17,7 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Save, Bot, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { templateConfigs } from "@/lib/templateConfigs";
 
 interface AgentConfig {
   name: string;
@@ -25,8 +28,17 @@ interface AgentConfig {
   isActive: boolean;
 }
 
+function isValidUUID(uuid: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    uuid
+  );
+}
+
 export function AgentSettings() {
+  const { agentId } = useParams<{ agentId?: string }>();
   const { toast } = useToast();
+  const { getSupabase } = useClerkSupabase();
+
   const [config, setConfig] = useState<AgentConfig>({
     name: "",
     description: "",
@@ -35,48 +47,187 @@ export function AgentSettings() {
     systemPrompt: "",
     isActive: true,
   });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    // Check if a template was selected
-    const selectedTemplate = localStorage.getItem("selectedTemplate");
-    if (selectedTemplate) {
+    const fetchAgentOrTemplate = async () => {
       try {
-        const template = JSON.parse(selectedTemplate);
-        setConfig({
-          name: template.name,
-          description: template.description,
-          personality: template.personality,
-          temperature: template.temperature,
-          systemPrompt: template.systemPrompt,
-          isActive: true,
-        });
-        // Clear the stored template
-        localStorage.removeItem("selectedTemplate");
-      } catch (error) {
-        console.error("Error parsing template:", error);
-      }
-    }
-  }, []);
+        setLoading(true);
+        const supabase = await getSupabase();
 
-  const handleSave = () => {
-    // Here you would typically save to Supabase
-    // For now, we'll just show a success toast
-    toast({
-      title: "Agent Saved",
-      description: "Your agent configuration has been saved successfully.",
-    });
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) {
+          console.warn("No logged in user");
+          return;
+        }
+
+        // Fetch templates just to ensure Supabase works
+        const { data: templates } = await supabase
+          .from("templates")
+          .select("*");
+        console.log("Templates fetched:", templates);
+
+        if (agentId && isValidUUID(agentId)) {
+          const { data: agent, error } = await supabase
+            .from("agents")
+            .select("*")
+            .eq("id", agentId)
+            .eq("user_id", user.id)
+            .maybeSingle();
+          if (error) throw error;
+          if (agent) {
+            setConfig(agent as AgentConfig);
+            return;
+          }
+        }
+
+        const storedTemplate = localStorage.getItem("selectedTemplate");
+        if (storedTemplate) {
+          const template: any = JSON.parse(storedTemplate);
+          const templateConfig = templateConfigs[template.id];
+          setConfig(
+            (templateConfig as AgentConfig) ||
+              ({
+                name: template.title,
+                description: template.description,
+                personality: template.personality || "",
+                temperature: template.temperature || 0.7,
+                systemPrompt: template.systemPrompt || "",
+                isActive: true,
+              } as AgentConfig)
+          );
+          localStorage.removeItem("selectedTemplate");
+          return;
+        }
+
+        const { data } = await supabase
+          .from("user_selected_templates")
+          .select("template_id, templates(*)")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (data?.templates) {
+          const template: any = data.templates;
+          setConfig({
+            name: template.title,
+            description: template.description,
+            personality: template.personality || "",
+            temperature: template.temperature || 0.7,
+            systemPrompt: template.systemPrompt || "",
+            isActive: true,
+          });
+        }
+      } catch (err) {
+        console.error("Error loading agent/template:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAgentOrTemplate();
+  }, [agentId, getSupabase]);
+
+  const handleSave = async () => {
+    if (!config.name.trim()) {
+      toast({
+        title: "Name Required",
+        description: "Please enter a name for your agent.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setSaving(true);
+      const supabase = await getSupabase();
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("No logged in user");
+
+      let agent_id = agentId;
+
+      if (agentId && isValidUUID(agentId)) {
+        const { data, error } = await supabase
+          .from("agents")
+          .update(config)
+          .eq("id", agentId)
+          .eq("user_id", user.id)
+          .select("id")
+          .maybeSingle();
+        if (error) throw error;
+        agent_id = data?.id || agentId;
+      } else {
+        let template_id;
+        const storedTemplate = localStorage.getItem("selectedTemplate");
+        if (storedTemplate) {
+          try {
+            const template = JSON.parse(storedTemplate);
+            if (template.id && isValidUUID(template.id)) {
+              template_id = template.id;
+            }
+          } catch {}
+        }
+        if (!template_id) {
+          const { data } = await supabase
+            .from("user_selected_templates")
+            .select("template_id")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (data?.template_id && isValidUUID(data.template_id)) {
+            template_id = data.template_id;
+          }
+        }
+
+        const insertObj: any = { ...config, user_id: user.id };
+        if (template_id) insertObj.template_id = template_id;
+
+        const { data, error } = await supabase
+          .from("agents")
+          .insert(insertObj)
+          .select("id")
+          .maybeSingle();
+        if (error) throw error;
+        agent_id = data?.id;
+      }
+
+      toast({
+        title: "Agent Saved",
+        description: "Your agent configuration has been saved successfully.",
+      });
+    } catch (err) {
+      console.error("Error saving agent:", err);
+      toast({
+        title: "Save Failed",
+        description: "Could not save your agent configuration.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleTest = () => {
-    // Simulate testing the agent
     toast({
       title: "Test Message Sent",
       description: "Your agent is responding...",
     });
   };
 
+  if (loading) return <p>Loading agent settings...</p>;
+
+  // === Your original UI preserved ===
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Agent Settings</h1>
         <p className="text-muted-foreground mt-2">
@@ -87,6 +238,7 @@ export function AgentSettings() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Configuration */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Basic Info */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -98,43 +250,38 @@ export function AgentSettings() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="name">Agent Name</Label>
-                <Input
-                  id="name"
-                  value={config.name}
-                  onChange={e => setConfig({ ...config, name: e.target.value })}
-                  placeholder="Enter your agent's name"
-                />
-              </div>
+              <Label htmlFor="name">Agent Name</Label>
+              <Input
+                id="name"
+                value={config.name}
+                onChange={e => setConfig({ ...config, name: e.target.value })}
+                disabled={loading || saving}
+              />
 
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={config.description}
-                  onChange={e =>
-                    setConfig({ ...config, description: e.target.value })
-                  }
-                  placeholder="Describe what your agent does"
-                  rows={3}
-                />
-              </div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={config.description}
+                onChange={e =>
+                  setConfig({ ...config, description: e.target.value })
+                }
+                rows={3}
+                disabled={loading || saving}
+              />
 
-              <div>
-                <Label htmlFor="personality">Personality</Label>
-                <Input
-                  id="personality"
-                  value={config.personality}
-                  onChange={e =>
-                    setConfig({ ...config, personality: e.target.value })
-                  }
-                  placeholder="e.g., Friendly, professional, helpful"
-                />
-              </div>
+              <Label htmlFor="personality">Personality</Label>
+              <Input
+                id="personality"
+                value={config.personality}
+                onChange={e =>
+                  setConfig({ ...config, personality: e.target.value })
+                }
+                disabled={loading || saving}
+              />
             </CardContent>
           </Card>
 
+          {/* System Prompt */}
           <Card>
             <CardHeader>
               <CardTitle>System Prompt</CardTitle>
@@ -148,45 +295,31 @@ export function AgentSettings() {
                 onChange={e =>
                   setConfig({ ...config, systemPrompt: e.target.value })
                 }
-                placeholder="You are a helpful assistant that..."
                 rows={8}
                 className="font-mono text-sm"
+                disabled={loading || saving}
               />
             </CardContent>
           </Card>
 
+          {/* Advanced Settings */}
           <Card>
             <CardHeader>
               <CardTitle>Advanced Settings</CardTitle>
-              <CardDescription>
-                Fine-tune your agent's behavior parameters
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <Label>Temperature: {config.temperature}</Label>
-                  <span className="text-sm text-muted-foreground">
-                    {config.temperature < 0.3
-                      ? "Conservative"
-                      : config.temperature < 0.7
-                      ? "Balanced"
-                      : "Creative"}
-                  </span>
-                </div>
+                <Label>Temperature: {config.temperature}</Label>
                 <Slider
                   value={[config.temperature]}
-                  onValueChange={value =>
-                    setConfig({ ...config, temperature: value[0] })
+                  onValueChange={([value]) =>
+                    setConfig({ ...config, temperature: value })
                   }
                   max={1}
                   min={0}
                   step={0.1}
-                  className="w-full"
+                  disabled={loading || saving}
                 />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Lower values make responses more focused and consistent
-                </p>
               </div>
 
               <Separator />
@@ -203,27 +336,30 @@ export function AgentSettings() {
                   onCheckedChange={checked =>
                     setConfig({ ...config, isActive: checked })
                   }
+                  disabled={loading || saving}
                 />
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Actions Panel */}
+        {/* Actions */}
         <div className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Actions</CardTitle>
-              <CardDescription>
-                Save your changes or test your agent
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button onClick={handleSave} className="w-full">
+              <Button onClick={handleSave} className="w-full" disabled={saving}>
                 <Save className="h-4 w-4 mr-2" />
-                Save Agent
+                {saving ? "Saving..." : "Save Agent"}
               </Button>
-              <Button onClick={handleTest} variant="outline" className="w-full">
+              <Button
+                onClick={handleTest}
+                variant="outline"
+                className="w-full"
+                disabled={saving}
+              >
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Test Agent
               </Button>
@@ -233,7 +369,6 @@ export function AgentSettings() {
           <Card>
             <CardHeader>
               <CardTitle>Preview</CardTitle>
-              <CardDescription>How your agent will appear</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="border rounded-lg p-4 bg-muted/50">

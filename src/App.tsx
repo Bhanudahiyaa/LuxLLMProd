@@ -15,6 +15,7 @@ import Blog from "./pages/Blog";
 import NotFound from "./pages/NotFound";
 // add this with your other page imports
 import Build from "./pages/Build";
+import ChatbotEditor from "./pages/ChatbotEditorNew";
 const queryClient = new QueryClient();
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -92,8 +93,8 @@ export default function App() {
                           colorText: "hsl(var(--foreground))",
                           colorInputBackground: "hsl(var(--input))",
                           colorInputText: "hsl(var(--foreground))",
-                          colorInputBorder: "hsl(var(--border))",
-                          colorAlphaShade: "hsl(var(--muted))",
+                          colorBorder: "hsl(var(--border))",
+
                           borderRadius: "1rem",
                         },
                       }}
@@ -136,8 +137,7 @@ export default function App() {
                           colorText: "hsl(var(--foreground))",
                           colorInputBackground: "hsl(var(--input))",
                           colorInputText: "hsl(var(--foreground))",
-                          colorInputBorder: "hsl(var(--border))",
-                          colorAlphaShade: "hsl(var(--muted))",
+
                           borderRadius: "1rem",
                         },
                       }}
@@ -157,6 +157,17 @@ export default function App() {
               }
             />
             <Route path="/build/*" element={<Build />} />
+
+            {/* Chatbot Editor route */}
+            <Route
+              path="/editor"
+              element={
+                <RequireAuth>
+                  <ChatbotEditor />
+                </RequireAuth>
+              }
+            />
+
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
 
             {/* 404 */}

@@ -99,9 +99,8 @@ export function MyAgents() {
   );
 
   const handleEdit = (agent: any) => {
-    // Store agent data for editing
-    localStorage.setItem("editingAgent", JSON.stringify(agent));
-    navigate("/build/settings");
+    // Navigate to the new chatbot editor
+    navigate("/editor");
   };
 
   const handleDelete = (agentId: number) => {
