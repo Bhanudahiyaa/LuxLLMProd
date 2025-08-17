@@ -28,7 +28,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAgentService } from "../hooks/agentService";
-import { useChatbotSettingsService, ChatbotSettingsData } from "../hooks/chatbotSettingsService";
+import {
+  useChatbotSettingsService,
+  ChatbotSettingsData,
+} from "../hooks/chatbotSettingsService";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 
@@ -52,7 +55,8 @@ interface ChatMessage {
 
 export function Editor() {
   const navigate = useNavigate();
-  const { getChatbotSettings, saveChatbotSettings } = useChatbotSettingsService();
+  const { getChatbotSettings, saveChatbotSettings } =
+    useChatbotSettingsService();
 
   // Form state
   const {
@@ -69,8 +73,8 @@ export function Editor() {
       border_color: "#000000",
       user_msg_color: "#3b82f6",
       bot_msg_color: "#f3f4f6",
-      system_prompt: "You are a helpful assistant."
-    }
+      system_prompt: "You are a helpful assistant.",
+    },
   });
 
   // Component state
@@ -83,7 +87,7 @@ export function Editor() {
 
   // Watch form values for live preview
   const watchedValues = watch();
-  
+
   // Watch specific UI customization fields for real-time updates
   const chatBg = watch("chat_bg");
   const borderColor = watch("border_color");
@@ -119,10 +123,16 @@ export function Editor() {
         setValue("system_prompt", foundAgent.system_prompt || "");
         // UI Customization defaults
         setValue("chat_bg_color", foundAgent.chat_bg_color || "#ffffff");
-        setValue("chat_border_color", foundAgent.chat_border_color || "#e5e7eb");
+        setValue(
+          "chat_border_color",
+          foundAgent.chat_border_color || "#e5e7eb"
+        );
         setValue("user_msg_color", foundAgent.user_msg_color || "#3b82f6");
         setValue("bot_msg_color", foundAgent.bot_msg_color || "#f3f4f6");
-        setValue("chat_name", foundAgent.chat_name || foundAgent.name || "AI Assistant");
+        setValue(
+          "chat_name",
+          foundAgent.chat_name || foundAgent.name || "AI Assistant"
+        );
       } catch (error) {
         console.error("Error loading agent:", error);
         toast.error("Failed to load agent");
@@ -546,236 +556,252 @@ export default ${watchedValues.name?.replace(/\s+/g, "") || "Chatbot"};`;
                       </AvatarFallback>
                     </Avatar>
                   </div>
-              </div>
-
-              {/* Heading */}
-              <div>
-                <Label htmlFor="heading" className="text-foreground">
-                  Heading
-                </Label>
-                <Input
-                  id="heading"
-                  {...register("heading")}
-                  className="bg-background border-border text-foreground"
-                  placeholder="Welcome! How can I help?"
-                />
-              </div>
-
-              {/* Subheading */}
-              <div>
-                <Label htmlFor="subheading" className="text-foreground">
-                  Subheading
-                </Label>
-                <Input
-                  id="subheading"
-                  {...register("subheading")}
-                  className="bg-background border-border text-foreground"
-                  placeholder="I'm here to assist you"
-                />
-              </div>
-
-              {/* Avatar */}
-              <div>
-                <Label htmlFor="avatar_url" className="text-foreground">
-                  Avatar URL
-                </Label>
-                <div className="flex items-center space-x-3">
-                  <Input
-                    id="avatar_url"
-                    {...register("avatar_url")}
-                    className="bg-background border-border text-foreground flex-1"
-                    placeholder="https://example.com/avatar.png"
-                  />
-                  <Avatar className="w-10 h-10">
-                    <AvatarImage src={watchedValues.avatar_url} />
-                    <AvatarFallback className="bg-neutral-600">
-                      <Bot className="w-5 h-5 text-neutral-300" />
-                    </AvatarFallback>
-                  </Avatar>
                 </div>
-              </div>
 
-              {/* System Prompt */}
-              <div>
-                <Label htmlFor="system_prompt" className="text-foreground">
-                  System Prompt
-                </Label>
-                <Textarea
-                  id="system_prompt"
-                  {...register("system_prompt", {
-                    required: "System prompt is required",
-                  })}
-                  className="bg-background border-border text-foreground min-h-[120px]"
-                  placeholder="You are a helpful AI assistant..."
-                />
-                {errors.system_prompt && (
-                  <p className="text-destructive text-sm mt-1">
-                    {errors.system_prompt.message}
-                  </p>
-                )}
-              </div>
-
-              {/* UI Customization Section */}
-              <div className="border-t border-border pt-6">
-                <h4 className="text-lg font-semibold text-foreground mb-4">UI Customization</h4>
-                
-                {/* Chat Name */}
-                <div className="mb-4">
-                  <Label htmlFor="chat_name" className="text-foreground">
-                    Display Name
+                {/* Heading */}
+                <div>
+                  <Label htmlFor="heading" className="text-foreground">
+                    Heading
                   </Label>
                   <Input
-                    id="chat_name"
-                    {...register("chat_name")}
+                    id="heading"
+                    {...register("heading")}
                     className="bg-background border-border text-foreground"
-                    placeholder="AI Assistant"
+                    placeholder="Welcome! How can I help?"
                   />
                 </div>
 
-                {/* Avatar Upload/Change */}
-                <div className="mb-4">
-                  <Label className="text-foreground mb-2 block">
-                    Avatar
+                {/* Subheading */}
+                <div>
+                  <Label htmlFor="subheading" className="text-foreground">
+                    Subheading
                   </Label>
-                  <div className="flex items-center space-x-4">
-                    <Avatar className="w-16 h-16">
-                      <AvatarImage src={avatarUrl} />
-                      <AvatarFallback className="bg-muted">
-                        <Bot className="w-8 h-8 text-muted-foreground" />
+                  <Input
+                    id="subheading"
+                    {...register("subheading")}
+                    className="bg-background border-border text-foreground"
+                    placeholder="I'm here to assist you"
+                  />
+                </div>
+
+                {/* Avatar */}
+                <div>
+                  <Label htmlFor="avatar_url" className="text-foreground">
+                    Avatar URL
+                  </Label>
+                  <div className="flex items-center space-x-3">
+                    <Input
+                      id="avatar_url"
+                      {...register("avatar_url")}
+                      className="bg-background border-border text-foreground flex-1"
+                      placeholder="https://example.com/avatar.png"
+                    />
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage src={watchedValues.avatar_url} />
+                      <AvatarFallback className="bg-neutral-600">
+                        <Bot className="w-5 h-5 text-neutral-300" />
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex-1">
-                      <Input
-                        {...register("avatar_url")}
-                        className="bg-background border-border text-foreground mb-2"
-                        placeholder="https://example.com/avatar.png"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                        onClick={() => {
-                          const input = document.createElement('input');
-                          input.type = 'file';
-                          input.accept = 'image/*';
-                          input.onchange = (e) => {
-                            const file = (e.target as HTMLInputElement).files?.[0];
-                            if (file) {
-                              const reader = new FileReader();
-                              reader.onload = (e) => {
-                                setValue('avatar_url', e.target?.result as string);
-                              };
-                              reader.readAsDataURL(file);
-                            }
-                          };
-                          input.click();
-                        }}
+                  </div>
+                </div>
+
+                {/* System Prompt */}
+                <div>
+                  <Label htmlFor="system_prompt" className="text-foreground">
+                    System Prompt
+                  </Label>
+                  <Textarea
+                    id="system_prompt"
+                    {...register("system_prompt", {
+                      required: "System prompt is required",
+                    })}
+                    className="bg-background border-border text-foreground min-h-[120px]"
+                    placeholder="You are a helpful AI assistant..."
+                  />
+                  {errors.system_prompt && (
+                    <p className="text-destructive text-sm mt-1">
+                      {errors.system_prompt.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* UI Customization Section */}
+                <div className="border-t border-border pt-6">
+                  <h4 className="text-lg font-semibold text-foreground mb-4">
+                    UI Customization
+                  </h4>
+
+                  {/* Chat Name */}
+                  <div className="mb-4">
+                    <Label htmlFor="chat_name" className="text-foreground">
+                      Display Name
+                    </Label>
+                    <Input
+                      id="chat_name"
+                      {...register("chat_name")}
+                      className="bg-background border-border text-foreground"
+                      placeholder="AI Assistant"
+                    />
+                  </div>
+
+                  {/* Avatar Upload/Change */}
+                  <div className="mb-4">
+                    <Label className="text-foreground mb-2 block">Avatar</Label>
+                    <div className="flex items-center space-x-4">
+                      <Avatar className="w-16 h-16">
+                        <AvatarImage src={avatarUrl} />
+                        <AvatarFallback className="bg-muted">
+                          <Bot className="w-8 h-8 text-muted-foreground" />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <Input
+                          {...register("avatar_url")}
+                          className="bg-background border-border text-foreground mb-2"
+                          placeholder="https://example.com/avatar.png"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => {
+                            const input = document.createElement("input");
+                            input.type = "file";
+                            input.accept = "image/*";
+                            input.onchange = e => {
+                              const file = (e.target as HTMLInputElement)
+                                .files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onload = e => {
+                                  setValue(
+                                    "avatar_url",
+                                    e.target?.result as string
+                                  );
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            };
+                            input.click();
+                          }}
+                        >
+                          <Upload className="w-4 h-4 mr-2" />
+                          Upload Image
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Color Customization */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label
+                        htmlFor="chat_bg_color"
+                        className="text-foreground"
                       >
-                        <Upload className="w-4 h-4 mr-2" />
-                        Upload Image
-                      </Button>
+                        Chat Background
+                      </Label>
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          id="chat_bg_color"
+                          type="color"
+                          {...register("chat_bg_color")}
+                          className="w-12 h-10 p-1 border-border"
+                        />
+                        <Input
+                          {...register("chat_bg_color")}
+                          className="bg-background border-border text-foreground flex-1"
+                          placeholder="#ffffff"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label
+                        htmlFor="chat_border_color"
+                        className="text-foreground"
+                      >
+                        Border Color
+                      </Label>
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          id="chat_border_color"
+                          type="color"
+                          {...register("chat_border_color")}
+                          className="w-12 h-10 p-1 border-border"
+                        />
+                        <Input
+                          {...register("chat_border_color")}
+                          className="bg-background border-border text-foreground flex-1"
+                          placeholder="#e5e7eb"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label
+                        htmlFor="user_msg_color"
+                        className="text-foreground"
+                      >
+                        User Message
+                      </Label>
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          id="user_msg_color"
+                          type="color"
+                          {...register("user_msg_color")}
+                          className="w-12 h-10 p-1 border-border"
+                        />
+                        <Input
+                          {...register("user_msg_color")}
+                          className="bg-background border-border text-foreground flex-1"
+                          placeholder="#3b82f6"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label
+                        htmlFor="bot_msg_color"
+                        className="text-foreground"
+                      >
+                        Bot Message
+                      </Label>
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          id="bot_msg_color"
+                          type="color"
+                          {...register("bot_msg_color")}
+                          className="w-12 h-10 p-1 border-border"
+                        />
+                        <Input
+                          {...register("bot_msg_color")}
+                          className="bg-background border-border text-foreground flex-1"
+                          placeholder="#f3f4f6"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-
-                {/* Color Customization */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="chat_bg_color" className="text-foreground">
-                      Chat Background
-                    </Label>
-                    <div className="flex items-center space-x-2">
-                      <Input
-                        id="chat_bg_color"
-                        type="color"
-                        {...register("chat_bg_color")}
-                        className="w-12 h-10 p-1 border-border"
-                      />
-                      <Input
-                        {...register("chat_bg_color")}
-                        className="bg-background border-border text-foreground flex-1"
-                        placeholder="#ffffff"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="chat_border_color" className="text-foreground">
-                      Border Color
-                    </Label>
-                    <div className="flex items-center space-x-2">
-                      <Input
-                        id="chat_border_color"
-                        type="color"
-                        {...register("chat_border_color")}
-                        className="w-12 h-10 p-1 border-border"
-                      />
-                      <Input
-                        {...register("chat_border_color")}
-                        className="bg-background border-border text-foreground flex-1"
-                        placeholder="#e5e7eb"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="user_msg_color" className="text-foreground">
-                      User Message
-                    </Label>
-                    <div className="flex items-center space-x-2">
-                      <Input
-                        id="user_msg_color"
-                        type="color"
-                        {...register("user_msg_color")}
-                        className="w-12 h-10 p-1 border-border"
-                      />
-                      <Input
-                        {...register("user_msg_color")}
-                        className="bg-background border-border text-foreground flex-1"
-                        placeholder="#3b82f6"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="bot_msg_color" className="text-foreground">
-                      Bot Message
-                    </Label>
-                    <div className="flex items-center space-x-2">
-                      <Input
-                        id="bot_msg_color"
-                        type="color"
-                        {...register("bot_msg_color")}
-                        className="w-12 h-10 p-1 border-border"
-                      />
-                      <Input
-                        {...register("bot_msg_color")}
-                        className="bg-background border-border text-foreground flex-1"
-                        placeholder="#f3f4f6"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
               </form>
             </CardContent>
           </Card>
         </div>
 
         {/* Right Panel - Chat Preview */}
-        <div 
+        <div
           className="lg:col-span-2 flex flex-col"
           style={{
-            backgroundColor: chatBgColor || '#ffffff',
-            border: `2px solid ${chatBorderColor || '#e5e7eb'}`,
-            borderRadius: '12px'
+            backgroundColor: chatBgColor || "#ffffff",
+            border: `2px solid ${chatBorderColor || "#e5e7eb"}`,
+            borderRadius: "12px",
           }}
         >
           {/* Chat Header */}
-          <div 
+          <div
             className="p-6 border-b"
-            style={{ borderColor: chatBorderColor || '#e5e7eb' }}
+            style={{ borderColor: chatBorderColor || "#e5e7eb" }}
           >
             <div className="flex items-center space-x-3">
               <Avatar>
@@ -786,7 +812,10 @@ export default ${watchedValues.name?.replace(/\s+/g, "") || "Chatbot"};`;
               </Avatar>
               <div>
                 <h2 className="text-xl font-semibold text-foreground mb-2">
-                  {chatName || watchedValues.heading || agent?.heading || "Chat Preview"}
+                  {chatName ||
+                    watchedValues.heading ||
+                    agent?.heading ||
+                    "Chat Preview"}
                 </h2>
                 <p className="text-muted-foreground">
                   {watchedValues.subheading ||
@@ -833,10 +862,11 @@ export default ${watchedValues.name?.replace(/\s+/g, "") || "Chatbot"};`;
                     <div
                       className="p-3 rounded-lg"
                       style={{
-                        backgroundColor: message.role === "user" 
-                          ? (userMsgColor || '#3b82f6')
-                          : (botMsgColor || '#f3f4f6'),
-                        color: message.role === "user" ? '#ffffff' : '#374151'
+                        backgroundColor:
+                          message.role === "user"
+                            ? userMsgColor || "#3b82f6"
+                            : botMsgColor || "#f3f4f6",
+                        color: message.role === "user" ? "#ffffff" : "#374151",
                       }}
                     >
                       {message.role === "assistant" ? (
@@ -862,10 +892,11 @@ export default ${watchedValues.name?.replace(/\s+/g, "") || "Chatbot"};`;
                           <Bot className="w-4 h-4 text-muted-foreground" />
                         </AvatarFallback>
                       </Avatar>
-                      <div 
+                      <div
                         className="p-3 rounded-lg"
                         style={{
-                          backgroundColor: watchedValues.bot_msg_color || '#f3f4f6'
+                          backgroundColor:
+                            watchedValues.bot_msg_color || "#f3f4f6",
                         }}
                       >
                         <div className="flex space-x-1">
@@ -888,9 +919,11 @@ export default ${watchedValues.name?.replace(/\s+/g, "") || "Chatbot"};`;
           </ScrollArea>
 
           {/* Chat Input */}
-          <div 
+          <div
             className="p-6 border-t"
-            style={{ borderColor: watchedValues.chat_border_color || '#e5e7eb' }}
+            style={{
+              borderColor: watchedValues.chat_border_color || "#e5e7eb",
+            }}
           >
             <div className="flex items-center space-x-3">
               <Input
@@ -906,7 +939,7 @@ export default ${watchedValues.name?.replace(/\s+/g, "") || "Chatbot"};`;
                 className="bg-background border-border text-foreground flex-1"
                 disabled={isTyping}
                 style={{
-                  borderColor: chatBorderColor || '#e5e7eb'
+                  borderColor: chatBorderColor || "#e5e7eb",
                 }}
               />
               <Button

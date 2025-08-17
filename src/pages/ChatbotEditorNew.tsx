@@ -8,8 +8,41 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Upload, Save, Code, MessageCircle, Palette, User, Bot, ArrowLeft, Download, Send, Moon, Sun, Copy } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+
+import { motion, AnimatePresence } from "framer-motion";
+import { ChatbotPreview } from "@/components/chatbot-preview";
+import { SettingsPanel } from "@/components/settings-panel";
+import { TemplateGallery } from "@/components/template-gallery";
+import { AnimatedBackground } from "@/components/animated-background";
+import { LoadingSpinner } from "@/components/loading-spinner";
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import { useToast } from "@/hooks/use-toast";
+import { Sparkles, Zap } from "lucide-react";
+import type { ChatbotTemplate } from "@/lib/templates";
+import {
+  Upload,
+  Save,
+  Code,
+  MessageCircle,
+  Palette,
+  User,
+  Bot,
+  ArrowLeft,
+  Download,
+  Send,
+  Moon,
+  Sun,
+  Copy,
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatbotSettingsService } from "@/hooks/chatbotSettingsService";
@@ -46,24 +79,32 @@ interface ChatMessage {
 export default function ChatbotEditor() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const agentId = searchParams.get('agentId');
-  
+  const agentId = searchParams.get("agentId");
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [agent, setAgent] = useState<Agent | null>(null);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  
+
   // Chat functionality
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  
-  const { getChatbotSettings, saveChatbotSettings } = useChatbotSettingsService();
+
+  const { getChatbotSettings, saveChatbotSettings } =
+    useChatbotSettingsService();
   const { getAgentsByUser, updateAgent } = useAgentService();
 
   // Form setup with default values
-  const { register, handleSubmit, setValue, watch, formState: { errors }, reset } = useForm<ChatbotFormData>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+    reset,
+  } = useForm<ChatbotFormData>({
     defaultValues: {
       name: "My Chatbot",
       avatar_url: "",
@@ -71,9 +112,9 @@ export default function ChatbotEditor() {
       border_color: "#e5e7eb",
       user_msg_color: "#3b82f6",
       bot_msg_color: "#f3f4f6",
-      system_prompt: "You are a helpful assistant."
+      system_prompt: "You are a helpful assistant.",
     },
-    mode: "onChange"
+    mode: "onChange",
   });
 
   // Watch form values for live preview
@@ -87,12 +128,14 @@ export default function ChatbotEditor() {
 
   // Initialize with welcome message
   useEffect(() => {
-    setMessages([{
-      id: "1",
-      role: "assistant",
-      content: "Hello! How can I help you today?",
-      timestamp: new Date()
-    }]);
+    setMessages([
+      {
+        id: "1",
+        role: "assistant",
+        content: "Hello! How can I help you today?",
+        timestamp: new Date(),
+      },
+    ]);
   }, []);
 
   // Load agent data if agentId is provided
@@ -111,7 +154,7 @@ export default function ChatbotEditor() {
               border_color: settings.border_color,
               user_msg_color: settings.user_msg_color,
               bot_msg_color: settings.bot_msg_color,
-              system_prompt: settings.system_prompt
+              system_prompt: settings.system_prompt,
             });
           }
         } catch (error) {
@@ -125,24 +168,24 @@ export default function ChatbotEditor() {
       try {
         const { data: agents, error } = await getAgentsByUser();
         if (error) throw new Error(error);
-        
+
         const foundAgent = agents?.find(a => a.id === agentId);
         if (!foundAgent) {
           toast.error("Agent not found");
           navigate("/build");
           return;
         }
-        
+
         setAgent(foundAgent);
-        
+
         // Load existing UI customization settings first
         let uiSettings = {
           chat_bg: "#ffffff",
           border_color: "#e5e7eb",
           user_msg_color: "#3b82f6",
-          bot_msg_color: "#f3f4f6"
+          bot_msg_color: "#f3f4f6",
         };
-        
+
         try {
           const { data: settings } = await getChatbotSettings();
           if (settings) {
@@ -150,21 +193,20 @@ export default function ChatbotEditor() {
               chat_bg: settings.chat_bg,
               border_color: settings.border_color,
               user_msg_color: settings.user_msg_color,
-              bot_msg_color: settings.bot_msg_color
+              bot_msg_color: settings.bot_msg_color,
             };
           }
         } catch (settingsError) {
           console.error("Error loading UI settings:", settingsError);
         }
-        
+
         // Set all form values at once using reset
         reset({
           name: foundAgent.name,
           avatar_url: foundAgent.avatar_url || "",
           system_prompt: foundAgent.system_prompt,
-          ...uiSettings
+          ...uiSettings,
         });
-        
       } catch (error) {
         console.error("Error loading agent:", error);
         toast.error("Failed to load agent");
@@ -185,7 +227,7 @@ export default function ChatbotEditor() {
       id: Date.now().toString(),
       role: "user",
       content: inputMessage,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -196,14 +238,14 @@ export default function ChatbotEditor() {
       const response = await chatWithAgent({
         system_prompt: systemPrompt,
         message: inputMessage,
-        agentId: agentId || "default"
+        agentId: agentId || "default",
       });
 
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
         content: response.message,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       setMessages(prev => [...prev, botMessage]);
@@ -212,8 +254,9 @@ export default function ChatbotEditor() {
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "I apologize, but I'm experiencing some technical difficulties. Please try again.",
-        timestamp: new Date()
+        content:
+          "I apologize, but I'm experiencing some technical difficulties. Please try again.",
+        timestamp: new Date(),
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -236,7 +279,7 @@ export default function ChatbotEditor() {
       if (agent && agentId) {
         const { error: agentError } = await updateAgent(agentId, {
           ...agent,
-          avatar_url: data.avatar_url
+          avatar_url: data.avatar_url,
         } as any);
         if (agentError) {
           toast.error("Failed to update agent: " + agentError);
@@ -277,7 +320,11 @@ export default function ChatbotEditor() {
     align-items: center;
     gap: 8px;
   ">
-    ${avatarUrl ? `<img src="${avatarUrl}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">` : '<div style="width: 32px; height: 32px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 14px;">🤖</div>'}
+    ${
+      avatarUrl
+        ? `<img src="${avatarUrl}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">`
+        : '<div style="width: 32px; height: 32px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 14px;">🤖</div>'
+    }
     <h3 style="margin: 0; font-size: 16px; font-weight: 600;">${chatName}</h3>
   </div>
   <div id="chat-messages" style="
@@ -396,13 +443,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 {agent ? `Customize ${agent.name}` : "Chatbot Customization"}
               </h1>
               <p className="text-gray-600 mt-1">
-                {agent ? "Customize the UI appearance of your agent" : "Design your perfect chatbot interface"}
+                {agent
+                  ? "Customize the UI appearance of your agent"
+                  : "Design your perfect chatbot interface"}
               </p>
             </div>
           </div>
-          
+
           <div className="flex gap-3">
-            <Dialog open={isExportModalOpen} onOpenChange={setIsExportModalOpen}>
+            <Dialog
+              open={isExportModalOpen}
+              onOpenChange={setIsExportModalOpen}
+            >
               <DialogTrigger asChild>
                 <Button variant="outline" className="flex items-center gap-2">
                   <Download className="h-4 w-4" />
@@ -433,232 +485,263 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Customization Panel */}
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Palette className="h-5 w-5" />
-                Customization Panel
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                {/* Basic Info */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    Basic Information
-                  </h3>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Display Name</Label>
-                    <Input
-                      id="name"
-                      {...register("name", { required: "Name is required" })}
-                      placeholder="My Chatbot"
-                      disabled={!!agent} // Disable if editing an agent (name comes from template)
-                    />
-                    {errors.name && (
-                      <p className="text-sm text-red-600">{errors.name.message}</p>
-                    )}
-                  </div>
+        <section>
+          <Tabs defaultValue="design" className="w-full">
+            <TabsList className="mb-6">
+              <TabsTrigger value="design">Design &amp; Preview</TabsTrigger>
+              <TabsTrigger value="templates">Template Gallery</TabsTrigger>
+            </TabsList>
+            <TabsContent value="design">
+              <div className="grid lg:grid-cols-2 gap-8">
+                {/* Customization Panel */}
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Palette className="h-5 w-5" />
+                      Customization Panel
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <form
+                      onSubmit={handleSubmit(onSubmit)}
+                      className="space-y-6"
+                    >
+                      {/* Basic Info */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold flex items-center gap-2">
+                          <User className="h-4 w-4" />
+                          Basic Information
+                        </h3>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="avatar_url">Avatar URL</Label>
-                    <Input
-                      id="avatar_url"
-                      {...register("avatar_url")}
-                      placeholder="https://example.com/avatar.jpg"
-                    />
-                  </div>
-                </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Display Name</Label>
+                          <Input
+                            id="name"
+                            {...register("name", {
+                              required: "Name is required",
+                            })}
+                            placeholder="My Chatbot"
+                            disabled={!!agent} // Disable if editing an agent (name comes from template)
+                          />
+                          {errors.name && (
+                            <p className="text-sm text-red-600">
+                              {errors.name.message}
+                            </p>
+                          )}
+                        </div>
 
-                <Separator />
-
-                {/* UI Customization */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <Palette className="h-4 w-4" />
-                    UI Customization
-                  </h3>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="chat_bg">Background Color</Label>
-                      <Input
-                        id="chat_bg"
-                        type="color"
-                        {...register("chat_bg")}
-                        className="h-10"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="border_color">Border Color</Label>
-                      <Input
-                        id="border_color"
-                        type="color"
-                        {...register("border_color")}
-                        className="h-10"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="user_msg_color">User Message Color</Label>
-                      <Input
-                        id="user_msg_color"
-                        type="color"
-                        {...register("user_msg_color")}
-                        className="h-10"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="bot_msg_color">Bot Message Color</Label>
-                      <Input
-                        id="bot_msg_color"
-                        type="color"
-                        {...register("bot_msg_color")}
-                        className="h-10"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* System Prompt */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <Bot className="h-4 w-4" />
-                    System Prompt
-                  </h3>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="system_prompt">System Prompt</Label>
-                    <Textarea
-                      id="system_prompt"
-                      {...register("system_prompt", { required: "System prompt is required" })}
-                      placeholder="You are a helpful assistant..."
-                      rows={4}
-                      disabled={!!agent} // Disable if editing an agent (prompt comes from template)
-                    />
-                    {errors.system_prompt && (
-                      <p className="text-sm text-red-600">{errors.system_prompt.message}</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Save Button */}
-                <Button
-                  type="submit"
-                  disabled={saving}
-                  className="w-full flex items-center gap-2"
-                >
-                  <Save className="h-4 w-4" />
-                  {saving ? "Saving..." : "Save Changes"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-
-          {/* Live Preview */}
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageCircle className="h-5 w-5" />
-                Live Preview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div
-                className="border-2 rounded-lg p-4 h-96 flex flex-col"
-                style={{
-                  backgroundColor: chatBg,
-                  borderColor: borderColor,
-                }}
-              >
-                {/* Chat Header */}
-                <div className="flex items-center gap-3 pb-3 border-b" style={{ borderColor: borderColor }}>
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={avatarUrl} alt="Chatbot" />
-                    <AvatarFallback>🤖</AvatarFallback>
-                  </Avatar>
-                  <h3 className="font-semibold">{chatName}</h3>
-                </div>
-
-                {/* Chat Messages */}
-                <ScrollArea className="flex-1 p-4">
-                  <div className="space-y-4">
-                    {messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`max-w-xs p-3 rounded-2xl text-sm leading-relaxed ${
-                          message.role === "user"
-                            ? "ml-auto text-white rounded-br-sm"
-                            : "rounded-bl-sm"
-                        }`}
-                        style={{
-                          backgroundColor: message.role === "user" ? userMsgColor : botMsgColor,
-                          color: message.role === "user" ? "white" : isDarkMode ? "#f9fafb" : "#111827"
-                        }}
-                      >
-                        {message.content}
-                      </div>
-                    ))}
-                    {isTyping && (
-                      <div
-                        className="max-w-xs p-3 rounded-2xl rounded-bl-sm text-sm opacity-70"
-                        style={{ backgroundColor: botMsgColor }}
-                      >
-                        <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        <div className="space-y-2">
+                          <Label htmlFor="avatar_url">Avatar URL</Label>
+                          <Input
+                            id="avatar_url"
+                            {...register("avatar_url")}
+                            placeholder="https://example.com/avatar.jpg"
+                          />
                         </div>
                       </div>
-                    )}
-                  </div>
-                </ScrollArea>
 
-                {/* Chat Input */}
-                <div 
-                  className="p-4 border-t"
-                  style={{ 
-                    borderColor: isDarkMode ? '#374151' : borderColor,
-                    backgroundColor: isDarkMode ? '#111827' : '#f9fafb'
-                  }}
-                >
-                  <div className="flex gap-3 items-end">
-                    <Input
-                      placeholder="Type your message..."
-                      value={inputMessage}
-                      onChange={(e) => setInputMessage(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          sendMessage();
-                        }
-                      }}
-                      className={`flex-1 rounded-full border-0 ${isDarkMode ? 'bg-gray-700 text-white placeholder-gray-400' : 'bg-white'}`}
-                      style={{ paddingLeft: '16px', paddingRight: '16px' }}
-                    />
-                    <Button 
-                      size="sm" 
-                      onClick={sendMessage}
-                      disabled={isTyping || !inputMessage.trim()}
-                      className="rounded-full w-10 h-10 p-0"
-                      style={{ backgroundColor: userMsgColor }}
+                      <Separator />
+
+                      {/* UI Customization */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold flex items-center gap-2">
+                          <Palette className="h-4 w-4" />
+                          UI Customization
+                        </h3>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="chat_bg">Background Color</Label>
+                            <Input
+                              id="chat_bg"
+                              type="color"
+                              {...register("chat_bg")}
+                              className="h-10"
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="border_color">Border Color</Label>
+                            <Input
+                              id="border_color"
+                              type="color"
+                              {...register("border_color")}
+                              className="h-10"
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="user_msg_color">
+                              User Message Color
+                            </Label>
+                            <Input
+                              id="user_msg_color"
+                              type="color"
+                              {...register("user_msg_color")}
+                              className="h-10"
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="bot_msg_color">
+                              Bot Message Color
+                            </Label>
+                            <Input
+                              id="bot_msg_color"
+                              type="color"
+                              {...register("bot_msg_color")}
+                              className="h-10"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      {/* System Prompt */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold flex items-center gap-2">
+                          <Bot className="h-4 w-4" />
+                          System Prompt
+                        </h3>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="system_prompt">System Prompt</Label>
+                          <Textarea
+                            id="system_prompt"
+                            {...register("system_prompt", {
+                              required: "System prompt is required",
+                            })}
+                            placeholder="You are a helpful assistant..."
+                            rows={4}
+                            disabled={!!agent} // Disable if editing an agent (prompt comes from template)
+                          />
+                          {errors.system_prompt && (
+                            <p className="text-sm text-red-600">
+                              {errors.system_prompt.message}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Save Button */}
+                      <Button
+                        type="submit"
+                        disabled={saving}
+                        className="w-full flex items-center gap-2"
+                      >
+                        <Save className="h-4 w-4" />
+                        {saving ? "Saving..." : "Save Changes"}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+
+                {/* Live Preview */}
+                <AnimatePresence mode="wait">
+                  {loading ? (
+                    <motion.div
+                      key="loading"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="flex items-center justify-center h-[600px]"
                     >
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
+                      <div className="text-center">
+                        <LoadingSpinner size="lg" color={userMsgColor} />
+                        <p className="mt-4 text-muted-foreground">
+                          Loading preview...
+                        </p>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="preview"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <ChatbotPreview
+                        config={{
+                          name: chatName,
+                          theme: isDarkMode ? "dark" : "light",
+                          primaryColor: userMsgColor,
+                          accentColor: borderColor,
+                          backgroundColor: chatBg,
+                          textColor: isDarkMode ? "#f9fafb" : "#111827",
+                          borderRadius: 12,
+                          fontSize: 14,
+                          fontFamily: "system-ui, sans-serif",
+                          position: "bottom-right",
+                          welcomeMessage:
+                            systemPrompt || "Hello! How can I help you today?",
+                          placeholder: "Type your message...",
+                          avatar: avatarUrl,
+                          showTypingIndicator: true,
+                          enableSounds: false,
+                          animationSpeed: "normal",
+                        }}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </TabsContent>
+            <TabsContent value="templates">
+              <div className="grid lg:grid-cols-2 gap-8">
+                <Card className="shadow-lg col-span-2">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Sparkles className="h-5 w-5" />
+                      Template Gallery
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {/* Placeholder handlers and current config */}
+                    <TemplateGallery
+                      currentConfig={{
+                        name: chatName,
+                        theme: isDarkMode ? "dark" : "light",
+                        primaryColor: userMsgColor,
+                        accentColor: borderColor,
+                        backgroundColor: chatBg,
+                        textColor: isDarkMode ? "#f9fafb" : "#111827",
+                        borderRadius: 12,
+                        fontSize: 14,
+                        fontFamily: "system-ui, sans-serif",
+                        position: "bottom-right",
+                        welcomeMessage:
+                          systemPrompt || "Hello! How can I help you today?",
+                        placeholder: "Type your message...",
+                        avatar: avatarUrl,
+                        showTypingIndicator: true,
+                        enableSounds: false,
+                        animationSpeed: "normal",
+                      }}
+                      onApplyTemplate={() => {
+                        toast.info("Apply Template: Not implemented yet");
+                      }}
+                      onPreviewTemplate={() => {
+                        toast.info("Preview Template: Not implemented yet");
+                      }}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
+          {/* Floating Add Template Button */}
+          <div className="fixed bottom-8 right-8 z-30">
+            <Button
+              variant="outline"
+              className="flex items-center gap-2 shadow-lg"
+              onClick={() => toast.info("Add Template/Theme: Coming soon!")}
+            >
+              <Sparkles className="h-4 w-4" />
+              Add Template/Theme
+            </Button>
+          </div>
+        </section>
       </div>
     </div>
   );
