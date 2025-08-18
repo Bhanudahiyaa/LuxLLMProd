@@ -139,6 +139,17 @@ export default function ChatbotEditor() {
   const avatarUrl = watch("avatar_url");
   const systemPrompt = watch("system_prompt");
 
+  // Debug: Log form values
+  console.log("Form values:", {
+    chatBg,
+    borderColor,
+    userMsgColor,
+    botMsgColor,
+    chatName,
+    avatarUrl,
+    systemPrompt,
+  });
+
   // Create a config object for the SettingsPanel that updates when form values change
   const settingsConfig = useMemo(() => {
     console.log("Creating settings config with botMsgColor:", botMsgColor);
@@ -193,6 +204,18 @@ export default function ChatbotEditor() {
     ]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Ensure form is properly initialized with default values
+  useEffect(() => {
+    // Force set the default values to ensure they're applied
+    setValue("bot_msg_color", "#000000", { shouldDirty: false });
+    setValue("chat_bg", "#ffffff", { shouldDirty: false });
+    setValue("border_color", "#e5e7eb", { shouldDirty: false });
+    setValue("user_msg_color", "#3b82f6", { shouldDirty: false });
+    setValue("system_prompt", "You are a helpful assistant.", {
+      shouldDirty: false,
+    });
+  }, [setValue]);
 
   // Load agent data if agentId is provided (only once per agentId)
   useEffect(() => {
@@ -303,7 +326,7 @@ export default function ChatbotEditor() {
           chat_bg: "#ffffff",
           border_color: "#e5e7eb",
           user_msg_color: "#3b82f6",
-          bot_msg_color: "#f3f4f6",
+          bot_msg_color: "#000000",
           system_prompt:
             template.system_prompt || "You are a helpful assistant.",
         });

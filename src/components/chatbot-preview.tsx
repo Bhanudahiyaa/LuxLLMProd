@@ -325,7 +325,14 @@ export function ChatbotPreview({ config }: ChatbotPreviewProps) {
                             }`,
                           }}
                         >
-                          <p className="text-sm">{message.text}</p>
+                          <p
+                            className="text-sm"
+                            style={{
+                              color: message.isBot ? config.textColor : "white",
+                            }}
+                          >
+                            {message.text}
+                          </p>
                         </motion.div>
                       </motion.div>
                     ))}

@@ -14,8 +14,13 @@ export interface ChatResponse {
 
 // OpenRouter GPT-OSS-20B API configuration
 const QWEN3_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-const QWEN3_API_KEY =
-  "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";
+const QWEN3_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
+
+// Validate API key is present
+if (!QWEN3_API_KEY) {
+  console.error("VITE_OPENROUTER_API_KEY is not set in environment variables");
+  throw new Error("OpenRouter API key is not configured");
+}
 
 // GPT-OSS-20B chat API function with role enforcement
 export async function chatWithAgent(
