@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createClient } from "@supabase/supabase-js";
+import { supabase, getAuthenticatedClient } from "@/lib/supabaseClient";
+import { useAuth } from "@clerk/clerk-react";
 import { createAgentFromTemplate } from "@/lib/createAgentFromTempate";
 import { toast } from "react-hot-toast";
 import { templateConfigs } from "@/lib/templateConfigs"; // ✅ all 30 UUID configs
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL as string,
-  import.meta.env.VITE_SUPABASE_ANON_KEY as string
-);
 
 interface Template {
   uuid: string;
@@ -24,10 +20,12 @@ const TemplateList: React.FC = () => {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { getToken } = useAuth();
 
   useEffect(() => {
     const fetchTemplates = async () => {
       setLoading(true);
+      // Use shared client for public template fetching
       const { data, error } = await supabase
         .from("templates")
         .select("*")
@@ -62,11 +60,21 @@ const TemplateList: React.FC = () => {
       // ✅ Save locally (optional, for quick reloads)
       localStorage.setItem("selectedTemplate", JSON.stringify(fullTemplate));
 
-      // ✅ Get logged-in user
+      // ✅ Get logged-in user from Clerk
+      const token = await getToken({ template: "supabase" });
+      if (!token) {
+        toast.error("You must be logged in to select a template.");
+        return;
+      }
+
+      // Use the shared authenticated client for user operations
+      const authenticatedClient = await getAuthenticatedClient(token);
+
+      // Get user info from the authenticated client
       const {
         data: { user },
         error: userError,
-      } = await supabase.auth.getUser();
+      } = await authenticatedClient.auth.getUser();
       if (userError) throw userError;
       if (!user) {
         toast.error("You must be logged in to select a template.");
@@ -95,7 +103,7 @@ const TemplateList: React.FC = () => {
         gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
       }}
     >
-      {templates.map((template) => (
+      {templates.map(template => (
         <div
           key={template.uuid}
           style={{
@@ -107,11 +115,10 @@ const TemplateList: React.FC = () => {
             transition: "0.2s ease-in-out",
           }}
           onClick={() => handleClick(template)}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.boxShadow =
-              "0px 4px 12px rgba(0,0,0,0.1)")
+          onMouseEnter={e =>
+            (e.currentTarget.style.boxShadow = "0px 4px 12px rgba(0,0,0,0.1)")
           }
-          onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
+          onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}
         >
           <h3>{template.title}</h3>
           <p style={{ fontSize: "0.9rem", color: "#666" }}>

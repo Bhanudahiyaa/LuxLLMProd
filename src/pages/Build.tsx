@@ -2,10 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Templates } from "@/components/build/Templates";
 import { AgentSettings } from "@/components/build/AgentSettings";
-import { EmbedGenerator } from "@/components/build/EmbedGenerator";
-import { Analytics } from "@/components/build/Analytics";
 import { MyAgents } from "@/components/build/MyAgents";
-import { Integrations } from "@/components/build/Integrations";
 import Navigation from "@/components/Navigation";
 
 export default function Build() {
@@ -33,11 +30,101 @@ export default function Build() {
               element={<Navigate to="/build/templates" replace />}
             />
             <Route path="/templates" element={<Templates />} />
+            <Route
+              path="/premium"
+              element={
+                <div className="text-center py-12">
+                  <h1 className="text-2xl font-bold mb-4">Premium Features</h1>
+                  <p className="text-muted-foreground">
+                    Premium features coming soon!
+                  </p>
+                </div>
+              }
+            />
             <Route path="/settings" element={<AgentSettings />} />
-            <Route path="/embed" element={<EmbedGenerator />} />
-            <Route path="/analytics" element={<Analytics />} />
             <Route path="/agents" element={<MyAgents />} />
-            <Route path="/integrations" element={<Integrations />} />
+            <Route
+              path="/export"
+              element={
+                <div className="text-center py-12">
+                  <h1 className="text-2xl font-bold mb-4">Export</h1>
+                  <p className="text-muted-foreground">
+                    Export functionality coming soon!
+                  </p>
+                </div>
+              }
+            />
+            <Route
+              path="/how-it-works"
+              element={
+                <div className="text-center py-12">
+                  <h1 className="text-2xl font-bold mb-4">How it Works</h1>
+                  <p className="text-muted-foreground">
+                    Learn how to use our platform!
+                  </p>
+                </div>
+              }
+            />
+            <Route
+              path="/quick-start"
+              element={
+                <div className="text-center py-12">
+                  <h1 className="text-2xl font-bold mb-4">Quick Start</h1>
+                  <p className="text-muted-foreground">
+                    Get started quickly with our platform!
+                  </p>
+                </div>
+              }
+            />
+            <Route
+              path="/pricing"
+              element={
+                <div className="text-center py-12">
+                  <h1 className="text-2xl font-bold mb-4">Pricing</h1>
+                  <p className="text-muted-foreground">
+                    View our pricing plans!
+                  </p>
+                </div>
+              }
+            />
+            <Route
+              path="/blogs"
+              element={
+                <div className="text-center py-12">
+                  <h1 className="text-2xl font-bold mb-4">Blogs</h1>
+                  <p className="text-muted-foreground">
+                    Read our latest blog posts!
+                  </p>
+                </div>
+              }
+            />
+            <Route
+              path="/team"
+              element={
+                <div className="text-center py-12">
+                  <h1 className="text-2xl font-bold mb-4">Team</h1>
+                  <p className="text-muted-foreground">Meet our team!</p>
+                </div>
+              }
+            />
+            <Route
+              path="/support"
+              element={
+                <div className="text-center py-12">
+                  <h1 className="text-2xl font-bold mb-4">Support</h1>
+                  <p className="text-muted-foreground">Get help and support!</p>
+                </div>
+              }
+            />
+            <Route
+              path="/about"
+              element={
+                <div className="text-center py-12">
+                  <h1 className="text-2xl font-bold mb-4">About</h1>
+                  <p className="text-muted-foreground">Learn more about us!</p>
+                </div>
+              }
+            />
           </Routes>
         </main>
       </div>

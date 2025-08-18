@@ -28,6 +28,15 @@ interface AgentConfig {
   isActive: boolean;
 }
 
+interface Template {
+  id: string;
+  title: string;
+  description: string;
+  personality?: string;
+  temperature?: number;
+  systemPrompt?: string;
+}
+
 function isValidUUID(uuid: string) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
     uuid
@@ -86,7 +95,7 @@ export function AgentSettings() {
 
         const storedTemplate = localStorage.getItem("selectedTemplate");
         if (storedTemplate) {
-          const template: any = JSON.parse(storedTemplate);
+          const template: Template = JSON.parse(storedTemplate);
           const templateConfig = templateConfigs[template.id];
           setConfig(
             (templateConfig as AgentConfig) ||
@@ -112,7 +121,7 @@ export function AgentSettings() {
           .maybeSingle();
 
         if (data?.templates) {
-          const template: any = data.templates;
+          const template: Template = data.templates;
           setConfig({
             name: template.title,
             description: template.description,
@@ -172,7 +181,9 @@ export function AgentSettings() {
             if (template.id && isValidUUID(template.id)) {
               template_id = template.id;
             }
-          } catch {}
+          } catch (error) {
+            console.warn("Failed to parse stored template:", error);
+          }
         }
         if (!template_id) {
           const { data } = await supabase
@@ -187,7 +198,7 @@ export function AgentSettings() {
           }
         }
 
-        const insertObj: any = { ...config, user_id: user.id };
+        const insertObj: AgentConfig & { user_id: string; template_id?: string } = { ...config, user_id: user.id };
         if (template_id) insertObj.template_id = template_id;
 
         const { data, error } = await supabase

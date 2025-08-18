@@ -1,6 +1,6 @@
 // src/hooks/agentService.ts
 import { useAuth } from "@clerk/clerk-react";
-import { createClient } from "@supabase/supabase-js";
+import { getAuthenticatedClient } from "@/lib/supabaseClient";
 
 // Types for better TypeScript support
 export interface Agent {
@@ -46,12 +46,19 @@ export interface ServiceResponse<T> {
   error: string | null;
 }
 
+export interface AgentStats {
+  id: string;
+  user_id: string;
+  agent_id: string;
+  total_conversations: number;
+  total_messages: number;
+  created_at: string;
+  updated_at: string;
+}
+
 // Hook to get authenticated Supabase client with Clerk integration
 export function useAgentService() {
   const { getToken, userId } = useAuth();
-
-  // Singleton Supabase client to avoid multiple instances
-  let authenticatedSupabaseClient: any = null;
 
   // Get authenticated Supabase client
   async function getAuthenticatedSupabase() {
@@ -59,25 +66,8 @@ export function useAgentService() {
       const token = await getToken({ template: "supabase" });
       if (!token) throw new Error("No Clerk token found");
 
-      // Reuse existing client if available and token hasn't changed
-      if (authenticatedSupabaseClient) {
-        return authenticatedSupabaseClient;
-      }
-
-      // Create a new Supabase client with the JWT token
-      authenticatedSupabaseClient = createClient(
-        import.meta.env.VITE_SUPABASE_URL as string,
-        import.meta.env.VITE_SUPABASE_ANON_KEY as string,
-        {
-          global: {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        }
-      );
-
-      return authenticatedSupabaseClient;
+      // Use the shared authenticated client
+      return await getAuthenticatedClient(token);
     } catch (error) {
       console.error("Error getting authenticated Supabase client:", error);
       throw error;
@@ -85,14 +75,16 @@ export function useAgentService() {
   }
 
   // 1. Create a new agent
-  async function createAgent(agentData: AgentData): Promise<ServiceResponse<Agent>> {
+  async function createAgent(
+    agentData: AgentData
+  ): Promise<ServiceResponse<Agent>> {
     try {
       if (!userId) {
         return { data: null, error: "User not authenticated" };
       }
 
       const authenticatedSupabase = await getAuthenticatedSupabase();
-      
+
       const { data, error } = await authenticatedSupabase
         .from("agents")
         .insert([
@@ -128,7 +120,7 @@ export function useAgentService() {
       }
 
       const authenticatedSupabase = await getAuthenticatedSupabase();
-      
+
       const { data, error } = await authenticatedSupabase
         .from("agents")
         .select("*")
@@ -158,7 +150,7 @@ export function useAgentService() {
       }
 
       const authenticatedSupabase = await getAuthenticatedSupabase();
-      
+
       const { data, error } = await authenticatedSupabase
         .from("agents")
         .update({
@@ -187,14 +179,16 @@ export function useAgentService() {
   }
 
   // 4. Delete an agent (cascades conversations)
-  async function deleteAgent(agentId: string): Promise<ServiceResponse<boolean>> {
+  async function deleteAgent(
+    agentId: string
+  ): Promise<ServiceResponse<boolean>> {
     try {
       if (!userId) {
         return { data: null, error: "User not authenticated" };
       }
 
       const authenticatedSupabase = await getAuthenticatedSupabase();
-      
+
       const { error } = await authenticatedSupabase
         .from("agents")
         .delete()
@@ -225,7 +219,7 @@ export function useAgentService() {
       }
 
       const authenticatedSupabase = await getAuthenticatedSupabase();
-      
+
       // First verify the agent belongs to the user (RLS will handle this, but good to be explicit)
       const { data: agent } = await authenticatedSupabase
         .from("agents")
@@ -263,14 +257,16 @@ export function useAgentService() {
   }
 
   // 6. Get all conversations for an agent
-  async function getConversations(agentId: string): Promise<ServiceResponse<Conversation[]>> {
+  async function getConversations(
+    agentId: string
+  ): Promise<ServiceResponse<Conversation[]>> {
     try {
       if (!userId) {
         return { data: null, error: "User not authenticated" };
       }
 
       const authenticatedSupabase = await getAuthenticatedSupabase();
-      
+
       // First verify the agent belongs to the user
       const { data: agent } = await authenticatedSupabase
         .from("agents")
@@ -302,14 +298,14 @@ export function useAgentService() {
   }
 
   // Bonus: Get agent statistics
-  async function getAgentStats(): Promise<ServiceResponse<any[]>> {
+  async function getAgentStats(): Promise<ServiceResponse<AgentStats[]>> {
     try {
       if (!userId) {
         return { data: null, error: "User not authenticated" };
       }
 
       const authenticatedSupabase = await getAuthenticatedSupabase();
-      
+
       const { data, error } = await authenticatedSupabase
         .from("agent_stats")
         .select("*")

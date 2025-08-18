@@ -1,21 +1,26 @@
-import { motion } from "framer-motion"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Check } from "lucide-react"
-import { themePresets, type ThemePreset } from "@/lib/themes"
+import { motion } from "framer-motion";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Check } from "lucide-react";
+import { themePresets, type ThemePreset } from "@/lib/themes";
 
 interface ThemeSelectorProps {
-  currentTheme: string
-  onThemeSelect: (theme: ThemePreset) => void
+  currentTheme: string;
+  onThemeSelect: (theme: ThemePreset) => void;
 }
 
-export function ThemeSelector({ currentTheme, onThemeSelect }: ThemeSelectorProps) {
+export function ThemeSelector({
+  currentTheme,
+  onThemeSelect,
+}: ThemeSelectorProps) {
   return (
     <div className="space-y-4">
       <div>
         <h3 className="text-lg font-semibold mb-2">Theme Presets</h3>
-        <p className="text-sm text-muted-foreground">Choose from our curated theme collection</p>
+        <p className="text-sm text-muted-foreground">
+          Choose from our curated theme collection
+        </p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -28,12 +33,16 @@ export function ThemeSelector({ currentTheme, onThemeSelect }: ThemeSelectorProp
           >
             <Card
               className={`relative p-4 cursor-pointer transition-all duration-200 hover:shadow-lg ${
-                currentTheme === theme.id ? "ring-2 ring-primary ring-offset-2 bg-primary/5" : "hover:bg-accent/50"
+                currentTheme === theme.id
+                  ? "ring-2 ring-primary ring-offset-2 bg-primary/5"
+                  : "hover:bg-accent/50"
               }`}
               onClick={() => onThemeSelect(theme)}
             >
               {/* Theme Preview */}
-              <div className={`w-full h-16 rounded-lg mb-3 ${theme.preview} relative overflow-hidden`}>
+              <div
+                className={`w-full h-16 rounded-lg mb-3 ${theme.preview} relative overflow-hidden`}
+              >
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 <div className="absolute bottom-2 left-2 right-2">
                   <div className="flex items-center gap-2">
@@ -63,7 +72,9 @@ export function ThemeSelector({ currentTheme, onThemeSelect }: ThemeSelectorProp
                     </Badge>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground line-clamp-2">{theme.description}</p>
+                <p className="text-xs text-muted-foreground line-clamp-2">
+                  {theme.description}
+                </p>
               </div>
 
               {/* Color Palette Preview */}
@@ -85,12 +96,6 @@ export function ThemeSelector({ currentTheme, onThemeSelect }: ThemeSelectorProp
           </motion.div>
         ))}
       </div>
-
-      <div className="pt-4 border-t">
-        <Button variant="outline" className="w-full bg-transparent" size="sm">
-          Create Custom Theme
-        </Button>
-      </div>
     </div>
-  )
+  );
 }

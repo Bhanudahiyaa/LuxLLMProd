@@ -7,7 +7,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import WrapButton from "@/components/ui/wrap-button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { SignedIn, SignedOut, UserButton, useClerk } from "@clerk/clerk-react";
-import { dark, light } from "@clerk/themes";
+import { dark } from "@clerk/themes";
 
 const useIsDark = () => {
   const getIsDark = () => document.documentElement.classList.contains("dark");
@@ -40,14 +40,24 @@ const useIsDark = () => {
 };
 
 const generateClerkAppearance = (isDark: boolean) => ({
-  baseTheme: isDark ? dark : light,
+  baseTheme: isDark ? dark : undefined,
   variables: {
-    colorBackground: "hsl(var(--card))",
-    colorText: "hsl(var(--foreground))",
-    colorPrimary: "hsl(var(--primary))",
-    colorInputBackground: "hsl(var(--muted))",
-    colorAlphaShade: "hsl(var(--muted-foreground))",
+    colorBackground: isDark ? "hsl(222.2 84% 4.9%)" : "hsl(0 0% 100%)",
+    colorText: isDark ? "hsl(210 40% 98%)" : "hsl(222.2 84% 4.9%)",
+    colorPrimary: "hsl(142.1 76.2% 36.3%)",
+    colorInputBackground: isDark
+      ? "hsl(217.2 32.6% 17.5%)"
+      : "hsl(210 40% 96%)",
+    colorAlphaShade: isDark ? "hsl(215 20.2% 65.1%)" : "hsl(215.4 16.3% 46.9%)",
+    colorNeutral: isDark ? "hsl(217.2 32.6% 17.5%)" : "hsl(210 40% 96%)",
+    colorNeutralAlpha: isDark
+      ? "hsla(217.2 32.6% 17.5% 0.8)"
+      : "hsla(210 40% 96% 0.8)",
     borderRadius: "0.75rem",
+    colorSuccess: "hsl(142.1 76.2% 36.3%)",
+    colorDanger: "hsl(0 84.2% 60.2%)",
+    colorWarning: "hsl(38 92% 50%)",
+    colorInfo: "hsl(199 89% 48%)",
   },
   elements: {
     avatarBox: "size-9",
@@ -61,6 +71,27 @@ const generateClerkAppearance = (isDark: boolean) => ({
       "bg-[hsl(var(--muted))] text-[hsl(var(--foreground))] border border-[hsl(var(--border))] hover:bg-[hsl(var(--muted)/90)] transition-all duration-200",
     socialButtonsBlockButton__github:
       "bg-[hsl(var(--muted))] text-[hsl(var(--foreground))] [&>svg]:fill-[hsl(var(--foreground))]",
+    formButtonPrimary:
+      "bg-[hsl(var(--primary))] text-white hover:bg-[hsl(var(--primary)/90)] transition-colors duration-200",
+    formButtonSecondary:
+      "bg-[hsl(var(--muted))] text-[hsl(var(--foreground))] border border-[hsl(var(--border))] hover:bg-[hsl(var(--muted)/90)] transition-colors duration-200",
+    card: "bg-[hsl(var(--card))] text-[hsl(var(--foreground))] border border-[hsl(var(--border))] shadow-sm",
+    headerTitle: "text-[hsl(var(--foreground))] font-semibold",
+    headerSubtitle: "text-[hsl(var(--muted-foreground))]",
+    dividerLine: "bg-[hsl(var(--border))]",
+    dividerText: "text-[hsl(var(--muted-foreground))]",
+    formFieldLabel: "text-[hsl(var(--foreground))] font-medium",
+    formFieldInput:
+      "bg-[hsl(var(--input))] text-[hsl(var(--foreground))] border border-[hsl(var(--border))] focus:ring-2 focus:ring-[hsl(var(--primary))] focus:border-transparent",
+    formFieldInputShowPasswordButton:
+      "text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]",
+    formResendCodeLink:
+      "text-[hsl(var(--primary))] hover:text-[hsl(var(--primary)/80)]",
+    footerActionLink:
+      "text-[hsl(var(--primary))] hover:text-[hsl(var(--primary)/80)]",
+    identityPreviewText: "text-[hsl(var(--foreground))]",
+    identityPreviewEditButton:
+      "text-[hsl(var(--primary))] hover:text-[hsl(var(--primary)/80)]",
   },
 });
 
@@ -118,7 +149,7 @@ const Navigation = () => {
             : "bg-transparent"
         }`}
       >
-        <div className="container mx-auto px-3 py-3 flex items-center justify-between">
+        <div className="container mx-auto px-3 py-2 flex items-center justify-between">
           {/* ✅ Make the logo navigate home from any route */}
           <button
             onClick={() => {
@@ -131,10 +162,17 @@ const Navigation = () => {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="font-bold text-2xl tracking-tighter"
+              className="flex items-center gap-2"
             >
-              <span className="text-primary">Lux</span>
-              <span className="text-foreground">LLM</span>
+              <img
+                src="/images/luxllm-logo.png"
+                alt="LuxLLM logo"
+                className="h-7 w-7 object-contain"
+              />
+              <div className="font-bold text-2xl tracking-tighter">
+                <span className="text-primary">Lux</span>
+                <span className="text-foreground">LLM</span>
+              </div>
             </motion.div>
           </button>
 
@@ -205,9 +243,17 @@ const Navigation = () => {
             >
               <div className="p-6">
                 <div className="flex items-center justify-between mb-8">
-                  <div className="font-bold text-xl tracking-tighter">
-                    <span className="text-primary">Lux</span>
-                    <span className="text-foreground">LLM</span>
+                  <div className="flex items-center gap-2">
+                    {" "}
+                    <img
+                      src="/images/luxllm-logo.png"
+                      alt="LuxLLM logo"
+                      className="h-6 w-6 object-contain"
+                    />
+                    <div className="font-bold text-xl tracking-tighter">
+                      <span className="text-primary">Lux</span>
+                      <span className="text-foreground">LLM</span>
+                    </div>
                   </div>
                   <button
                     onClick={() => setIsOpen(false)}

@@ -1,5 +1,5 @@
 import { useAuth } from "@clerk/clerk-react";
-import { createClient } from "@supabase/supabase-js";
+import { getAuthenticatedClient } from "@/lib/supabaseClient";
 
 // Types for chatbot settings
 export interface ChatbotSettings {
@@ -31,54 +31,39 @@ export interface ServiceResponse<T> {
   error: string | null;
 }
 
-// Singleton pattern for authenticated Supabase client
-let authenticatedSupabaseInstance: any = null;
-
 export function useChatbotSettingsService() {
   const { getToken, userId } = useAuth();
 
-  // Get authenticated Supabase client
+    // Get authenticated Supabase client
   async function getAuthenticatedSupabase() {
-    if (authenticatedSupabaseInstance) {
-      return authenticatedSupabaseInstance;
-    }
-
     const token = await getToken({ template: "supabase" });
     if (!token) {
       throw new Error("No authentication token available");
     }
 
-    authenticatedSupabaseInstance = createClient(
-      import.meta.env.VITE_SUPABASE_URL!,
-      import.meta.env.VITE_SUPABASE_ANON_KEY!,
-      {
-        global: {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      }
-    );
-
-    return authenticatedSupabaseInstance;
+    // Use the shared authenticated client
+    return await getAuthenticatedClient(token);
   }
 
   // 1. Get user's chatbot settings
-  async function getChatbotSettings(): Promise<ServiceResponse<ChatbotSettings>> {
+  async function getChatbotSettings(): Promise<
+    ServiceResponse<ChatbotSettings>
+  > {
     try {
       if (!userId) {
         return { data: null, error: "User not authenticated" };
       }
 
       const authenticatedSupabase = await getAuthenticatedSupabase();
-      
+
       const { data, error } = await authenticatedSupabase
         .from("chatbot_settings")
         .select("*")
         .eq("user_id", userId)
         .single();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+      if (error && error.code !== "PGRST116") {
+        // PGRST116 = no rows returned
         console.error("Error fetching chatbot settings:", error);
         return { data: null, error: error.message };
       }
@@ -105,7 +90,7 @@ export function useChatbotSettingsService() {
       }
 
       const authenticatedSupabase = await getAuthenticatedSupabase();
-      
+
       // Check if settings already exist
       const { data: existingSettings } = await authenticatedSupabase
         .from("chatbot_settings")
@@ -114,7 +99,7 @@ export function useChatbotSettingsService() {
         .single();
 
       let result;
-      
+
       if (existingSettings) {
         // Update existing settings
         result = await authenticatedSupabase

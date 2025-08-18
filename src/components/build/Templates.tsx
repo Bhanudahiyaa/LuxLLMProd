@@ -1,10 +1,25 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Clipboard, Calendar, X, Bot, Users, Zap, HelpCircle, MessageSquare } from "lucide-react";
+import {
+  ArrowRight,
+  Clipboard,
+  Calendar,
+  X,
+  Bot,
+  Users,
+  Zap,
+  HelpCircle,
+  MessageSquare,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useAgentService } from "@/hooks/agentService";
 import { toast } from "sonner";
@@ -33,7 +48,8 @@ const TEMPLATES: Template[] = [
     name: "Customer Support Bot",
     title: "Customer Support Bot",
     category: "Customer Support",
-    description: "Handle customer queries instantly with a friendly AI assistant that provides 24/7 support.",
+    description:
+      "Handle customer queries instantly with a friendly AI assistant that provides 24/7 support.",
     excerpt: "Instant customer support",
     avatar_url: "/avatars/support.png",
     heading: "24/7 Support",
@@ -41,14 +57,15 @@ const TEMPLATES: Template[] = [
     system_prompt: "You are a helpful customer support assistant.",
     created_at: "March 15, 2025",
     date: "March 15, 2025",
-    logo: "👥"
+    logo: "👥",
   },
   {
     id: "2",
     name: "Portfolio Bot",
     title: "Portfolio Bot",
     category: "Personal",
-    description: "Introduce yourself and your work with an interactive portfolio chatbot that showcases your skills.",
+    description:
+      "Introduce yourself and your work with an interactive portfolio chatbot that showcases your skills.",
     excerpt: "Interactive portfolio guide",
     avatar_url: "/avatars/portfolio.png",
     heading: "Meet My Work",
@@ -56,14 +73,15 @@ const TEMPLATES: Template[] = [
     system_prompt: "You are a personal portfolio presenter AI.",
     created_at: "March 16, 2025",
     date: "March 16, 2025",
-    logo: "🤖"
+    logo: "🤖",
   },
   {
     id: "3",
     name: "Request Handler Bot",
     title: "Request Handler Bot",
     category: "Productivity",
-    description: "Automate form submissions and handle structured requests with intelligent processing.",
+    description:
+      "Automate form submissions and handle structured requests with intelligent processing.",
     excerpt: "Smart request automation",
     avatar_url: "/avatars/request.png",
     heading: "Smart Request Manager",
@@ -71,14 +89,15 @@ const TEMPLATES: Template[] = [
     system_prompt: "You manage structured requests and provide confirmations.",
     created_at: "March 17, 2025",
     date: "March 17, 2025",
-    logo: "⚡"
+    logo: "⚡",
   },
   {
     id: "4",
     name: "FAQ Assistant",
     title: "FAQ Assistant",
     category: "Knowledge Base",
-    description: "Answer common questions about your product or service with instant, accurate responses.",
+    description:
+      "Answer common questions about your product or service with instant, accurate responses.",
     excerpt: "Instant FAQ responses",
     avatar_url: "/avatars/faq.png",
     heading: "Instant Answers",
@@ -86,14 +105,15 @@ const TEMPLATES: Template[] = [
     system_prompt: "You are an FAQ answering AI assistant.",
     created_at: "March 18, 2025",
     date: "March 18, 2025",
-    logo: "❓"
+    logo: "❓",
   },
   {
     id: "5",
     name: "Feedback Collector",
     title: "Feedback Collector",
     category: "Analytics",
-    description: "Collect and organize user feedback conversationally to improve your products and services.",
+    description:
+      "Collect and organize user feedback conversationally to improve your products and services.",
     excerpt: "Conversational feedback collection",
     avatar_url: "/avatars/feedback.png",
     heading: "Gather Insights",
@@ -101,17 +121,19 @@ const TEMPLATES: Template[] = [
     system_prompt: "You ask for feedback in a polite and structured way.",
     created_at: "March 19, 2025",
     date: "March 19, 2025",
-    logo: "💬"
-  }
+    logo: "💬",
+  },
 ];
 
 export function Templates() {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(
+    null
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCloning, setIsCloning] = useState(false);
-  
+
   const { createAgent } = useAgentService();
 
   const categories = useMemo(() => {
@@ -129,6 +151,18 @@ export function Templates() {
     setIsModalOpen(true);
   };
 
+  const handleCustomizeTemplate = (template: Template) => {
+    try {
+      localStorage.setItem("selectedTemplate", JSON.stringify(template));
+    } catch (e) {
+      console.warn("Failed to cache selected template", e);
+    }
+    setIsModalOpen(false);
+    navigate(
+      `/editor?template=${encodeURIComponent(JSON.stringify(template))}`
+    );
+  };
+
   const handleCloneTemplate = async (template: Template) => {
     setIsCloning(true);
     try {
@@ -141,16 +175,16 @@ export function Templates() {
       });
 
       if (error) {
-        toast.error(`Failed to clone template: ${error}`);
+        toast.error(`Failed to save template: ${error}`);
       } else {
-        toast.success("Template cloned successfully!");
+        toast.success("Template saved to My Agents successfully!");
         setIsModalOpen(false);
-        // Redirect to editor with the new agent ID
-        navigate(`/editor?agentId=${data.id}`);
+        // Return to build page instead of editor
+        navigate("/build");
       }
     } catch (err) {
-      console.error("Error cloning template:", err);
-      toast.error("Failed to clone template");
+      console.error("Error saving template:", err);
+      toast.error("Failed to save template");
     } finally {
       setIsCloning(false);
     }
@@ -254,12 +288,15 @@ export function Templates() {
               </Button>
             </div>
           </DialogHeader>
-          
+
           {selectedTemplate && (
             <div className="space-y-6">
               {/* Category and date */}
               <div className="flex items-center justify-between">
-                <Badge variant="secondary" className="bg-muted text-muted-foreground">
+                <Badge
+                  variant="secondary"
+                  className="bg-muted text-muted-foreground"
+                >
                   {selectedTemplate.category}
                 </Badge>
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
@@ -270,8 +307,12 @@ export function Templates() {
 
               {/* Description */}
               <div>
-                <h4 className="font-medium text-foreground mb-2">Description</h4>
-                <p className="text-muted-foreground">{selectedTemplate.description}</p>
+                <h4 className="font-medium text-foreground mb-2">
+                  Description
+                </h4>
+                <p className="text-muted-foreground">
+                  {selectedTemplate.description}
+                </p>
               </div>
 
               {/* Heading and Subheading */}
@@ -280,10 +321,14 @@ export function Templates() {
                   <h4 className="font-medium text-foreground mb-2">Preview</h4>
                   <div className="bg-muted/20 rounded-lg p-4 border border-border">
                     {selectedTemplate.heading && (
-                      <h5 className="font-semibold text-foreground mb-1">{selectedTemplate.heading}</h5>
+                      <h5 className="font-semibold text-foreground mb-1">
+                        {selectedTemplate.heading}
+                      </h5>
                     )}
                     {selectedTemplate.subheading && (
-                      <p className="text-muted-foreground text-sm">{selectedTemplate.subheading}</p>
+                      <p className="text-muted-foreground text-sm">
+                        {selectedTemplate.subheading}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -291,37 +336,31 @@ export function Templates() {
 
               {/* System Prompt */}
               <div>
-                <h4 className="font-medium text-foreground mb-2">System Prompt</h4>
+                <h4 className="font-medium text-foreground mb-2">
+                  System Prompt
+                </h4>
                 <div className="bg-muted/20 rounded-lg p-4 border border-border">
-                  <p className="text-muted-foreground text-sm font-mono">{selectedTemplate.system_prompt}</p>
+                  <p className="text-muted-foreground text-sm font-mono">
+                    {selectedTemplate.system_prompt}
+                  </p>
                 </div>
               </div>
 
-              {/* Clone button */}
-              <div className="flex justify-end space-x-3 pt-4">
+              {/* Actions */}
+              <div className="flex justify-between items-center pt-4 gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => handleCustomizeTemplate(selectedTemplate)}
+                  className="border-border"
+                >
+                  Configure Chatbot
+                </Button>
                 <Button
                   variant="outline"
                   onClick={() => setIsModalOpen(false)}
                   className="border-border text-muted-foreground hover:bg-muted"
                 >
                   Cancel
-                </Button>
-                <Button
-                  onClick={() => handleCloneTemplate(selectedTemplate)}
-                  disabled={isCloning}
-                  className="bg-primary hover:bg-primary/90"
-                >
-                  {isCloning ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                      Cloning...
-                    </>
-                  ) : (
-                    <>
-                      <Clipboard className="w-4 h-4 mr-2" />
-                      Clone this template
-                    </>
-                  )}
                 </Button>
               </div>
             </div>

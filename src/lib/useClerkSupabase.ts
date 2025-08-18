@@ -1,11 +1,7 @@
 import { useAuth } from "@clerk/clerk-react";
 import { useCallback } from "react";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { SupabaseClient } from "@supabase/supabase-js";
+import { getAuthenticatedClient } from "./supabaseClient";
 
 export function useClerkSupabase() {
   const { getToken } = useAuth();
@@ -14,12 +10,8 @@ export function useClerkSupabase() {
     const token = await getToken({ template: "supabase" });
     if (!token) throw new Error("No Clerk token available");
 
-    await supabase.auth.signInWithIdToken({
-      provider: "clerk",
-      token,
-    });
-
-    return supabase;
+    // Use the shared authenticated client
+    return await getAuthenticatedClient(token);
   }, [getToken]);
 
   return { getSupabase };

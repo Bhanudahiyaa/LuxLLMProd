@@ -12,13 +12,30 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Upload, Save, Code, MessageCircle, Palette, User, Bot } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Upload,
+  Save,
+  Code,
+  MessageCircle,
+  Palette,
+  User,
+  Bot,
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useChatbotSettings } from "@/hooks/chatbotSettingsService";
-import { useAgentService } from "@/hooks/agentService"; 
+import { useAgentService } from "@/hooks/agentService";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useChatbotSettingsService, ChatbotSettingsData } from "../hooks/chatbotSettingsService";
+import {
+  useChatbotSettingsService,
+  ChatbotSettingsData,
+} from "../hooks/chatbotSettingsService";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 
@@ -42,7 +59,8 @@ interface ChatMessage {
 
 export function ChatbotEditor() {
   const navigate = useNavigate();
-  const { getChatbotSettings, saveChatbotSettings } = useChatbotSettingsService();
+  const { getChatbotSettings, saveChatbotSettings } =
+    useChatbotSettingsService();
 
   // Form state
   const {
@@ -59,8 +77,8 @@ export function ChatbotEditor() {
       border_color: "#000000",
       user_msg_color: "#3b82f6",
       bot_msg_color: "#f3f4f6",
-      system_prompt: "You are a helpful assistant."
-    }
+      system_prompt: "You are a helpful assistant.",
+    },
   });
 
   // Component state
@@ -73,7 +91,7 @@ export function ChatbotEditor() {
 
   // Watch form values for live preview
   const watchedValues = watch();
-  
+
   // Watch specific UI customization fields for real-time updates
   const chatBg = watch("chat_bg");
   const borderColor = watch("border_color");
@@ -111,7 +129,7 @@ export function ChatbotEditor() {
     };
 
     loadSettings();
-  }, []); // Remove dependencies to prevent re-running
+  }, [getChatbotSettings, setValue]); // Include required dependencies
 
   // Save chatbot settings
   const onSubmit = async (data: ChatbotFormData) => {
@@ -151,7 +169,8 @@ export function ChatbotEditor() {
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "This is a preview response from your chatbot. The actual responses will be generated based on your system prompt.",
+        content:
+          "This is a preview response from your chatbot. The actual responses will be generated based on your system prompt.",
         timestamp: new Date(),
       };
       setChatMessages(prev => [...prev, botMessage]);
@@ -331,7 +350,9 @@ export function ChatbotEditor() {
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Build
             </Button>
-            <h1 className="text-2xl font-bold text-foreground">Chatbot Editor</h1>
+            <h1 className="text-2xl font-bold text-foreground">
+              Chatbot Editor
+            </h1>
           </div>
           <div className="flex space-x-3">
             <Button
@@ -359,7 +380,9 @@ export function ChatbotEditor() {
           <div className="lg:col-span-2">
             <Card className="bg-card border-border shadow-lg">
               <CardHeader>
-                <CardTitle className="text-foreground">UI Customization</CardTitle>
+                <CardTitle className="text-foreground">
+                  UI Customization
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -444,7 +467,10 @@ export function ChatbotEditor() {
                   {/* Message Colors */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="user_msg_color" className="text-foreground">
+                      <Label
+                        htmlFor="user_msg_color"
+                        className="text-foreground"
+                      >
                         User Message
                       </Label>
                       <div className="flex space-x-2">
@@ -462,7 +488,10 @@ export function ChatbotEditor() {
                     </div>
 
                     <div>
-                      <Label htmlFor="bot_msg_color" className="text-foreground">
+                      <Label
+                        htmlFor="bot_msg_color"
+                        className="text-foreground"
+                      >
                         Bot Message
                       </Label>
                       <div className="flex space-x-2">
@@ -505,17 +534,17 @@ export function ChatbotEditor() {
           </div>
 
           {/* Right Panel - Chat Preview */}
-          <div 
+          <div
             className="lg:col-span-3 flex flex-col rounded-xl shadow-lg"
             style={{
-              backgroundColor: chatBg || '#ffffff',
-              border: `2px solid ${borderColor || '#000000'}`,
+              backgroundColor: chatBg || "#ffffff",
+              border: `2px solid ${borderColor || "#000000"}`,
             }}
           >
             {/* Chat Header */}
-            <div 
+            <div
               className="p-6 border-b rounded-t-xl"
-              style={{ borderColor: borderColor || '#000000' }}
+              style={{ borderColor: borderColor || "#000000" }}
             >
               <div className="flex items-center space-x-3">
                 <Avatar>
@@ -571,10 +600,12 @@ export function ChatbotEditor() {
                       <div
                         className="p-3 rounded-lg"
                         style={{
-                          backgroundColor: message.role === "user" 
-                            ? (userMsgColor || '#3b82f6')
-                            : (botMsgColor || '#f3f4f6'),
-                          color: message.role === "user" ? '#ffffff' : '#374151'
+                          backgroundColor:
+                            message.role === "user"
+                              ? userMsgColor || "#3b82f6"
+                              : botMsgColor || "#f3f4f6",
+                          color:
+                            message.role === "user" ? "#ffffff" : "#374151",
                         }}
                       >
                         {message.role === "assistant" ? (
@@ -601,10 +632,10 @@ export function ChatbotEditor() {
                           <Bot className="w-4 h-4 text-muted-foreground" />
                         </AvatarFallback>
                       </Avatar>
-                      <div 
+                      <div
                         className="p-3 rounded-lg"
                         style={{
-                          backgroundColor: botMsgColor || '#f3f4f6'
+                          backgroundColor: botMsgColor || "#f3f4f6",
                         }}
                       >
                         <div className="flex space-x-1">
@@ -626,9 +657,9 @@ export function ChatbotEditor() {
             </ScrollArea>
 
             {/* Chat Input */}
-            <div 
+            <div
               className="p-6 border-t rounded-b-xl"
-              style={{ borderColor: borderColor || '#000000' }}
+              style={{ borderColor: borderColor || "#000000" }}
             >
               <div className="flex items-center space-x-3">
                 <Input
@@ -644,7 +675,7 @@ export function ChatbotEditor() {
                   className="bg-background border-border text-foreground flex-1"
                   disabled={isTyping}
                   style={{
-                    borderColor: borderColor || '#000000'
+                    borderColor: borderColor || "#000000",
                   }}
                 />
                 <Button
@@ -664,7 +695,9 @@ export function ChatbotEditor() {
       <Dialog open={exportModalOpen} onOpenChange={setExportModalOpen}>
         <DialogContent className="bg-card border-border text-card-foreground max-w-4xl max-h-[80vh]">
           <DialogHeader>
-            <DialogTitle className="text-foreground">Export Chatbot Code</DialogTitle>
+            <DialogTitle className="text-foreground">
+              Export Chatbot Code
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-muted-foreground">

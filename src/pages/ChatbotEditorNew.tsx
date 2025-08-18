@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -12,7 +12,6 @@ import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChatbotPreview } from "@/components/chatbot-preview";
 import { SettingsPanel } from "@/components/settings-panel";
-import { TemplateGallery } from "@/components/template-gallery";
 import { AnimatedBackground } from "@/components/animated-background";
 import { LoadingSpinner } from "@/components/loading-spinner";
 
@@ -36,18 +35,15 @@ import {
   Sun,
   Copy,
 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatbotSettingsService } from "@/hooks/chatbotSettingsService";
 import { useAgentService } from "@/hooks/agentService";
 import { chatWithAgent } from "@/api/chat";
+import { AppSidebar } from "@/components/layout/AppSidebar";
+import Navigation from "@/components/Navigation";
+import { useAuth } from "@clerk/clerk-react";
+import { supabase, getAuthenticatedClient } from "@/lib/supabaseClient";
 
 // Types
 interface ChatbotFormData {
@@ -66,7 +62,7 @@ interface Agent {
   heading?: string;
   subheading?: string;
   avatar_url?: string;
-  system_prompt: string;
+  system_prompt?: string;
 }
 
 interface ChatMessage {
@@ -84,8 +80,24 @@ export default function ChatbotEditor() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [agent, setAgent] = useState<Agent | null>(null);
-  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [borderRadius, setBorderRadius] = useState(12);
+  const [fontSize, setFontSize] = useState(14);
+  const [fontFamily, setFontFamily] = useState("Inter");
+  const [position, setPosition] = useState("bottom-right");
+  const [showTypingIndicatorState, setShowTypingIndicatorState] =
+    useState(true);
+  const [enableSoundsState, setEnableSoundsState] = useState(false);
+  const [animationSpeedState, setAnimationSpeedState] = useState<
+    "slow" | "normal" | "fast"
+  >("normal");
+  const [welcomeMessageState, setWelcomeMessageState] = useState(
+    "Hello! How can I help you today?"
+  );
+  const [placeholderState, setPlaceholderState] = useState(
+    "Type your message..."
+  );
+  const didInitRef = useRef(false);
 
   // Chat functionality
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -94,7 +106,8 @@ export default function ChatbotEditor() {
 
   const { getChatbotSettings, saveChatbotSettings } =
     useChatbotSettingsService();
-  const { getAgentsByUser, updateAgent } = useAgentService();
+  const { getAgentsByUser, updateAgent, createAgent } = useAgentService();
+  const { getToken } = useAuth();
 
   // Form setup with default values
   const {
@@ -111,7 +124,7 @@ export default function ChatbotEditor() {
       chat_bg: "#ffffff",
       border_color: "#e5e7eb",
       user_msg_color: "#3b82f6",
-      bot_msg_color: "#f3f4f6",
+      bot_msg_color: "#000000",
       system_prompt: "You are a helpful assistant.",
     },
     mode: "onChange",
@@ -126,21 +139,74 @@ export default function ChatbotEditor() {
   const avatarUrl = watch("avatar_url");
   const systemPrompt = watch("system_prompt");
 
+  // Create a config object for the SettingsPanel that updates when form values change
+  const settingsConfig = useMemo(() => {
+    console.log("Creating settings config with botMsgColor:", botMsgColor);
+    return {
+      name: chatName,
+      theme: isDarkMode ? "dark" : "light",
+      primaryColor: userMsgColor,
+      accentColor: borderColor,
+      backgroundColor: chatBg,
+      textColor: botMsgColor || "#000000",
+      borderRadius: borderRadius,
+      fontSize: fontSize,
+      fontFamily: fontFamily,
+      position: position as "bottom-right" | "bottom-left",
+      welcomeMessage: welcomeMessageState,
+      systemPrompt: systemPrompt || "You are a helpful assistant.",
+      placeholder: placeholderState,
+      avatar: avatarUrl || "",
+      showTypingIndicator: showTypingIndicatorState,
+      enableSounds: enableSoundsState,
+      animationSpeed: animationSpeedState,
+    };
+  }, [
+    chatName,
+    isDarkMode,
+    userMsgColor,
+    borderColor,
+    chatBg,
+    botMsgColor,
+    borderRadius,
+    fontSize,
+    fontFamily,
+    position,
+    welcomeMessageState,
+    systemPrompt,
+    placeholderState,
+    avatarUrl,
+    showTypingIndicatorState,
+    enableSoundsState,
+    animationSpeedState,
+  ]);
+
   // Initialize with welcome message
   useEffect(() => {
     setMessages([
       {
         id: "1",
         role: "assistant",
-        content: "Hello! How can I help you today?",
+        content: welcomeMessageState,
         timestamp: new Date(),
       },
     ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Load agent data if agentId is provided
+  // Load agent data if agentId is provided (only once per agentId)
   useEffect(() => {
     const loadAgentData = async () => {
+      if (didInitRef.current) return;
+      didInitRef.current = true;
+
+      // Check if we have template data first - if so, skip agent loading
+      const templateParam = searchParams.get("template");
+      if (templateParam) {
+        // Template data will be handled by the template useEffect
+        return;
+      }
+
       if (!agentId) {
         // No agent ID, load saved chatbot settings if any
         try {
@@ -204,7 +270,8 @@ export default function ChatbotEditor() {
         reset({
           name: foundAgent.name,
           avatar_url: foundAgent.avatar_url || "",
-          system_prompt: foundAgent.system_prompt,
+          system_prompt:
+            foundAgent.system_prompt || "You are a helpful assistant.",
           ...uiSettings,
         });
       } catch (error) {
@@ -217,7 +284,44 @@ export default function ChatbotEditor() {
     };
 
     loadAgentData();
-  }, [agentId, getChatbotSettings, getAgentsByUser, navigate, reset]);
+    // Only depend on agentId to avoid re-running due to unstable function refs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [agentId]);
+
+  // Load template data if template parameter is provided
+  useEffect(() => {
+    const templateParam = searchParams.get("template");
+    if (templateParam) {
+      try {
+        const template = JSON.parse(decodeURIComponent(templateParam));
+        console.log("Loading template:", template); // Debug log
+
+        // Update form with template data
+        reset({
+          name: template.name || template.title || "My Chatbot",
+          avatar_url: template.avatar_url || "",
+          chat_bg: "#ffffff",
+          border_color: "#e5e7eb",
+          user_msg_color: "#3b82f6",
+          bot_msg_color: "#f3f4f6",
+          system_prompt:
+            template.system_prompt || "You are a helpful assistant.",
+        });
+
+        // Also update the local state for immediate UI update
+        setLoading(false);
+
+        // Clear the template parameter from URL
+        const newSearchParams = new URLSearchParams(searchParams);
+        newSearchParams.delete("template");
+        navigate(`/editor?${newSearchParams.toString()}`, { replace: true });
+      } catch (error) {
+        console.error("Error parsing template:", error);
+        toast.error("Failed to load template");
+        setLoading(false);
+      }
+    }
+  }, [searchParams, navigate, reset]);
 
   // Send message function
   const sendMessage = async () => {
@@ -268,29 +372,34 @@ export default function ChatbotEditor() {
   const onSubmit = async (data: ChatbotFormData) => {
     setSaving(true);
     try {
-      // Save UI customization settings
-      const { error: settingsError } = await saveChatbotSettings(data);
-      if (settingsError) {
-        toast.error("Failed to save settings: " + settingsError);
+      // Create a new agent with the chatbot settings
+      const { data: newAgent, error: createError } = await createAgent({
+        name: data.name,
+        avatar_url: data.avatar_url,
+        heading: data.name,
+        subheading: "AI-powered chatbot",
+        system_prompt: data.system_prompt,
+      });
+
+      if (createError) {
+        toast.error("Failed to create agent: " + createError);
         return;
       }
 
-      // If we have an agent, update it with the new avatar
-      if (agent && agentId) {
-        const { error: agentError } = await updateAgent(agentId, {
-          ...agent,
-          avatar_url: data.avatar_url,
-        } as any);
-        if (agentError) {
-          toast.error("Failed to update agent: " + agentError);
-          return;
-        }
+      // Save UI customization settings
+      const { error: settingsError } = await saveChatbotSettings(data);
+      if (settingsError) {
+        console.warn("Failed to save UI settings:", settingsError);
+        // Continue anyway since the agent was created
       }
 
-      toast.success("Settings saved successfully!");
+      toast.success("Chatbot created successfully!");
+
+      // Navigate to My Agents page
+      navigate("/build/agents");
     } catch (error) {
       console.error("Error saving:", error);
-      toast.error("Failed to save settings");
+      toast.error("Failed to create chatbot");
     } finally {
       setSaving(false);
     }
@@ -424,25 +533,41 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      <AppSidebar />
+
+      {/* Main Content */}
+      <div className="md:ml-48">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/build")}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Build
-            </Button>
+        <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="flex h-16 items-center justify-between px-6">
+            <div className="md:hidden">
+              {/* Mobile menu trigger is handled by AppSidebar */}
+            </div>
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <main className="flex-1 p-6">
+          {/* Page Header */}
+          <div className="mb-8">
+            <div className="flex items-center gap-4 mb-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/build")}
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Build
+              </Button>
+            </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-foreground">
                 {agent ? `Customize ${agent.name}` : "Chatbot Customization"}
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-muted-foreground mt-2">
                 {agent
                   ? "Customize the UI appearance of your agent"
                   : "Design your perfect chatbot interface"}
@@ -450,298 +575,244 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
           </div>
 
-          <div className="flex gap-3">
-            <Dialog
-              open={isExportModalOpen}
-              onOpenChange={setIsExportModalOpen}
-            >
-              <DialogTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Download className="h-4 w-4" />
+          <section>
+            <Tabs defaultValue="design" className="w-full">
+              <div className="mb-6 flex items-center justify-between gap-3">
+                <TabsList className="bg-background border border-border">
+                  <TabsTrigger
+                    value="design"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  >
+                    Design & Preview
+                  </TabsTrigger>
+                </TabsList>
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2 shadow-sm bg-background border-border hover:bg-muted"
+                  onClick={() => {
+                    const currentData = {
+                      id: "preview-" + Date.now(),
+                      name: watch("name") || "My Chatbot",
+                      avatar_url: watch("avatar_url") || "",
+                      system_prompt:
+                        watch("system_prompt") ||
+                        "You are a helpful assistant.",
+                      chat_bg_color: watch("chat_bg") || "#ffffff",
+                      chat_border_color: watch("border_color") || "#e5e7eb",
+                      user_msg_color: watch("user_msg_color") || "#3b82f6",
+                      bot_msg_color: watch("bot_msg_color") || "#f3f4f6",
+                    };
+                    localStorage.setItem(
+                      "chatbotPreviewData",
+                      JSON.stringify(currentData)
+                    );
+                    navigate("/export");
+                  }}
+                >
+                  <Code className="h-4 w-4" />
                   Export Code
                 </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[80vh]">
-                <DialogHeader>
-                  <DialogTitle>Export Chatbot Widget</DialogTitle>
-                </DialogHeader>
-                <ScrollArea className="h-96">
-                  <pre className="bg-gray-100 p-4 rounded-lg text-sm overflow-x-auto">
-                    <code>{generateExportCode()}</code>
-                  </pre>
-                </ScrollArea>
-                <div className="flex justify-end">
-                  <Button
-                    onClick={() => {
-                      navigator.clipboard.writeText(generateExportCode());
-                      toast.success("Code copied to clipboard!");
-                    }}
-                  >
-                    Copy Code
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-
-        <section>
-          <Tabs defaultValue="design" className="w-full">
-            <TabsList className="mb-6">
-              <TabsTrigger value="design">Design &amp; Preview</TabsTrigger>
-              <TabsTrigger value="templates">Template Gallery</TabsTrigger>
-            </TabsList>
-            <TabsContent value="design">
-              <div className="grid lg:grid-cols-2 gap-8">
-                {/* Customization Panel */}
-                <Card className="shadow-lg">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Palette className="h-5 w-5" />
-                      Customization Panel
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <form
-                      onSubmit={handleSubmit(onSubmit)}
-                      className="space-y-6"
-                    >
-                      {/* Basic Info */}
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold flex items-center gap-2">
-                          <User className="h-4 w-4" />
-                          Basic Information
-                        </h3>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="name">Display Name</Label>
-                          <Input
-                            id="name"
-                            {...register("name", {
-                              required: "Name is required",
-                            })}
-                            placeholder="My Chatbot"
-                            disabled={!!agent} // Disable if editing an agent (name comes from template)
-                          />
-                          {errors.name && (
-                            <p className="text-sm text-red-600">
-                              {errors.name.message}
-                            </p>
-                          )}
+              </div>
+              <TabsContent value="design">
+                <div className="grid lg:grid-cols-2 gap-8">
+                  {/* Customization Panel */}
+                  <Card className="shadow-lg border border-border">
+                    <CardHeader className="border-b border-border">
+                      <CardTitle className="flex items-center gap-3 text-xl font-semibold">
+                        <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <Palette className="h-5 w-5 text-primary" />
                         </div>
+                        Customization Panel
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <SettingsPanel
+                        config={settingsConfig}
+                        onAvatarUpload={async (file: File) => {
+                          try {
+                            // Upload to Supabase storage
+                            const fileExt = file.name.split(".").pop();
+                            const fileName = `${Date.now()}.${fileExt}`;
+                            const filePath = fileName;
 
-                        <div className="space-y-2">
-                          <Label htmlFor="avatar_url">Avatar URL</Label>
-                          <Input
-                            id="avatar_url"
-                            {...register("avatar_url")}
-                            placeholder="https://example.com/avatar.jpg"
-                          />
-                        </div>
-                      </div>
+                            // Get authenticated client for storage operations
+                            const token = await getToken();
+                            const client = await getAuthenticatedClient(token);
 
-                      <Separator />
+                            const { data: uploadData, error: uploadError } =
+                              await client.storage
+                                .from("avatars")
+                                .upload(filePath, file, { upsert: false });
 
-                      {/* UI Customization */}
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold flex items-center gap-2">
-                          <Palette className="h-4 w-4" />
-                          UI Customization
-                        </h3>
+                            if (uploadError) {
+                              console.error(
+                                "Avatar upload error:",
+                                uploadError
+                              );
+                              toast.error("Failed to upload avatar");
+                              return;
+                            }
 
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="chat_bg">Background Color</Label>
-                            <Input
-                              id="chat_bg"
-                              type="color"
-                              {...register("chat_bg")}
-                              className="h-10"
-                            />
-                          </div>
+                            const {
+                              data: { publicUrl },
+                            } = client.storage
+                              .from("avatars")
+                              .getPublicUrl(filePath);
 
-                          <div className="space-y-2">
-                            <Label htmlFor="border_color">Border Color</Label>
-                            <Input
-                              id="border_color"
-                              type="color"
-                              {...register("border_color")}
-                              className="h-10"
-                            />
-                          </div>
+                            // Set avatar URL back into form
+                            setValue("avatar_url", publicUrl, {
+                              shouldDirty: true,
+                            });
 
-                          <div className="space-y-2">
-                            <Label htmlFor="user_msg_color">
-                              User Message Color
-                            </Label>
-                            <Input
-                              id="user_msg_color"
-                              type="color"
-                              {...register("user_msg_color")}
-                              className="h-10"
-                            />
-                          </div>
+                            // Force a re-render by updating the avatar state
+                            // This will update the settingsConfig since it depends on avatarUrl
+                            setValue("avatar_url", publicUrl, {
+                              shouldDirty: true,
+                            });
 
-                          <div className="space-y-2">
-                            <Label htmlFor="bot_msg_color">
-                              Bot Message Color
-                            </Label>
-                            <Input
-                              id="bot_msg_color"
-                              type="color"
-                              {...register("bot_msg_color")}
-                              className="h-10"
-                            />
-                          </div>
-                        </div>
-                      </div>
+                            // Debug: Log the avatar update
+                            console.log(
+                              "Avatar uploaded successfully:",
+                              publicUrl
+                            );
+                            console.log(
+                              "Form avatar_url value:",
+                              watch("avatar_url")
+                            );
+                            console.log(
+                              "Settings config avatar:",
+                              settingsConfig.avatar
+                            );
 
-                      <Separator />
+                            toast.success("Avatar uploaded successfully");
+                          } catch (e) {
+                            console.error("Avatar upload error:", e);
+                            toast.error(
+                              "Failed to upload avatar. Please try again."
+                            );
+                          }
+                        }}
+                        onConfigChange={cfg => {
+                          console.log("Settings panel config change:", cfg);
+                          console.log("Text color changed to:", cfg.textColor);
 
-                      {/* System Prompt */}
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold flex items-center gap-2">
-                          <Bot className="h-4 w-4" />
-                          System Prompt
-                        </h3>
+                          // Map settings panel changes back to form values
+                          setValue("chat_bg", cfg.backgroundColor, {
+                            shouldDirty: true,
+                          });
+                          setValue("border_color", cfg.accentColor, {
+                            shouldDirty: true,
+                          });
+                          setValue("user_msg_color", cfg.primaryColor, {
+                            shouldDirty: true,
+                          });
+                          setValue("bot_msg_color", cfg.textColor, {
+                            shouldDirty: true,
+                          });
+                          setIsDarkMode(cfg.theme === "dark");
 
-                        <div className="space-y-2">
-                          <Label htmlFor="system_prompt">System Prompt</Label>
-                          <Textarea
-                            id="system_prompt"
-                            {...register("system_prompt", {
-                              required: "System prompt is required",
-                            })}
-                            placeholder="You are a helpful assistant..."
-                            rows={4}
-                            disabled={!!agent} // Disable if editing an agent (prompt comes from template)
-                          />
-                          {errors.system_prompt && (
-                            <p className="text-sm text-red-600">
-                              {errors.system_prompt.message}
-                            </p>
-                          )}
-                        </div>
-                      </div>
+                          // Update UI settings
+                          setBorderRadius(cfg.borderRadius);
+                          setFontSize(cfg.fontSize);
+                          setFontFamily(cfg.fontFamily);
+                          setPosition(cfg.position);
+                          setWelcomeMessageState(cfg.welcomeMessage);
+                          setPlaceholderState(cfg.placeholder);
+                          setShowTypingIndicatorState(cfg.showTypingIndicator);
+                          setEnableSoundsState(cfg.enableSounds);
+                          setAnimationSpeedState(
+                            (cfg.animationSpeed as
+                              | "slow"
+                              | "normal"
+                              | "fast") || "normal"
+                          );
+
+                          // Update other settings
+                          if (cfg.avatar !== avatarUrl) {
+                            setValue("avatar_url", cfg.avatar, {
+                              shouldDirty: true,
+                            });
+                          }
+
+                          // Update form state immediately for real-time preview
+                          // This ensures the watched values are updated
+                          const formData = {
+                            chat_bg: cfg.backgroundColor,
+                            border_color: cfg.accentColor,
+                            user_msg_color: cfg.primaryColor,
+                            bot_msg_color: cfg.textColor,
+                            avatar_url: cfg.avatar,
+                          };
+
+                          // Force form update
+                          Object.entries(formData).forEach(([key, value]) => {
+                            setValue(key as keyof ChatbotFormData, value, {
+                              shouldDirty: true,
+                            });
+                          });
+                        }}
+                        lockedFields={["name", "systemPrompt"]}
+                      />
 
                       {/* Save Button */}
-                      <Button
-                        type="submit"
-                        disabled={saving}
-                        className="w-full flex items-center gap-2"
-                      >
-                        <Save className="h-4 w-4" />
-                        {saving ? "Saving..." : "Save Changes"}
-                      </Button>
-                    </form>
-                  </CardContent>
-                </Card>
-
-                {/* Live Preview */}
-                <AnimatePresence mode="wait">
-                  {loading ? (
-                    <motion.div
-                      key="loading"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="flex items-center justify-center h-[600px]"
-                    >
-                      <div className="text-center">
-                        <LoadingSpinner size="lg" color={userMsgColor} />
-                        <p className="mt-4 text-muted-foreground">
-                          Loading preview...
-                        </p>
+                      <div className="mt-6 pt-6 border-t border-border">
+                        <Button
+                          onClick={handleSubmit(onSubmit)}
+                          disabled={saving}
+                          className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+                        >
+                          <Save className="h-4 w-4 mr-2" />
+                          {saving ? "Creating..." : "Create & Save Chatbot"}
+                        </Button>
                       </div>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="preview"
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <ChatbotPreview
-                        config={{
-                          name: chatName,
-                          theme: isDarkMode ? "dark" : "light",
-                          primaryColor: userMsgColor,
-                          accentColor: borderColor,
-                          backgroundColor: chatBg,
-                          textColor: isDarkMode ? "#f9fafb" : "#111827",
-                          borderRadius: 12,
-                          fontSize: 14,
-                          fontFamily: "system-ui, sans-serif",
-                          position: "bottom-right",
-                          welcomeMessage:
-                            systemPrompt || "Hello! How can I help you today?",
-                          placeholder: "Type your message...",
-                          avatar: avatarUrl,
-                          showTypingIndicator: true,
-                          enableSounds: false,
-                          animationSpeed: "normal",
-                        }}
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </TabsContent>
-            <TabsContent value="templates">
-              <div className="grid lg:grid-cols-2 gap-8">
-                <Card className="shadow-lg col-span-2">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Sparkles className="h-5 w-5" />
-                      Template Gallery
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {/* Placeholder handlers and current config */}
-                    <TemplateGallery
-                      currentConfig={{
-                        name: chatName,
-                        theme: isDarkMode ? "dark" : "light",
-                        primaryColor: userMsgColor,
-                        accentColor: borderColor,
-                        backgroundColor: chatBg,
-                        textColor: isDarkMode ? "#f9fafb" : "#111827",
-                        borderRadius: 12,
-                        fontSize: 14,
-                        fontFamily: "system-ui, sans-serif",
-                        position: "bottom-right",
-                        welcomeMessage:
-                          systemPrompt || "Hello! How can I help you today?",
-                        placeholder: "Type your message...",
-                        avatar: avatarUrl,
-                        showTypingIndicator: true,
-                        enableSounds: false,
-                        animationSpeed: "normal",
-                      }}
-                      onApplyTemplate={() => {
-                        toast.info("Apply Template: Not implemented yet");
-                      }}
-                      onPreviewTemplate={() => {
-                        toast.info("Preview Template: Not implemented yet");
-                      }}
-                    />
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
-          {/* Floating Add Template Button */}
-          <div className="fixed bottom-8 right-8 z-30">
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 shadow-lg"
-              onClick={() => toast.info("Add Template/Theme: Coming soon!")}
-            >
-              <Sparkles className="h-4 w-4" />
-              Add Template/Theme
-            </Button>
-          </div>
-        </section>
+                    </CardContent>
+                  </Card>
+
+                  {/* Live Preview */}
+                  <div className="relative">
+                    <div className="mb-4">
+                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                        Live Preview
+                      </h3>
+                      <p className="text-muted-foreground text-sm">
+                        See your changes in real-time
+                      </p>
+                    </div>
+
+                    <AnimatePresence mode="wait">
+                      {loading ? (
+                        <motion.div
+                          key="loading"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="flex items-center justify-center h-[600px] bg-muted/50 border border-border rounded-lg"
+                        >
+                          <div className="text-center">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                            <p className="text-muted-foreground">
+                              Loading preview...
+                            </p>
+                          </div>
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="preview"
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.5 }}
+                          className="bg-muted/50 border border-border rounded-lg p-4"
+                        >
+                          <ChatbotPreview config={settingsConfig} />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </section>
+        </main>
       </div>
     </div>
   );

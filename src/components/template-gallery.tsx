@@ -22,7 +22,7 @@ import { Play, Save, MoreVertical, Trash2, Copy, Plus } from "lucide-react"
 import { getTemplates, saveTemplate, deleteTemplate, getDefaultTemplates, type ChatbotTemplate } from "@/lib/templates"
 
 interface TemplateGalleryProps {
-  currentConfig: any
+  currentConfig: ChatbotTemplate["config"]
   onTemplateLoad: (template: ChatbotTemplate) => void
   onSaveTemplate: () => void
 }

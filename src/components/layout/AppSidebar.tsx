@@ -12,6 +12,9 @@ import {
   Info,
   Menu,
   X,
+  Zap,
+  MessageSquare,
+  Users,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -22,19 +25,21 @@ import { cn } from "@/lib/utils";
 
 const buildItems = [
   { title: "Templates", url: "/build/templates", icon: Wand2 },
-  { title: "Agent Settings", url: "/build/settings", icon: Settings },
-  { title: "Embed Generator", url: "/build/embed", icon: Code },
-  { title: "Analytics", url: "/build/analytics", icon: BarChart3 },
+  { title: "Premium", url: "/build/premium", icon: Bot },
 ];
 
 const manageItems = [
   { title: "My Agents", url: "/build/agents", icon: Bot },
-  { title: "Integrations", url: "/build/integrations", icon: Plug },
+  { title: "Customize", url: "/build/settings", icon: Settings },
+  { title: "Export", url: "/export", icon: Code },
 ];
 
 const helpItems = [
   { title: "How it Works", url: "/build/how-it-works", icon: HelpCircle },
   { title: "Quick Start", url: "/build/quick-start", icon: Play },
+  { title: "Pricing", url: "/build/pricing", icon: Zap },
+  { title: "Blogs", url: "/build/blogs", icon: MessageSquare },
+  { title: "Team", url: "/build/team", icon: Users },
   { title: "Support", url: "/build/support", icon: Phone },
   { title: "About", url: "/build/about", icon: Info },
 ];

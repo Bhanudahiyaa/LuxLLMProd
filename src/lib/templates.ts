@@ -49,7 +49,7 @@ export function getTemplates(): ChatbotTemplate[] {
     if (!stored) return []
 
     const templates = JSON.parse(stored)
-    return templates.map((t: any) => ({
+    return templates.map((t: Partial<ChatbotTemplate> & { createdAt: string; updatedAt: string }) => ({
       ...t,
       createdAt: new Date(t.createdAt),
       updatedAt: new Date(t.updatedAt),

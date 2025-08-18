@@ -16,6 +16,8 @@ import NotFound from "./pages/NotFound";
 // add this with your other page imports
 import Build from "./pages/Build";
 import ChatbotEditor from "./pages/ChatbotEditorNew";
+import ExportAgent from "./pages/ExportAgent";
+import Export from "./pages/Export";
 const queryClient = new QueryClient();
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -164,6 +166,34 @@ export default function App() {
               element={
                 <RequireAuth>
                   <ChatbotEditor />
+                </RequireAuth>
+              }
+            />
+
+            {/* Export Agent route */}
+            <Route
+              path="/export-agent/:agentId"
+              element={
+                <RequireAuth>
+                  <ExportAgent />
+                </RequireAuth>
+              }
+            />
+
+            {/* Export route */}
+            <Route
+              path="/export"
+              element={
+                <RequireAuth>
+                  <Export />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/export/:agentId"
+              element={
+                <RequireAuth>
+                  <Export />
                 </RequireAuth>
               }
             />
