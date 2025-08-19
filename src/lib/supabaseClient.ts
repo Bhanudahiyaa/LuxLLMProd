@@ -11,7 +11,7 @@ export const supabase = createClient(
 let authenticatedClient: SupabaseClient | null = null;
 
 // Function to get or create an authenticated client
-export async function getAuthenticatedClient(token: string): Promise<SupabaseClient> {
+export function getAuthenticatedClient(token: string): SupabaseClient {
   if (!authenticatedClient) {
     authenticatedClient = createClient(
       import.meta.env.VITE_SUPABASE_URL as string,
@@ -31,6 +31,6 @@ export async function getAuthenticatedClient(token: string): Promise<SupabaseCli
       Authorization: `Bearer ${token}`,
     };
   }
-  
+
   return authenticatedClient;
 }

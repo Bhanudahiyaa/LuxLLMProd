@@ -88,7 +88,7 @@ const HeroSection = () => {
                     "linear-gradient(90deg, #333 0%, #777 45%, #ddd 50%, #777 55%, #333 100%)",
                 }}
               >
-                ✨ Explore AI Agents
+                ✨ Explore AI Chatbots
               </span>
 
               <a
@@ -117,7 +117,7 @@ const HeroSection = () => {
               </span>
               <br />
               <div className="font-italianno mt-7 tracking-tight text-primary text-4xl sm:text-5xl md:text-7xl font-light opacity-80 text-center">
-                𝘊𝘰𝘥𝘦 𝘍𝘳𝘦𝘦 𝘈𝘨𝘦𝘯𝘵 𝘉𝘶𝘪𝘭𝘥𝘪𝘯𝘨,
+                𝘊𝘰𝘥𝘦 𝘍𝘳𝘦𝘦 𝘈𝘐 𝘊𝘩𝘢𝘵𝘣𝘰𝘵𝘴 𝘉𝘶𝘪𝘭𝘥𝘪𝘯𝘨,
                 <br />
                 𝘔𝘢𝘥𝘦 𝘌𝘢𝘴𝘺
               </div>

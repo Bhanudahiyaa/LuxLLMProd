@@ -68,7 +68,7 @@ function SidebarContent({ className, onNavigate }: SidebarContentProps) {
 
   return (
     <div
-      className={cn("flex h-full w-full flex-col bg-card md:w-48", className)}
+      className={cn("flex h-full w-full flex-col bg-card md:w-44", className)}
     >
       {/* Header */}
       <div className="p-3 flex items-center justify-start">
@@ -176,7 +176,7 @@ export function AppSidebar() {
             size="sm"
             className="fixed top-3 left-3 z-50 md:hidden bg-transparent p-0"
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="h-4 w-4" />
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="w-80 p-0">
@@ -185,7 +185,7 @@ export function AppSidebar() {
       </Sheet>
 
       {/* Desktop Sidebar */}
-      <div className=" md:flex md:w-48 md:flex-col md:fixed md:inset-y-0 md:border-r md:border-border">
+      <div className=" md:flex md:w-44 md:flex-col md:fixed md:inset-y-0 md:border-r md:border-border">
         <SidebarContent />
       </div>
     </>

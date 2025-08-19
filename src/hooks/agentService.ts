@@ -63,13 +63,22 @@ export function useAgentService() {
   // Get authenticated Supabase client
   async function getAuthenticatedSupabase() {
     try {
+      console.log("agentService: Getting Clerk token...");
       const token = await getToken({ template: "supabase" });
+      console.log("agentService: Clerk token received:", !!token);
+
       if (!token) throw new Error("No Clerk token found");
 
+      console.log("agentService: Getting authenticated Supabase client...");
       // Use the shared authenticated client
-      return await getAuthenticatedClient(token);
+      const client = getAuthenticatedClient(token);
+      console.log("agentService: Got authenticated Supabase client");
+      return client;
     } catch (error) {
-      console.error("Error getting authenticated Supabase client:", error);
+      console.error(
+        "agentService: Error getting authenticated Supabase client:",
+        error
+      );
       throw error;
     }
   }
@@ -115,11 +124,16 @@ export function useAgentService() {
   // 2. Get all agents for the current user
   async function getAgentsByUser(): Promise<ServiceResponse<Agent[]>> {
     try {
+      console.log("agentService: getAgentsByUser called, userId:", userId);
+
       if (!userId) {
+        console.log("agentService: No userId found, user not authenticated");
         return { data: null, error: "User not authenticated" };
       }
 
+      console.log("agentService: Getting authenticated Supabase client...");
       const authenticatedSupabase = await getAuthenticatedSupabase();
+      console.log("agentService: Got authenticated client, making query...");
 
       const { data, error } = await authenticatedSupabase
         .from("agents")
@@ -127,14 +141,17 @@ export function useAgentService() {
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
 
+      console.log("agentService: Supabase query result:", { data, error });
+
       if (error) {
-        console.error("Error fetching agents:", error);
+        console.error("agentService: Error fetching agents:", error);
         return { data: null, error: error.message };
       }
 
+      console.log("agentService: Successfully fetched agents:", data);
       return { data: data || [], error: null };
     } catch (error) {
-      console.error("Unexpected error fetching agents:", error);
+      console.error("agentService: Unexpected error fetching agents:", error);
       return { data: null, error: "Failed to fetch agents" };
     }
   }

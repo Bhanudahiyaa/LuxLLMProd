@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -28,6 +28,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAgentService } from "@/hooks/agentService";
+import { useAuth } from "@clerk/clerk-react";
 
 interface Agent {
   id: string;
@@ -47,20 +48,67 @@ export function MyAgents() {
   const [agents, setAgents] = useState<Agent[]>([]);
   // Preview state removed
   const [loading, setLoading] = useState(true);
+  const loadingRef = useRef(loading);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { getAgentsByUser, deleteAgent, updateAgent } = useAgentService();
 
+  // Add authentication check
+  const { isSignedIn, isLoaded } = useAuth();
+
+  // Debug authentication state
+  console.log("MyAgents: Authentication state:", { isLoaded, isSignedIn });
+
+  // Update ref when loading state changes
+  useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
+
   // Load agents on component mount
   useEffect(() => {
-    loadAgents();
-  }, []);
+    // Only load agents if user is signed in and Clerk is loaded
+    if (isLoaded && isSignedIn) {
+      console.log("MyAgents: User is authenticated, loading agents...");
+      loadAgents();
+    } else if (isLoaded && !isSignedIn) {
+      console.log(
+        "MyAgents: User is not authenticated, redirecting to sign in..."
+      );
+      setLoading(false);
+      navigate("/auth/sign-in");
+      return;
+    }
+
+    // Add a timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      if (loadingRef.current) {
+        console.log(
+          "MyAgents: Loading timeout reached, forcing loading to false"
+        );
+        setLoading(false);
+        loadingRef.current = false;
+        toast({
+          title: "Warning",
+          description: "Loading took too long. Please refresh the page.",
+          variant: "destructive",
+        });
+      }
+    }, 10000); // 10 second timeout
+
+    return () => clearTimeout(timeout);
+  }, [isLoaded, isSignedIn, toast, navigate]);
 
   const loadAgents = async () => {
     try {
+      console.log("MyAgents: Starting to load agents...");
       setLoading(true);
+      loadingRef.current = true;
+
       const { data, error } = await getAgentsByUser();
+      console.log("MyAgents: Response from getAgentsByUser:", { data, error });
+
       if (error) {
+        console.error("MyAgents: Error loading agents:", error);
         toast({
           title: "Error",
           description: "Failed to load agents: " + error,
@@ -68,16 +116,20 @@ export function MyAgents() {
         });
         return;
       }
+
+      console.log("MyAgents: Setting agents:", data);
       setAgents(data || []);
     } catch (error) {
-      console.error("Error loading agents:", error);
+      console.error("MyAgents: Unexpected error loading agents:", error);
       toast({
         title: "Error",
         description: "Failed to load agents",
         variant: "destructive",
       });
     } finally {
+      console.log("MyAgents: Setting loading to false");
       setLoading(false);
+      loadingRef.current = false;
     }
   };
 
@@ -128,33 +180,73 @@ export function MyAgents() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">My Agents</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {!isLoaded
+              ? "Loading..."
+              : !isSignedIn
+              ? "Authentication Required"
+              : "My Agents"}
+          </h1>
           <p className="text-muted-foreground mt-2">
-            Manage and monitor your AI agents
+            {!isLoaded
+              ? "Please wait..."
+              : !isSignedIn
+              ? "Sign in to access your agents"
+              : "Manage and monitor your AI agents"}
           </p>
         </div>
-        <Button onClick={() => navigate("/build/templates")} className="w-fit">
-          <Plus className="h-4 w-4 mr-2" />
-          Create New Agent
-        </Button>
+        {isLoaded && isSignedIn && (
+          <Button
+            onClick={() => navigate("/build/templates")}
+            className="w-fit"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create New Agent
+          </Button>
+        )}
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-        <Input
-          placeholder="Search agents..."
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-          className="pl-10 max-w-md"
-        />
-      </div>
+      {/* Search - Only show when authenticated */}
+      {isLoaded && isSignedIn && (
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            placeholder="Search agents..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="pl-10 max-w-md"
+          />
+        </div>
+      )}
 
       {/* Agents Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loading ? (
+        {!isLoaded ? (
           <div className="col-span-full text-center py-12">
-            <p className="text-lg font-medium">Loading agents...</p>
+            <div className="flex flex-col items-center gap-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <p className="text-lg font-medium">Loading authentication...</p>
+            </div>
+          </div>
+        ) : !isSignedIn ? (
+          <div className="col-span-full text-center py-12">
+            <div className="flex flex-col items-center gap-4">
+              <Bot className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-lg font-medium">
+                Please sign in to view your agents
+              </p>
+              <Button onClick={() => navigate("/auth/sign-in")}>Sign In</Button>
+            </div>
+          </div>
+        ) : loading ? (
+          <div className="col-span-full text-center py-12">
+            <div className="flex flex-col items-center gap-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <p className="text-lg font-medium">Loading agents...</p>
+              <Button variant="outline" onClick={loadAgents} className="mt-2">
+                Retry
+              </Button>
+            </div>
           </div>
         ) : filteredAgents.length === 0 ? (
           <div className="col-span-full text-center py-12">

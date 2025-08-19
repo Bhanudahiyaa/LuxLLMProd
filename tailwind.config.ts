@@ -107,6 +107,18 @@ const config: Config = {
             backgroundPosition: "calc(100% + var(--shimmer-width)) 0",
           },
         },
+        float: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        "glow-premium": {
+          from: { boxShadow: "0 0 20px rgba(0, 255, 0, 0.3)" },
+          to: { boxShadow: "0 0 30px rgba(0, 255, 0, 0.6)" },
+        },
+        "shimmer-premium": {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
 
         // ✅ NEW: animated background gradient (from snippet you shared)
         "background-gradient": {
@@ -142,6 +154,9 @@ const config: Config = {
         glow: "glow 2s ease-in-out infinite",
         rainbow: "rainbow var(--speed, 2s) infinite linear",
         shimmer: "shimmer 8s infinite linear",
+        float: "float 6s ease-in-out infinite",
+        "glow-premium": "glow-premium 2s ease-in-out infinite alternate",
+        "shimmer-premium": "shimmer-premium 2s infinite",
 
         // ✅ NEW
         "background-gradient":
@@ -150,6 +165,10 @@ const config: Config = {
 
       backdropBlur: { xs: "2px" },
       letterSpacing: { tighter: "-0.025em" },
+      transitionTimingFunction: {
+        premium: "cubic-bezier(0.4, 0, 0.2, 1)",
+        smooth: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

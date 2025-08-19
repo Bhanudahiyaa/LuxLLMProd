@@ -121,7 +121,29 @@ const Navigation = () => {
     setIsOpen(false);
     const scrollTo = () => {
       const el = document.querySelector(href);
-      if (el) el.scrollIntoView({ behavior: "smooth" });
+      if (el) {
+        // Enhanced smooth scrolling with easing
+        const targetPosition = (el as HTMLElement).offsetTop - 80; // Account for fixed header
+        const startPosition = window.pageYOffset;
+        const distance = targetPosition - startPosition;
+        const duration = 800;
+        let start: number | null = null;
+
+        const animation = (currentTime: number) => {
+          if (start === null) start = currentTime;
+          const timeElapsed = currentTime - start;
+          const run = easeInOutCubic(
+            timeElapsed,
+            startPosition,
+            distance,
+            duration
+          );
+          window.scrollTo(0, run);
+          if (timeElapsed < duration) requestAnimationFrame(animation);
+        };
+
+        requestAnimationFrame(animation);
+      }
     };
     if (location.pathname !== "/") {
       navigate("/");
@@ -129,6 +151,14 @@ const Navigation = () => {
     } else {
       scrollTo();
     }
+  };
+
+  // Smooth easing function for premium scrolling
+  const easeInOutCubic = (t: number, b: number, c: number, d: number) => {
+    t /= d / 2;
+    if (t < 1) return (c / 2) * t * t * t + b;
+    t -= 2;
+    return (c / 2) * (t * t * t + 2) + b;
   };
 
   const openAuth = () =>
@@ -185,7 +215,7 @@ const Navigation = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 onClick={() => handleNavClick(item.href)}
-                className="text-foreground/80 hover:text-primary transition-colors duration-200 text-sm font-light"
+                className="text-foreground/80 hover:text-primary transition-all duration-300 text-sm font-light relative group hover-lift"
               >
                 {item.label}
               </motion.button>
@@ -272,7 +302,7 @@ const Navigation = () => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
                       onClick={() => handleNavClick(item.href)}
-                      className="block w-full text-left text-foreground/80 hover:text-primary transition-colors duration-200 text-lg font-light py-2"
+                      className="block w-full text-left text-foreground/80 hover:text-primary transition-all duration-300 text-lg font-light py-2 hover-lift"
                     >
                       {item.label}
                     </motion.button>
