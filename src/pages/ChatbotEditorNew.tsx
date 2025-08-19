@@ -130,6 +130,8 @@ export default function ChatbotEditor() {
     mode: "onChange",
   });
 
+  console.log("Form initialized with default values");
+
   // Watch form values for live preview
   const chatBg = watch("chat_bg");
   const borderColor = watch("border_color");
@@ -150,9 +152,34 @@ export default function ChatbotEditor() {
     systemPrompt,
   });
 
+  // Debug: Log when name changes
+  useEffect(() => {
+    console.log("Chat name changed to:", chatName);
+  }, [chatName]);
+
+  // Debug: Test form watching
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      if (name === "name") {
+        console.log("Form name field changed:", value.name, "Type:", type);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
+  // Debug: Track form state changes
+  useEffect(() => {
+    console.log("Form state changed - current values:", {
+      name: watch("name"),
+      avatar_url: watch("avatar_url"),
+      system_prompt: watch("system_prompt"),
+    });
+  }, [watch]);
+
   // Create a config object for the SettingsPanel that updates when form values change
   const settingsConfig = useMemo(() => {
     console.log("Creating settings config with botMsgColor:", botMsgColor);
+    console.log("Settings config name will be:", chatName);
     return {
       name: chatName,
       theme: isDarkMode ? "dark" : "light",
@@ -212,9 +239,8 @@ export default function ChatbotEditor() {
     setValue("chat_bg", "#ffffff", { shouldDirty: false });
     setValue("border_color", "#e5e7eb", { shouldDirty: false });
     setValue("user_msg_color", "#3b82f6", { shouldDirty: false });
-    setValue("system_prompt", "You are a helpful assistant.", {
-      shouldDirty: false,
-    });
+    // Remove the hardcoded system prompt override - let templates use their own prompts
+    // setValue("system_prompt", "You are a helpful assistant.", { shouldDirty: false });
   }, [setValue]);
 
   // Load agent data if agentId is provided (only once per agentId)
@@ -231,7 +257,61 @@ export default function ChatbotEditor() {
       }
 
       if (!agentId) {
-        // No agent ID, load saved chatbot settings if any
+        // No agent ID, try to restore from localStorage first
+        const savedAgentData = localStorage.getItem("selectedAgent");
+        if (savedAgentData) {
+          try {
+            const parsedAgent = JSON.parse(savedAgentData);
+            console.log("Restoring agent from localStorage:", parsedAgent);
+
+            // Restore form with saved agent data
+            const restoreData = {
+              name: parsedAgent.name || "My Chatbot",
+              avatar_url: parsedAgent.avatar_url || "",
+              chat_bg: parsedAgent.chat_bg || "#ffffff",
+              border_color: parsedAgent.border_color || "#e5e7eb",
+              user_msg_color: parsedAgent.user_msg_color || "#3b82f6",
+              bot_msg_color: parsedAgent.bot_msg_color || "#000000",
+              system_prompt:
+                parsedAgent.system_prompt || "You are a helpful assistant.",
+            };
+
+            console.log("Restoring form with data:", restoreData);
+            reset(restoreData);
+
+            // Verify form was updated
+            setTimeout(() => {
+              console.log(
+                "Form after localStorage restore - name:",
+                watch("name")
+              );
+            }, 100);
+
+            // Set agent state for UI consistency
+            setAgent(parsedAgent);
+            setLoading(false);
+
+            // Verify localStorage data was used
+            console.log(
+              "Verified localStorage restore - agent state:",
+              parsedAgent
+            );
+
+            // Verify form was updated
+            console.log("Final form state after localStorage restore:", {
+              name: watch("name"),
+              avatar_url: watch("avatar_url"),
+              system_prompt: watch("system_prompt"),
+            });
+
+            return;
+          } catch (error) {
+            console.error("Error parsing saved agent data:", error);
+            localStorage.removeItem("selectedAgent"); // Clear invalid data
+          }
+        }
+
+        // No saved agent, load saved chatbot settings if any
         try {
           const { data: settings, error } = await getChatbotSettings();
           if (!error && settings) {
@@ -290,12 +370,45 @@ export default function ChatbotEditor() {
         }
 
         // Set all form values at once using reset
-        reset({
+        const agentFormData = {
           name: foundAgent.name,
           avatar_url: foundAgent.avatar_url || "",
           system_prompt:
             foundAgent.system_prompt || "You are a helpful assistant.",
           ...uiSettings,
+        };
+
+        console.log("Resetting form with agent data:", agentFormData);
+        reset(agentFormData);
+
+        // Verify form was updated
+        setTimeout(() => {
+          console.log("Form after reset - name:", watch("name"));
+        }, 100);
+
+        // Save agent data to localStorage for persistence
+        const agentDataToSave = {
+          ...foundAgent,
+          ...agentFormData,
+        };
+        localStorage.setItem("selectedAgent", JSON.stringify(agentDataToSave));
+        console.log("Saved agent to localStorage:", agentDataToSave);
+
+        // Verify localStorage was saved
+        const savedData = localStorage.getItem("selectedAgent");
+        console.log(
+          "Verified localStorage save:",
+          savedData ? JSON.parse(savedData) : null
+        );
+
+        // Verify agent state was set
+        console.log("Verified agent state set:", foundAgent);
+
+        // Verify form was updated
+        console.log("Final form state after agent load:", {
+          name: watch("name"),
+          avatar_url: watch("avatar_url"),
+          system_prompt: watch("system_prompt"),
         });
       } catch (error) {
         console.error("Error loading agent:", error);
@@ -320,7 +433,7 @@ export default function ChatbotEditor() {
         console.log("Loading template:", template); // Debug log
 
         // Update form with template data
-        reset({
+        const templateFormData = {
           name: template.name || template.title || "My Chatbot",
           avatar_url: template.avatar_url || "",
           chat_bg: "#ffffff",
@@ -329,10 +442,60 @@ export default function ChatbotEditor() {
           bot_msg_color: "#000000",
           system_prompt:
             template.system_prompt || "You are a helpful assistant.",
-        });
+        };
+
+        console.log("Loading template form data:", templateFormData);
+        reset(templateFormData);
+
+        // Verify form was updated
+        setTimeout(() => {
+          console.log("Form after template load - name:", watch("name"));
+        }, 100);
+
+        // Save template data to localStorage for persistence
+        const templateDataToSave = {
+          id: template.id || `template-${Date.now()}`,
+          name: template.name || template.title || "My Chatbot",
+          avatar_url: template.avatar_url || "",
+          system_prompt:
+            template.system_prompt || "You are a helpful assistant.",
+          chat_bg: "#ffffff",
+          border_color: "#e5e7eb",
+          user_msg_color: "#3b82f6",
+          bot_msg_color: "#000000",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+
+        localStorage.setItem(
+          "selectedAgent",
+          JSON.stringify(templateDataToSave)
+        );
+        console.log("Saved template to localStorage:", templateDataToSave);
+
+        // Verify localStorage was saved
+        const savedTemplateData = localStorage.getItem("selectedAgent");
+        console.log(
+          "Verified template localStorage save:",
+          savedTemplateData ? JSON.parse(savedTemplateData) : null
+        );
 
         // Also update the local state for immediate UI update
+        setAgent(templateDataToSave);
         setLoading(false);
+
+        // Verify template data was used
+        console.log(
+          "Verified template load - agent state:",
+          templateDataToSave
+        );
+
+        // Verify form was updated
+        console.log("Final form state after template load:", {
+          name: watch("name"),
+          avatar_url: watch("avatar_url"),
+          system_prompt: watch("system_prompt"),
+        });
 
         // Clear the template parameter from URL
         const newSearchParams = new URLSearchParams(searchParams);
@@ -345,6 +508,45 @@ export default function ChatbotEditor() {
       }
     }
   }, [searchParams, navigate, reset]);
+
+  // Cleanup effect to clear localStorage when switching agents or unmounting
+  useEffect(() => {
+    return () => {
+      // Only clear if we're not actively using an agent
+      if (!agentId && !agent) {
+        clearSelectedAgent();
+      }
+    };
+  }, [agentId, agent]);
+
+  // Clear localStorage when switching agents
+  const clearSelectedAgent = () => {
+    localStorage.removeItem("selectedAgent");
+    console.log("Cleared selected agent from localStorage");
+  };
+
+  // Update localStorage when form values change
+  useEffect(() => {
+    if (agent && !loading) {
+      const currentFormData = {
+        name: watch("name"),
+        avatar_url: watch("avatar_url"),
+        chat_bg: watch("chat_bg"),
+        border_color: watch("border_color"),
+        user_msg_color: watch("user_msg_color"),
+        bot_msg_color: watch("bot_msg_color"),
+        system_prompt: watch("system_prompt"),
+      };
+
+      const agentDataToUpdate = {
+        ...agent,
+        ...currentFormData,
+        updated_at: new Date().toISOString(),
+      };
+
+      localStorage.setItem("selectedAgent", JSON.stringify(agentDataToUpdate));
+    }
+  }, [agent, watch, loading]);
 
   // Send message function
   const sendMessage = async () => {
@@ -414,6 +616,20 @@ export default function ChatbotEditor() {
       if (settingsError) {
         console.warn("Failed to save UI settings:", settingsError);
         // Continue anyway since the agent was created
+      }
+
+      // Update localStorage with the new agent data
+      if (newAgent) {
+        const agentDataToSave = {
+          ...newAgent,
+          chat_bg: data.chat_bg,
+          border_color: data.border_color,
+          user_msg_color: data.user_msg_color,
+          bot_msg_color: data.bot_msg_color,
+          updated_at: new Date().toISOString(),
+        };
+        localStorage.setItem("selectedAgent", JSON.stringify(agentDataToSave));
+        console.log("Updated localStorage with new agent:", agentDataToSave);
       }
 
       toast.success("Chatbot created successfully!");

@@ -39,7 +39,54 @@ interface ChatbotPreviewProps {
 
 export function ChatbotPreview({ config }: ChatbotPreviewProps) {
   console.log("ChatbotPreview received config:", config);
+  console.log("ChatbotPreview config.name:", config.name);
   console.log("Text color:", config.textColor);
+
+  // Helper function to derive agentId from config for role detection
+  const getAgentIdFromConfig = (config: ChatbotConfig): string => {
+    const systemPrompt = config.systemPrompt || "";
+    const lowerPrompt = systemPrompt.toLowerCase();
+
+    if (
+      lowerPrompt.includes("faq") ||
+      lowerPrompt.includes("question") ||
+      lowerPrompt.includes("assistant")
+    ) {
+      return "faq-bot";
+    } else if (
+      lowerPrompt.includes("customer support") ||
+      lowerPrompt.includes("support")
+    ) {
+      return "customer-support-bot";
+    } else if (
+      lowerPrompt.includes("portfolio") ||
+      lowerPrompt.includes("resume")
+    ) {
+      return "portfolio-bot";
+    } else if (
+      lowerPrompt.includes("feedback") ||
+      lowerPrompt.includes("review")
+    ) {
+      return "feedback-bot";
+    } else if (
+      lowerPrompt.includes("sales") ||
+      lowerPrompt.includes("product")
+    ) {
+      return "sales-bot";
+    } else if (
+      lowerPrompt.includes("meeting") ||
+      lowerPrompt.includes("prep")
+    ) {
+      return "meeting-prep-bot";
+    } else if (
+      lowerPrompt.includes("document") ||
+      lowerPrompt.includes("generator")
+    ) {
+      return "document-generator-bot";
+    } else {
+      return "general-assistant-bot";
+    }
+  };
 
   const [isOpen, setIsOpen] = useState(true);
   const [messages, setMessages] = useState<Message[]>([
@@ -52,12 +99,12 @@ export function ChatbotPreview({ config }: ChatbotPreviewProps) {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [audio] = useState(() =>
+  const [audio] = useState<HTMLAudioElement | null>(() =>
     typeof window !== "undefined"
       ? new Audio(
           "data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQACcQAAAAAAAGF1ZGlvZGF0YQAAAAA="
         )
-      : (null as unknown as HTMLAudioElement)
+      : null
   );
 
   // Update welcome message when config changes
@@ -91,7 +138,7 @@ export function ChatbotPreview({ config }: ChatbotPreviewProps) {
       const response = await chatWithAgent({
         system_prompt: config.systemPrompt || "You are a helpful AI assistant.",
         message: userMessage,
-        agentId: "preview-chatbot",
+        agentId: getAgentIdFromConfig(config),
       });
 
       const botMessage: Message = {

@@ -117,9 +117,9 @@ const HeroSection = () => {
               </span>
               <br />
               <div className="font-italianno mt-7 tracking-tight text-primary text-4xl sm:text-5xl md:text-7xl font-light opacity-80 text-center">
-                𝘊𝘰𝘥𝘦 𝘍𝘳𝘦𝘦 𝘈𝘐 𝘊𝘩𝘢𝘵𝘣𝘰𝘵𝘴 𝘉𝘶𝘪𝘭𝘥𝘪𝘯𝘨,
+                𝘚𝘦𝘢𝘮𝘭𝘦𝘴𝘴 𝘕𝘰 𝘊𝘰𝘥𝘦 𝘈𝘐 𝘊𝘩𝘢𝘵𝘣𝘰𝘵 𝘧𝘰𝘳
                 <br />
-                𝘔𝘢𝘥𝘦 𝘌𝘢𝘴𝘺
+                𝘌𝘷𝘦𝘳𝘺 𝘞𝘦𝘣𝘴𝘪𝘵𝘦
               </div>
             </motion.h1>
           </div>
@@ -130,10 +130,10 @@ const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-base sm:text-lg text-foreground/60 font-light leading-relaxed mb-8 max-w-2xl"
           >
-            The ultimate platform that lets you seamlessly integrate AI into
-            your stack so you can{" "}
+            The ultimate platform that lets you seamlessly integrate Chatbot
+            into your stack so you can{" "}
             <span className="text-foreground">
-              Build Production Ready, AI Agents
+              Build Production Ready, AI Chatbots
             </span>{" "}
             with editable UI in seconds.
           </motion.p>
