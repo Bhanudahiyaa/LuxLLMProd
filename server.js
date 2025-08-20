@@ -254,7 +254,8 @@ async function handlePublicChat(request) {
   } catch (error) {
     console.error("❌ Public chat error:", error);
     return {
-      message: "Sorry, I'm experiencing technical difficulties. Please try again later.",
+      message:
+        "Sorry, I'm experiencing technical difficulties. Please try again later.",
       sessionId: request.sessionId,
       error: "Internal server error",
     };
@@ -629,7 +630,9 @@ app.listen(PORT, () => {
     `🌍 Environment: ${IS_PRODUCTION ? "🚀 Production" : "🧪 Development"}`
   );
   console.log(`🔗 Production URL: ${PRODUCTION_URL}`);
-  console.log(`🔒 CSP Headers: ${IS_PRODUCTION ? "✅ Enabled" : "⚠️ Development Mode"}`);
+  console.log(
+    `🔒 CSP Headers: ${IS_PRODUCTION ? "✅ Enabled" : "⚠️ Development Mode"}`
+  );
 });
 
 export default app;
