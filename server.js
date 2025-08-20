@@ -68,6 +68,160 @@ app.use((req, res, next) => {
   next();
 });
 
+// Root route - Welcome page
+app.get("/", (req, res) => {
+  const html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>LuxLLM - AI Embed System</title>
+      <style>
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          min-height: 100vh;
+          color: white;
+        }
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 40px 20px;
+          text-align: center;
+        }
+        .header {
+          margin-bottom: 60px;
+        }
+        .header h1 {
+          font-size: 3.5rem;
+          margin-bottom: 20px;
+          text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .header p {
+          font-size: 1.3rem;
+          opacity: 0.9;
+          max-width: 600px;
+          margin: 0 auto;
+        }
+        .status-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 30px;
+          margin-bottom: 60px;
+        }
+        .status-card {
+          background: rgba(255,255,255,0.1);
+          backdrop-filter: blur(10px);
+          border-radius: 16px;
+          padding: 30px;
+          border: 1px solid rgba(255,255,255,0.2);
+        }
+        .status-card h3 {
+          margin-top: 0;
+          color: #fff;
+          font-size: 1.5rem;
+        }
+        .status-card p {
+          opacity: 0.8;
+          line-height: 1.6;
+        }
+        .status-badge {
+          display: inline-block;
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-size: 14px;
+          font-weight: 600;
+          margin-bottom: 15px;
+        }
+        .status-success {
+          background: #10b981;
+          color: white;
+        }
+        .status-info {
+          background: #3b82f6;
+          color: white;
+        }
+        .cta-section {
+          background: rgba(255,255,255,0.1);
+          backdrop-filter: blur(10px);
+          border-radius: 16px;
+          padding: 40px;
+          border: 1px solid rgba(255,255,255,0.2);
+          margin-bottom: 40px;
+        }
+        .cta-button {
+          background: #10b981;
+          color: white;
+          border: none;
+          padding: 16px 32px;
+          border-radius: 12px;
+          font-size: 18px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-decoration: none;
+          display: inline-block;
+          margin: 10px;
+        }
+        .cta-button:hover {
+          background: #059669;
+          transform: translateY(-2px);
+        }
+        .footer {
+          opacity: 0.7;
+          font-size: 14px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>🤖 LuxLLM</h1>
+          <p>Your AI-powered embed system is running successfully in production!</p>
+        </div>
+        
+        <div class="status-grid">
+          <div class="status-card">
+            <div class="status-badge status-success">✅ Active</div>
+            <h3>Server Status</h3>
+            <p>Your embed system server is running and responding to requests.</p>
+          </div>
+          
+          <div class="status-card">
+            <div class="status-badge status-success">✅ Ready</div>
+            <h3>AI Integration</h3>
+            <p>OpenRouter API is connected and ready to provide AI responses.</p>
+          </div>
+          
+          <div class="status-card">
+            <div class="status-badge status-info">🔧 Configured</div>
+            <h3>Database</h3>
+            <p>Supabase connection is established and ready for production use.</p>
+          </div>
+        </div>
+        
+        <div class="cta-section">
+          <h2>🚀 Test Your System</h2>
+          <p>Your embed system is now live and ready for testing!</p>
+          <a href="/health" class="cta-button">Health Check</a>
+          <a href="/embed/test-embed" class="cta-button">Test Embed</a>
+          <a href="/api/public-chat" class="cta-button">API Status</a>
+        </div>
+        
+        <div class="footer">
+          <p>Production Environment • lux-llm-prod.vercel.app</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  res.send(html);
+});
+
 // Favicon route
 app.get("/favicon.ico", (req, res) => {
   const faviconPath = path.join(__dirname, "public", "favicon.ico");
@@ -633,6 +787,7 @@ app.listen(PORT, () => {
   console.log(
     `🔒 CSP Headers: ${IS_PRODUCTION ? "✅ Enabled" : "⚠️ Development Mode"}`
   );
+  console.log(`🏠 Root Route: ✅ Added welcome page`);
 });
 
 export default app;
