@@ -91,7 +91,7 @@
     --neon-pink: 330 81% 60%;
 
     /* Glassmorphism */
-    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-bg: rgba(255, 255, 255, 0.01);
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-blur: 20px;
 
@@ -665,6 +665,6 @@ div {
   background: var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--glass-border);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }

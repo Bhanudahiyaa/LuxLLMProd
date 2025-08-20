@@ -56,14 +56,14 @@ export function FeatureSteps({
                 className={cn(
                   "w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-2",
                   index === activeIndex
-                    ? "bg-primary border-primary text-primary-foreground scale-110"
+                    ? "bg-primary/80 border-muted/80 text-primary-foreground scale-110"
                     : "bg-muted border-muted-foreground"
                 )}
               >
                 {index <= activeIndex ? (
-                  <span className="text-lg font-bold">✓</span>
+                  <span className="text-lg font-thin">✓</span>
                 ) : (
-                  <span className="text-lg font-semibold">{index + 1}</span>
+                  <span className="text-lg font-thin">{index + 1}</span>
                 )}
               </motion.div>
 

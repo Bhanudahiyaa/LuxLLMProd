@@ -68,7 +68,7 @@ const FAQSection = () => {
             >
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full glass-card p-6 rounded-2xl text-left hover:bg-white/10 transition-all duration-300 group"
+                className="w-full glass-card p-6 rounded-2xl text-left hover:bg-muted/70 transition-all duration-300 group"
               >
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-light tracking-tighter pr-4">

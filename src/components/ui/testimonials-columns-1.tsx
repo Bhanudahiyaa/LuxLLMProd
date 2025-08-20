@@ -76,7 +76,7 @@ export const TestimonialsColumn = (props: {
           ease: "linear",
           repeatType: "loop",
         }}
-        className="flex flex-col gap-6 pb-6 bg-background"
+        className="flex flex-col gap-6 pb-6 bg-glass"
       >
         {[
           ...new Array(2).fill(0).map((_, index) => (
@@ -86,7 +86,7 @@ export const TestimonialsColumn = (props: {
                   className="glass-card p-10 rounded-3xl border border-border/20 shadow-lg shadow-primary/80 max-w-xs w-full"
                   key={i}
                 >
-                  <div className="text-foreground/75 font-light leading-relaxed">
+                  <div className="text-foreground/75 font-thin leading-relaxed">
                     {text}
                   </div>
                   <div className="flex items-center gap-2 mt-5">

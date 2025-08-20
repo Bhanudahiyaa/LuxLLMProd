@@ -9,9 +9,20 @@ const supabase = createClient(
 
 // OpenRouter API configuration
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-const OPENROUTER_API_KEY =
-  process.env.OPENROUTER_API_KEY ||
-  "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";
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+
+// Log environment variable status (for debugging)
+console.log("🔑 Environment check:", {
+  hasOpenRouterKey: !!OPENROUTER_API_KEY,
+  keyLength: OPENROUTER_API_KEY ? OPENROUTER_API_KEY.length : 0,
+  nodeEnv: process.env.NODE_ENV,
+  supabaseUrl: !!process.env.SUPABASE_URL,
+  supabaseKey: !!process.env.SUPABASE_ANON_KEY
+});
+
+if (!OPENROUTER_API_KEY) {
+  console.error("❌ CRITICAL: OPENROUTER_API_KEY is not set!");
+}
 
 // Mock embed configuration for testing
 const MOCK_EMBED_CONFIG = {
@@ -120,6 +131,10 @@ async function handlePublicChat(request) {
 
     // Call OpenRouter AI API
     try {
+      if (!OPENROUTER_API_KEY) {
+        throw new Error("OpenRouter API key is not configured");
+      }
+
       console.log(
         "🤖 Calling OpenRouter API with prompt:",
         systemPrompt.substring(0, 100) + "..."
@@ -146,7 +161,7 @@ async function handlePublicChat(request) {
       if (!response.ok) {
         const errorText = await response.text();
         console.error("❌ OpenRouter API error:", response.status, errorText);
-        throw new Error(`OpenRouter API error: ${response.status}`);
+        throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
@@ -185,6 +200,7 @@ async function handlePublicChat(request) {
           "I'm sorry, but I'm having trouble processing your request right now. Please try again in a moment.",
         sessionId: request.sessionId,
         error: "AI API error",
+        details: error.message
       };
     }
   } catch (error) {
