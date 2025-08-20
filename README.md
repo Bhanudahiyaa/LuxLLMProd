@@ -1,13 +1,13 @@
 # 🚀 LuxLLM - AI Chatbot Embed System
 
-A complete AI-powered chatbot embed system with React frontend and Express backend, designed to work both locally and in production on Vercel.
+A complete AI-powered chatbot embed system with React frontend and Vercel serverless functions, designed to work both locally and in production.
 
 ## ✨ Features
 
 - **🤖 AI-Powered Chatbots**: Integration with OpenRouter API for intelligent responses
 - **🌐 Embeddable Widgets**: Easy-to-integrate chatbot scripts for any website
 - **📱 React Frontend**: Modern, responsive UI for managing chatbots
-- **🔧 Express Backend**: Robust API server for chatbot functionality
+- **⚡ Serverless Backend**: Vercel serverless functions for scalable API
 - **🗄️ Supabase Database**: PostgreSQL database with Row Level Security
 - **🚀 Vercel Deployment**: Production-ready deployment configuration
 - **🎨 Customizable Themes**: Beautiful, customizable chatbot designs
@@ -16,8 +16,8 @@ A complete AI-powered chatbot embed system with React frontend and Express backe
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   React App     │    │  Express API    │    │   Supabase      │
-│   (Frontend)    │◄──►│   (Backend)     │◄──►│   (Database)    │
+│   React App     │    │ Vercel Serverless│    │   Supabase      │
+│   (Frontend)    │◄──►│   Functions     │◄──►│   (Database)    │
 │                 │    │                 │    │                 │
 │ • Export Page   │    │ • Chat API      │    │ • Embed Configs │
 │ • Chatbot UI    │    │ • Embed Scripts │    │ • Conversations │
@@ -29,7 +29,7 @@ A complete AI-powered chatbot embed system with React frontend and Express backe
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 - Supabase account
 - OpenRouter API key
@@ -60,19 +60,9 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ### 3. Development Mode
 
-#### Option A: Run Everything Together
 ```bash
-npm run dev:all
-```
-This starts both the React app and embed API server simultaneously.
-
-#### Option B: Run Separately
-```bash
-# Terminal 1: React App (Vite dev server)
+# Start React development server
 npm run dev
-
-# Terminal 2: Embed API Server
-npm run dev:server
 ```
 
 ### 4. Production Build
@@ -84,15 +74,15 @@ npm run build
 ## 🌐 Development URLs
 
 - **React App**: http://localhost:8080
-- **Embed API**: http://localhost:3001
-- **Health Check**: http://localhost:3001/health
-- **Embed Preview**: http://localhost:3001/embed/test-embed
+- **Export Page**: http://localhost:8080/export
+- **Health Check**: http://localhost:8080/health (after deployment)
 
 ## 🚀 Production Deployment
 
 ### Vercel Deployment
 
 1. **Push to GitHub**:
+
 ```bash
 git add .
 git commit -m "Ready for production deployment"
@@ -100,6 +90,7 @@ git push origin main
 ```
 
 2. **Deploy to Vercel**:
+
 ```bash
 vercel --prod
 ```
@@ -114,8 +105,10 @@ vercel --prod
 
 - **Main Website**: https://lux-llm-prod.vercel.app/
 - **Export Page**: https://lux-llm-prod.vercel.app/export
-- **Embed API**: https://lux-llm-prod.vercel.app/api/public-chat
+- **Chat API**: https://lux-llm-prod.vercel.app/api/public-chat
 - **Health Check**: https://lux-llm-prod.vercel.app/health
+- **Embed Scripts**: https://lux-llm-prod.vercel.app/api/embed/[code].js
+- **Embed Preview**: https://lux-llm-prod.vercel.app/api/embed/[code]
 
 ## 📁 Project Structure
 
@@ -127,9 +120,14 @@ vercel --prod
 │   │   └── ...            # Other pages
 │   ├── components/        # Reusable components
 │   └── lib/              # Utilities and services
+├── api/                   # Vercel serverless functions
+│   ├── public-chat.js     # Chat API endpoint
+│   ├── health.js          # Health check endpoint
+│   └── embed/             # Embed-related endpoints
+│       ├── [embedCode].js # Dynamic embed script
+│       └── [embedCode]/   # Dynamic embed preview
+│           index.js
 ├── public/                # Static assets
-│   └── embed-template.js  # Chatbot embed template
-├── server.js              # Express API server
 ├── vercel.json            # Vercel configuration
 ├── vite.config.ts         # Vite configuration
 └── package.json           # Dependencies and scripts
@@ -137,30 +135,30 @@ vercel --prod
 
 ## 🔧 Available Scripts
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start React development server |
-| `npm run dev:server` | Start embed API server |
-| `npm run dev:all` | Start both servers simultaneously |
-| `npm run build` | Build React app for production |
-| `npm run preview` | Preview production build |
-| `npm run start` | Start production preview server |
-| `npm run start:server` | Start production embed API server |
+| Script            | Description                     |
+| ----------------- | ------------------------------- |
+| `npm run dev`     | Start React development server  |
+| `npm run build`   | Build React app for production  |
+| `npm run preview` | Preview production build        |
+| `npm run start`   | Start production preview server |
+| `npm run lint`    | Run ESLint                      |
 
 ## 🗄️ Database Setup
 
 1. **Run the schema script** in your Supabase SQL editor:
+
 ```sql
 -- Run supabase_embeds_schema.sql
 ```
 
 2. **Create your first embed** using the Export page
 
-3. **Test the embed** by visiting `/embed/[your-embed-code]`
+3. **Test the embed** by visiting `/api/embed/[your-embed-code]`
 
 ## 🔌 API Endpoints
 
 ### Public Chat API
+
 ```
 POST /api/public-chat
 Content-Type: application/json
@@ -173,26 +171,38 @@ Content-Type: application/json
 ```
 
 ### Embed Scripts
+
 ```
-GET /embed/[embedCode].js
+GET /api/embed/[embedCode].js
+```
+
+### Embed Preview
+
+```
+GET /api/embed/[embedCode]
 ```
 
 ### Health Check
+
 ```
-GET /health
+GET /api/health
 ```
 
 ## 🎨 Customization
 
 ### Chatbot Themes
-Modify the embed template in `public/embed-template.js` to customize:
+
+The embed scripts are dynamically generated with customizable:
+
 - Colors and styling
 - Position and size
 - Welcome messages
 - Typing indicators
 
 ### AI Behavior
-Update the system prompt in the Export page or modify `server.js` for:
+
+Update the system prompt in the Export page or modify the API functions for:
+
 - Different AI personalities
 - Response styles
 - Context handling
@@ -202,31 +212,46 @@ Update the system prompt in the Export page or modify `server.js` for:
 ### Common Issues
 
 1. **"Cannot GET /" Error**
+
    - Ensure Vercel is configured to serve React app for main routes
    - Check that `vercel.json` has correct routing
 
 2. **Embed Script Not Loading**
-   - Verify the embed API server is running
+
+   - Verify the serverless functions are deployed
    - Check CORS headers in production
    - Ensure embed code exists in database
 
 3. **AI Responses Not Working**
-   - Verify OpenRouter API key is set
+   - Verify OpenRouter API key is set in Vercel
    - Check API rate limits
    - Ensure network connectivity
 
 ### Development Debugging
 
 ```bash
-# Check server logs
-npm run dev:server
-
 # Check React app logs
 npm run dev
 
-# Test API endpoints
-curl http://localhost:3001/health
+# Test API endpoints (after deployment)
+curl https://your-domain.vercel.app/api/health
 ```
+
+## 🚀 Serverless Functions
+
+The system now uses Vercel's serverless functions instead of a traditional Express server:
+
+- **`/api/public-chat.js`**: Handles AI chat requests
+- **`/api/health.js`**: System health monitoring
+- **`/api/embed/[code].js`**: Dynamic embed script generation
+- **`/api/embed/[code]/index.js`**: Embed preview pages
+
+This approach provides:
+
+- ✅ **Better scalability** - Automatic scaling based on demand
+- ✅ **Cost efficiency** - Pay only for actual usage
+- ✅ **Simpler deployment** - No server management needed
+- ✅ **Global edge** - Faster response times worldwide
 
 ## 📚 Additional Resources
 
