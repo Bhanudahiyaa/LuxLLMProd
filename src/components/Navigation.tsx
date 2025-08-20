@@ -179,7 +179,7 @@ const Navigation = () => {
             : "bg-transparent"
         }`}
       >
-        <div className="container mx-auto px-3 py-2 flex items-center justify-between">
+        <div className="container mx-auto px-1 py-3 flex items-center justify-between">
           {/* ✅ Make the logo navigate home from any route */}
           <button
             onClick={() => {

@@ -347,16 +347,19 @@ export default function Export() {
       let finalAgent = agent;
 
       // Check if we're in preview mode (agent ID starts with 'preview-')
-      if (isPreviewMode && agent.id.startsWith('preview-')) {
-        console.log("Export page: Preview mode detected, creating real agent first...");
-        
+      if (isPreviewMode && agent.id.startsWith("preview-")) {
+        console.log(
+          "Export page: Preview mode detected, creating real agent first..."
+        );
+
         // Create a real agent from the preview data
         const agentData = {
           name: agent.name || "My Chatbot",
           avatar_url: agent.avatar_url,
           heading: agent.heading,
           subheading: agent.subheading,
-          system_prompt: agent.system_prompt || "You are a helpful AI assistant.",
+          system_prompt:
+            agent.system_prompt || "You are a helpful AI assistant.",
           chat_bg_color: agent.chat_bg_color || "#ffffff",
           chat_border_color: agent.chat_border_color || "#e5e7eb",
           user_msg_color: agent.user_msg_color || "#3b82f6",
@@ -364,26 +367,31 @@ export default function Export() {
           chat_name: agent.chat_name || agent.name || "My Chatbot",
         };
 
-        const { data: newAgent, error: agentError } = await createAgent(agentData);
-        
+        const { data: newAgent, error: agentError } = await createAgent(
+          agentData
+        );
+
         if (agentError || !newAgent) {
-          throw new Error(`Failed to create agent: ${agentError || "Unknown error"}`);
+          throw new Error(
+            `Failed to create agent: ${agentError || "Unknown error"}`
+          );
         }
 
         console.log("Export page: Real agent created:", newAgent);
         finalAgentId = newAgent.id;
         finalAgent = newAgent;
-        
+
         // Update the agent state to use the real agent
         setAgent(newAgent);
         setIsPreviewMode(false);
-        
+
         // Clear the preview data from localStorage
         localStorage.removeItem("chatbotPreviewData");
-        
+
         toast({
           title: "Agent Created",
-          description: "Your agent has been saved and is now ready for embedding!",
+          description:
+            "Your agent has been saved and is now ready for embedding!",
         });
       }
 
@@ -404,7 +412,8 @@ export default function Export() {
       const generatedScript = await generateEmbedScript({
         embedCode: embed.embed_code,
         chatbotName: embed.name,
-        systemPrompt: finalAgent.system_prompt || "You are a helpful AI assistant.",
+        systemPrompt:
+          finalAgent.system_prompt || "You are a helpful AI assistant.",
         config: embedConfig,
       });
 
@@ -700,14 +709,18 @@ export default function Export() {
                     <div className="bg-gradient-to-r from-[#ff6b35] to-[#f7931e] rounded-2xl p-4 border border-[#ff6b35]/30">
                       <div className="flex items-center gap-3">
                         <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                          <span className="text-[#ff6b35] text-sm font-bold">!</span>
+                          <span className="text-[#ff6b35] text-sm font-bold">
+                            !
+                          </span>
                         </div>
                         <div>
                           <p className="text-white font-medium text-sm">
                             Preview Mode Active
                           </p>
                           <p className="text-white/90 text-xs">
-                            You're working with a preview agent. When you create an embed, we'll automatically save your agent first, then create the embed.
+                            You're working with a preview agent. When you create
+                            an embed, we'll automatically save your agent first,
+                            then create the embed.
                           </p>
                         </div>
                       </div>
@@ -891,7 +904,7 @@ export default function Export() {
                           <Button
                             onClick={() =>
                               window.open(
-                                `https://lux-llm-prod.vercel.app/embed/${embedCode}`,
+                                `https://lux-llm-prod.vercel.app/api/embed/${embedCode}`,
                                 "_blank"
                               )
                             }
