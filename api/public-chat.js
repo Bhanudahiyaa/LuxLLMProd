@@ -127,7 +127,7 @@ async function handlePublicChat(request) {
 
     // Get system prompt
     const systemPrompt =
-      embedConfig.system_prompt || "You are a helpful AI assistant.";
+      embedConfig?.agents?.system_prompt || embedConfig.system_prompt || "You are a helpful AI assistant.";
 
     // Call OpenRouter AI API
     try {

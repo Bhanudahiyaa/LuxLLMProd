@@ -43,20 +43,20 @@ const PromptNode = ({ data }: NodeProps) => {
           <Sparkles className="w-3 h-3 sm:w-5 sm:h-5 text-green-400" />
         </div>
         <h3 className="text-xs sm:text-lg font-semibold text-zinc-100 leading-tight">
-          Prompt Your Idea
+          Customise Your Chatbot
         </h3>
       </div>
 
       <div className="space-y-2 sm:space-y-3">
         <input
           type="text"
-          placeholder="Describe your AI agent..."
+          placeholder="Describe your AI Chatbot..."
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
           className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1.5 sm:px-4 sm:py-3 text-xs sm:text-base text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
         />
         <p className="text-xs text-zinc-500 hidden sm:block">
-          Enter your requirements and let AI build your Custom Agent
+          Enter your requirements and your AI Chatbot will be created.
         </p>
       </div>
     </div>
@@ -94,7 +94,7 @@ const GeneratingNode = ({ data }: NodeProps) => {
           />
         </div>
         <h3 className="text-xs sm:text-lg font-semibold text-zinc-100 leading-tight">
-          Generating Your AI Agent
+          Generating AI Chatbot
         </h3>
       </div>
 
@@ -118,9 +118,9 @@ const GeneratingNode = ({ data }: NodeProps) => {
 
 const FilesNode = ({ data }: NodeProps) => {
   const files = [
-    { name: ".env", icon: FileText, description: "Environment variables" },
-    { name: ".logic", icon: Code, description: "Agent logic & behavior" },
-    { name: ".demo", icon: Bot, description: "Demo & examples" },
+    { name: "<iframe>", icon: FileText, description: "AI Chatbot Widget" },
+    { name: "<script>", icon: Code, description: "Embeded Script" },
+    { name: "Preview Bot", icon: Bot, description: "See Live Preview" },
   ];
 
   return (
@@ -187,25 +187,25 @@ const ImportNode = ({ data }: NodeProps) => {
           <FolderOpen className="w-3 h-3 sm:w-5 sm:h-5 text-green-400" />
         </div>
         <h3 className="text-xs sm:text-lg font-semibold text-zinc-100 leading-tight">
-          Import Files in Your Project
+          Import Code in Your Project
         </h3>
       </div>
 
       <div className="space-y-2">
         <div className="bg-zinc-800 rounded-lg p-2 sm:p-3 font-mono text-xs">
-          <div className="text-zinc-500 mb-1 sm:mb-2">📁 my-ai-project/</div>
+          <div className="text-zinc-500 mb-1 sm:mb-2">📁 mywebsite/</div>
           <div className="ml-2 sm:ml-4 space-y-1">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <span className="text-green-400 text-xs">✓</span>
-              <span className="text-zinc-300 text-xs">.env</span>
+              <span className="text-zinc-300 text-xs">iframe</span>
             </div>
             <div className="flex items-center gap-1.5 sm:gap-2">
               <span className="text-green-400 text-xs">✓</span>
-              <span className="text-zinc-300 text-xs">.logic</span>
+              <span className="text-zinc-300 text-xs">script</span>
             </div>
             <div className="flex items-center gap-1.5 sm:gap-2">
               <span className="text-green-400 text-xs">✓</span>
-              <span className="text-zinc-300 text-xs">.demo</span>
+              <span className="text-zinc-300 text-xs">integrate</span>
             </div>
           </div>
         </div>
@@ -231,7 +231,7 @@ const ReadyNode = ({ data }: NodeProps) => {
           <CheckCircle className="w-3 h-3 sm:w-5 sm:h-5 text-green-400" />
         </div>
         <h3 className="text-xs sm:text-lg font-semibold text-zinc-100 leading-tight">
-          Your Custom AI Agent is Ready
+          Your Custom AI Chatbot is Ready
         </h3>
       </div>
 
@@ -243,11 +243,11 @@ const ReadyNode = ({ data }: NodeProps) => {
           <div className="flex items-center justify-center gap-1.5 sm:gap-2">
             <CheckCircle className="w-3 h-3 sm:w-5 sm:h-5 text-green-400" />
             <span className="text-xs sm:text-sm font-medium text-green-400">
-              Agent Deployed Successfully
+              AI Chatbot Integrated Successfully
             </span>
           </div>
           <p className="text-xs text-zinc-500 hidden sm:block">
-            Your AI agent is now live and ready to use
+            Your AI Chatbot is now live and ready to use
           </p>
         </div>
       </div>

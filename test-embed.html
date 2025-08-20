@@ -1,188 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chatbot Embed Test</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Embed Script</title>
     <style>
-      body {
-        font-family: system-ui, -apple-system, sans-serif;
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 40px 20px;
-        line-height: 1.6;
-        color: #333;
-      }
-      h1 {
-        color: #2563eb;
-        text-align: center;
-        margin-bottom: 30px;
-      }
-      .test-section {
-        background: #f8fafc;
-        padding: 30px;
-        border-radius: 12px;
-        margin: 30px 0;
-        border: 1px solid #e2e8f0;
-      }
-      .test-section h2 {
-        color: #1e40af;
-        margin-top: 0;
-      }
-      .code-block {
-        background: #1e293b;
-        color: #e2e8f0;
-        padding: 20px;
-        border-radius: 8px;
-        font-family: monospace;
-        font-size: 14px;
-        overflow-x: auto;
-        margin: 20px 0;
-      }
-      .success {
-        background: #dcfce7;
-        border: 1px solid #22c55e;
-        color: #166534;
-        padding: 15px;
-        border-radius: 8px;
-        margin: 20px 0;
-      }
-      .info {
-        background: #dbeafe;
-        border: 1px solid #3b82f6;
-        color: #1e40af;
-        padding: 15px;
-        border-radius: 8px;
-        margin: 20px 0;
-      }
-      .warning {
-        background: #fef3c7;
-        border: 1px solid #f59e0b;
-        color: #92400e;
-        padding: 15px;
-        border-radius: 8px;
-        margin: 20px 0;
-      }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .instructions {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #2196f3;
+        }
+        .embed-code {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            margin: 10px 0;
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <h1>🤖 Chatbot Embed Test</h1>
-
-    <div class="info">
-      <strong>ℹ️ Test Status:</strong> This page is testing the embeddable
-      chatbot system. Look for a floating chat button in the bottom-right
-      corner.
+    
+    <div class="test-section">
+        <h2>Test Instructions</h2>
+        <div class="instructions">
+            <p><strong>This page tests your embed script functionality:</strong></p>
+            <ol>
+                <li>The chatbot should appear as a floating button</li>
+                <li>Click the button to open the chat window</li>
+                <li>Type a message and press Enter or click Send</li>
+                <li>You should get an AI response from your OpenRouter API</li>
+                <li>All customized UI settings should be applied</li>
+            </ol>
+        </div>
     </div>
 
     <div class="test-section">
-      <h2>🧪 What We're Testing</h2>
-      <ul>
-        <li>
-          <strong>Embed Loading:</strong> The chatbot script loads from your
-          local server
-        </li>
-        <li>
-          <strong>UI Rendering:</strong> Floating button and chat interface
-          appear
-        </li>
-        <li>
-          <strong>Chat Functionality:</strong> Send messages and receive
-          responses
-        </li>
-        <li>
-          <strong>API Integration:</strong> Messages are sent to your local API
-        </li>
-      </ul>
+        <h2>Embed Script</h2>
+        <p>The following script tag is loaded on this page:</p>
+        <div class="embed-code">
+            &lt;script src="https://lux-llm-prod.vercel.app/api/embed-script/embed-1755723257844-4w5sve.js"&gt;&lt;/script&gt;
+        </div>
+        <p><strong>Status:</strong> <span id="status">Loading...</span></p>
     </div>
 
     <div class="test-section">
-      <h2>📋 Test Steps</h2>
-      <ol>
-        <li>
-          <strong>Look for the chat button:</strong> A blue circular button
-          should appear in the bottom-right corner
-        </li>
-        <li>
-          <strong>Click the button:</strong> This should open the chat interface
-        </li>
-        <li>
-          <strong>Send a message:</strong> Type "Hello" and press Enter or click
-          the send button
-        </li>
-        <li>
-          <strong>Check the response:</strong> You should see a response from
-          the AI
-        </li>
-        <li>
-          <strong>Test closing:</strong> Click the × button or outside the chat
-          to close it
-        </li>
-      </ol>
+        <h2>Expected Results</h2>
+        <ul>
+            <li>✅ Chatbot button appears (bottom-right corner)</li>
+            <li>✅ Clicking opens chat window</li>
+            <li>✅ Custom colors and styling applied</li>
+            <li>✅ Typing and sending messages works</li>
+            <li>✅ AI responses received from your API</li>
+            <li>✅ All UI customizations visible</li>
+        </ul>
     </div>
 
-    <div class="test-section">
-      <h2>🔧 Technical Details</h2>
-      <p>
-        <strong>Embed Script URL:</strong>
-        <code>http://localhost:3001/embed/test-embed.js</code>
-      </p>
-      <p>
-        <strong>API Endpoint:</strong>
-        <code>http://localhost:3001/api/public-chat</code>
-      </p>
-      <p>
-        <strong>Server Status:</strong>
-        <span id="server-status">Checking...</span>
-      </p>
-    </div>
-
-    <div class="test-section">
-      <h2>📱 Expected Behavior</h2>
-      <div class="code-block">
-        ✅ Floating chat button appears ✅ Clicking button opens chat interface
-        ✅ Welcome message is displayed ✅ Input field is functional ✅ Send
-        button works ✅ Messages are sent to API ✅ AI responses are received ✅
-        Chat can be closed
-      </div>
-    </div>
-
-    <div class="warning">
-      <strong>⚠️ Note:</strong> This is currently using a mock AI response. To
-      test with real AI, you'll need to:
-      <ol>
-        <li>Set up your OpenRouter API key</li>
-        <li>Connect to your Supabase database</li>
-        <li>Update the API endpoint URLs</li>
-      </ol>
-    </div>
-
-    <div class="success">
-      <strong>🎉 Success!</strong> If you can see the chat button and interact
-      with it, your embed system is working correctly!
-    </div>
-
+    <!-- Load the embed script -->
+    <script src="https://lux-llm-prod.vercel.app/api/embed-script/embed-1755723257844-4w5sve.js"></script>
+    
     <script>
-      // Check server status
-      fetch("http://localhost:3001/health")
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById("server-status").textContent = "✅ Running";
-          document.getElementById("server-status").style.color = "#22c55e";
-        })
-        .catch(error => {
-          document.getElementById("server-status").textContent =
-            "❌ Not running";
-          document.getElementById("server-status").style.color = "#ef4444";
-        });
-
-      // Add some interactive elements
-      console.log("🚀 Test page loaded successfully!");
-      console.log(
-        "🔍 Look for the floating chat button in the bottom-right corner"
-      );
+        // Check if script loaded successfully
+        setTimeout(() => {
+            const status = document.getElementById('status');
+            if (window.toggleChat && window.sendMessage) {
+                status.innerHTML = '✅ <strong>Script loaded successfully!</strong>';
+                status.style.color = 'green';
+            } else {
+                status.innerHTML = '❌ <strong>Script failed to load</strong>';
+                status.style.color = 'red';
+            }
+        }, 2000);
     </script>
-
-    <!-- This is where your chatbot will be embedded -->
-    <script src="http://localhost:3001/embed/test-embed.js"></script>
-  </body>
+</body>
 </html>

@@ -65,9 +65,37 @@ function generateEmbedScript(embedCode, embedConfig) {
   const isProduction = process.env.NODE_ENV === "production";
   const apiBaseUrl = isProduction ? productionUrl : "http://localhost:3000";
 
+  // Get agent configuration with fallbacks
+  const agent = embedConfig?.agents || {};
+  
   // Escape any single quotes in the config values to prevent syntax errors
-  const escapedName = (embedConfig?.agents?.name || embedConfig?.name || "AI Assistant").replace(/'/g, "\\'");
-  const escapedPrompt = (embedConfig?.agents?.system_prompt || "You are a helpful AI assistant that can answer questions about technology, programming, and general knowledge.").replace(/'/g, "\\'");
+  const escapedName = (agent.name || embedConfig?.name || "AI Assistant").replace(/'/g, "\\'");
+  const escapedPrompt = (agent.system_prompt || "You are a helpful AI assistant that can answer questions about technology, programming, and general knowledge.").replace(/'/g, "\\'");
+  
+  // Extract theme configuration with fallbacks
+  const themeConfig = agent.theme_config || {};
+  
+  // Colors with fallbacks
+  const primaryColor = themeConfig.primary_color || agent.primary_color || '#3b82f6';
+  const backgroundColor = themeConfig.background_color || agent.background_color || '#ffffff';
+  const textColor = themeConfig.text_color || agent.text_color || '#1f2937';
+  const accentColor = themeConfig.accent_color || agent.accent_color || '#e5e7eb';
+  const chatBgColor = themeConfig.chat_bg_color || agent.chat_bg_color || '#ffffff';
+  const chatBorderColor = themeConfig.chat_border_color || agent.chat_border_color || '#e5e7eb';
+  
+  // UI settings with fallbacks
+  const borderRadius = themeConfig.border_radius || agent.border_radius || 12;
+  const fontSize = themeConfig.font_size || agent.font_size || 14;
+  const fontFamily = themeConfig.font_family || agent.font_family || 'Inter';
+  const position = themeConfig.position || agent.position || 'bottom-right';
+  const welcomeMessage = themeConfig.welcome_message || agent.welcome_message || "Hello! I'm your AI assistant. How can I help you today?";
+  const placeholder = themeConfig.placeholder || agent.placeholder || "Type your message...";
+  const avatarUrl = agent.avatar_url || themeConfig.avatar_url || '';
+  
+  // Features
+  const showTypingIndicator = themeConfig.show_typing_indicator !== false;
+  const enableSounds = themeConfig.enable_sounds || false;
+  const animationSpeed = themeConfig.animation_speed || 'normal';
 
   return `// LuxLLM Chatbot Embed Script
 // Generated for: ${embedCode}
@@ -81,20 +109,22 @@ function generateEmbedScript(embedCode, embedConfig) {
     embedCode: '${embedCode}',
     chatbotName: '${escapedName}',
     systemPrompt: '${escapedPrompt}',
-    primaryColor: '#3b82f6',
-    backgroundColor: '#ffffff',
-    textColor: '#1f2937',
-    accentColor: '#e5e7eb',
-    borderRadius: 12,
-    fontSize: 14,
-    fontFamily: 'Inter',
-    position: 'bottom-right',
-    welcomeMessage: 'Hello! I\\'m your AI assistant. How can I help you today?',
-    placeholder: 'Type your message...',
-    avatarUrl: '',
-    showTypingIndicator: true,
-    enableSounds: false,
-    animationSpeed: 'normal',
+    primaryColor: '${primaryColor}',
+    backgroundColor: '${backgroundColor}',
+    textColor: '${textColor}',
+    accentColor: '${accentColor}',
+    chatBgColor: '${chatBgColor}',
+    chatBorderColor: '${chatBorderColor}',
+    borderRadius: ${borderRadius},
+    fontSize: ${fontSize},
+    fontFamily: '${fontFamily}',
+    position: '${position}',
+    welcomeMessage: '${welcomeMessage.replace(/'/g, "\\'")}',
+    placeholder: '${placeholder.replace(/'/g, "\\'")}',
+    avatarUrl: '${avatarUrl}',
+    showTypingIndicator: ${showTypingIndicator},
+    enableSounds: ${enableSounds},
+    animationSpeed: '${animationSpeed}',
     apiBaseUrl: '${apiBaseUrl}'
   };
 
@@ -105,7 +135,7 @@ function generateEmbedScript(embedCode, embedConfig) {
       \${config.position.includes('bottom') ? 'bottom: 20px;' : 'top: 20px;'}
       \${config.position.includes('right') ? 'right: 20px;' : 'left: 20px;'}
       z-index: 10000;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-family: \${config.fontFamily}, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     ">
       <!-- Chat Button -->
       <div id="luxllm-chat-button" style="
@@ -120,9 +150,10 @@ function generateEmbedScript(embedCode, embedConfig) {
         box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         transition: transform 0.2s ease;
       " onclick="toggleChat()">
+        \${config.avatarUrl ? \`<img src="\${config.avatarUrl}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" alt="Chatbot Avatar">\` : \`
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
+        </svg>\`}
       </div>
 
       <!-- Chat Window -->
@@ -132,13 +163,13 @@ function generateEmbedScript(embedCode, embedConfig) {
         \${config.position.includes('right') ? 'right: 0;' : 'left: 0;'}
         width: 350px;
         height: 500px;
-        background: \${config.backgroundColor};
+        background: \${config.chatBgColor};
         border-radius: \${config.borderRadius}px;
         box-shadow: 0 8px 32px rgba(0,0,0,0.12);
         display: none;
         flex-direction: column;
         overflow: hidden;
-        border: 1px solid \${config.accentColor};
+        border: 1px solid \${config.chatBorderColor};
       ">
         <!-- Header -->
         <div style="
@@ -150,6 +181,7 @@ function generateEmbedScript(embedCode, embedConfig) {
           align-items: center;
           gap: 8px;
         ">
+          \${config.avatarUrl ? \`<img src="\${config.avatarUrl}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" alt="Chatbot Avatar">\` : \`
           <div style="
             width: 32px;
             height: 32px;
@@ -162,7 +194,7 @@ function generateEmbedScript(embedCode, embedConfig) {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             </svg>
-          </div>
+          </div>\`}
           <span>\${config.chatbotName}</span>
         </div>
 
@@ -192,18 +224,19 @@ function generateEmbedScript(embedCode, embedConfig) {
         <!-- Input Area -->
         <div style="
           padding: 16px;
-          border-top: 1px solid \${config.accentColor};
+          border-top: 1px solid \${config.chatBorderColor};
           display: flex;
           gap: 8px;
         ">
           <input id="luxllm-input" type="text" placeholder="\${config.placeholder}" style="
             flex: 1;
             padding: 12px 16px;
-            border: 1px solid \${config.accentColor};
+            border: 1px solid \${config.chatBorderColor};
             border-radius: 8px;
             font-size: \${config.fontSize}px;
             outline: none;
             font-family: inherit;
+            color: \${config.textColor};
           " onkeypress="handleKeyPress(event)">
           <button onclick="sendMessage()" style="
             background: \${config.primaryColor};

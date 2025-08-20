@@ -31,8 +31,8 @@ const Footer = () => {
   ];
 
   const quickLinks = [
-    { label: "Build AI Agents", href: "/build" },
-    { label: "PreMade Agents", href: "/" },
+    { label: "Build AI Chabots", href: "/build" },
+    { label: "Templates", href: "/build" },
     { label: "Features", href: "#features" },
     { label: "Pricing", href: "#pricing" },
   ];
@@ -62,7 +62,7 @@ const Footer = () => {
               <span className="text-foreground">LLM</span>
             </div>
             <p className="text-foreground/70 font-light leading-relaxed mb-6">
-              Generate AI agents in minutes from plain language.
+              Generate and Import Fully Customisable AI Chatbots.
             </p>
             <div className="flex space-x-4">
               {socialLinks.map((link, index) => (

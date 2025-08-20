@@ -8,50 +8,54 @@ const About = () => {
     {
       icon: <Heart size={48} weight="light" />,
       title: "User-Centric",
-      description: "Every decision we make is guided by what's best for our users and their success."
+      description:
+        "Every decision we make is guided by what's best for our users and their success.",
     },
     {
       icon: <Users size={48} weight="light" />,
       title: "Collaborative",
-      description: "We believe in the power of community and open collaboration to drive innovation."
+      description:
+        "We believe in the power of community and open collaboration to drive innovation.",
     },
     {
       icon: <Rocket size={48} weight="light" />,
       title: "Innovative",
-      description: "We constantly push boundaries and explore new possibilities in AI technology."
+      description:
+        "We constantly push boundaries and explore new possibilities in AI technology.",
     },
     {
       icon: <Target size={48} weight="light" />,
       title: "Focused",
-      description: "We maintain laser focus on building the best AI aggregation platform possible."
-    }
+      description:
+        "We maintain laser focus on building the best AI aggregation platform possible.",
+    },
   ];
 
   const team = [
     {
-      name: "Alex Thompson",
-      role: "CEO & Founder",
+      name: "Bhanu Pratap Singh",
+      role: " Founder",
       bio: "Former AI researcher at DeepMind with 10+ years in machine learning and product development.",
-      avatar: "👨‍💻"
+      avatar: "👨‍💻",
     },
     {
-      name: "Sarah Chen",
+      name: "Hardik Goel",
       role: "CTO",
       bio: "Ex-Google senior engineer who led the development of large-scale AI infrastructure systems.",
-      avatar: "👩‍💻"
+      avatar: "👩‍💻",
     },
     {
-      name: "Marcus Rodriguez",
+      name: "Arjun Rawat",
       role: "Head of Product",
       bio: "Product design veteran with experience at Stripe and Figma, focused on developer experiences.",
-      avatar: "👨‍🎨"
+      avatar: "👨‍🎨",
     },
     {
-      name: "Emily Watson",
+      name: "Aaditya Malik",
       role: "Head of AI Research",
       bio: "PhD in Computer Science from Stanford, specializing in large language model optimization.",
-      avatar: "👩‍🔬"
-    }
+      avatar: "👩‍🔬",
+    },
   ];
 
   return (
@@ -62,7 +66,7 @@ const About = () => {
       className="min-h-screen bg-background"
     >
       <Navigation />
-      
+
       {/* Hero Section */}
       <section className="pt-32 pb-24 relative">
         <div className="container mx-auto px-4">
@@ -76,7 +80,8 @@ const About = () => {
               About <span className="text-primary">t3Dotgg</span>
             </h1>
             <p className="text-xl md:text-2xl text-foreground/70 font-light leading-relaxed">
-              We're building the future of AI accessibility, one conversation at a time.
+              We're building the future of AI accessibility, one conversation at
+              a time.
             </p>
           </motion.div>
         </div>
@@ -98,18 +103,24 @@ const About = () => {
               </h2>
               <div className="space-y-6 text-lg text-foreground/80 font-light leading-relaxed">
                 <p>
-                  t3Dotgg was born from a simple frustration: the AI landscape was becoming increasingly fragmented. 
-                  Developers and researchers found themselves jumping between multiple platforms, each with their own 
-                  interfaces, APIs, and limitations.
+                  t3Dotgg was born from a simple frustration: the AI landscape
+                  was becoming increasingly fragmented. Developers and
+                  researchers found themselves jumping between multiple
+                  platforms, each with their own interfaces, APIs, and
+                  limitations.
                 </p>
                 <p>
-                  Our founders, coming from backgrounds at leading AI companies, recognized that the real power of 
-                  artificial intelligence would only be unlocked when these tools became truly accessible and 
-                  interoperable. We set out to build the platform we wished existed.
+                  Our founders, coming from backgrounds at leading AI companies,
+                  recognized that the real power of artificial intelligence
+                  would only be unlocked when these tools became truly
+                  accessible and interoperable. We set out to build the platform
+                  we wished existed.
                 </p>
                 <p>
-                  Today, t3Dotgg serves thousands of developers, researchers, and businesses worldwide, providing 
-                  them with seamless access to the most advanced AI models through a single, unified interface.
+                  Today, t3Dotgg serves thousands of developers, researchers,
+                  and businesses worldwide, providing them with seamless access
+                  to the most advanced AI models through a single, unified
+                  interface.
                 </p>
               </div>
             </motion.div>
