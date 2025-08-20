@@ -28,9 +28,10 @@ const OPENROUTER_API_KEY =
   process.env.OPENROUTER_API_KEY ||
   "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";
 
-// Production configuration
-const PRODUCTION_URL = "https://lux-llm-prod.vercel.app";
+// Environment configuration
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
+const PRODUCTION_URL = "https://lux-llm-prod.vercel.app";
+const PORT = process.env.PORT || 3001;
 
 // Mock embed configuration for testing (when database is not set up)
 const MOCK_EMBED_CONFIG = {
@@ -42,7 +43,6 @@ const MOCK_EMBED_CONFIG = {
 };
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(
@@ -56,7 +56,7 @@ app.use(
 app.use(express.json({ limit: "10mb" }));
 app.use(express.static("public"));
 
-// Add CSP headers middleware
+// Add CSP headers middleware for production
 app.use((req, res, next) => {
   if (IS_PRODUCTION) {
     // Set CSP headers for production
@@ -82,7 +82,12 @@ app.get("/favicon.ico", (req, res) => {
 
 // Health check endpoint
 app.get("/health", (req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+  res.json({ 
+    status: "ok", 
+    timestamp: new Date().toISOString(),
+    environment: IS_PRODUCTION ? "production" : "development",
+    server: "embed-api-server"
+  });
 });
 
 // Real public chat handler with AI integration
@@ -254,8 +259,7 @@ async function handlePublicChat(request) {
   } catch (error) {
     console.error("❌ Public chat error:", error);
     return {
-      message:
-        "Sorry, I'm experiencing technical difficulties. Please try again later.",
+      message: "Sorry, I'm experiencing technical difficulties. Please try again later.",
       sessionId: request.sessionId,
       error: "Internal server error",
     };
@@ -530,11 +534,11 @@ app.get("/embed/:embedCode", (req, res) => {
           <p><strong>Script URL:</strong> <code>${baseUrl}/embed/${embedCode}.js</code></p>
           <p><strong>Status:</strong> <span class="status-badge ${
             IS_PRODUCTION ? "status-active" : "status-testing"
-          }">${IS_PRODUCTION ? "✅ Production" : "🔄 Testing Mode"}</span></p>
+          }">${IS_PRODUCTION ? "✅ Production" : "🔄 Development"}</span></p>
           ${
             IS_PRODUCTION
               ? ""
-              : "<p><strong>Note:</strong> This is running in testing mode with mock configuration</p>"
+              : "<p><strong>Note:</strong> This is running in development mode</p>"
           }
         </div>
         
@@ -601,7 +605,7 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 Embed API Server running on port ${PORT}`);
   console.log(
     `📡 Public Chat API: ${
       IS_PRODUCTION ? PRODUCTION_URL : `http://localhost:${PORT}`
@@ -634,6 +638,8 @@ app.listen(PORT, () => {
     `🔒 CSP Headers: ${IS_PRODUCTION ? "✅ Enabled" : "⚠️ Development Mode"}`
   );
   console.log(`🏠 React App: ✅ Served by Vercel static build`);
+  console.log(`📱 Development: ✅ Run 'npm run dev' for React app`);
+  console.log(`🔧 Server: ✅ Run 'npm run dev:server' for embed API`);
 });
 
 export default app;
