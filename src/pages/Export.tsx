@@ -50,7 +50,7 @@ export default function Export() {
   const { agentId } = useParams<{ agentId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { getAgentsByUser } = useAgentService();
+  const { getAgentsByUser, createAgent } = useAgentService();
   const { createEmbed } = useEmbedService();
 
   // Get platform logo URLs
@@ -321,12 +321,21 @@ export default function Export() {
     return `<script src="https://lux-llm-prod.vercel.app/embed/${agent.id}.js"></script>`;
   };
 
-  // Create new embed
-  const createNewEmbed = async () => {
-    if (!agent || !embedConfig) {
+  // Create embed function
+  const handleCreateEmbed = async () => {
+    if (!agent) {
       toast({
         title: "Error",
-        description: "Missing agent or configuration data",
+        description: "No agent selected",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!embedName.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter an embed name",
         variant: "destructive",
       });
       return;
@@ -334,9 +343,54 @@ export default function Export() {
 
     setIsCreatingEmbed(true);
     try {
+      let finalAgentId = agent.id;
+      let finalAgent = agent;
+
+      // Check if we're in preview mode (agent ID starts with 'preview-')
+      if (isPreviewMode && agent.id.startsWith('preview-')) {
+        console.log("Export page: Preview mode detected, creating real agent first...");
+        
+        // Create a real agent from the preview data
+        const agentData = {
+          name: agent.name || "My Chatbot",
+          avatar_url: agent.avatar_url,
+          heading: agent.heading,
+          subheading: agent.subheading,
+          system_prompt: agent.system_prompt || "You are a helpful AI assistant.",
+          chat_bg_color: agent.chat_bg_color || "#ffffff",
+          chat_border_color: agent.chat_border_color || "#e5e7eb",
+          user_msg_color: agent.user_msg_color || "#3b82f6",
+          bot_msg_color: agent.bot_msg_color || "#1f2937",
+          chat_name: agent.chat_name || agent.name || "My Chatbot",
+        };
+
+        const { data: newAgent, error: agentError } = await createAgent(agentData);
+        
+        if (agentError || !newAgent) {
+          throw new Error(`Failed to create agent: ${agentError || "Unknown error"}`);
+        }
+
+        console.log("Export page: Real agent created:", newAgent);
+        finalAgentId = newAgent.id;
+        finalAgent = newAgent;
+        
+        // Update the agent state to use the real agent
+        setAgent(newAgent);
+        setIsPreviewMode(false);
+        
+        // Clear the preview data from localStorage
+        localStorage.removeItem("chatbotPreviewData");
+        
+        toast({
+          title: "Agent Created",
+          description: "Your agent has been saved and is now ready for embedding!",
+        });
+      }
+
+      // Now create the embed with the real agent ID
       const { data: embed, error } = await createEmbed({
-        agentId: agent.id,
-        name: embedName || agent.name,
+        agentId: finalAgentId,
+        name: embedName || finalAgent.name,
         description: embedDescription,
         maxRequestsPerHour,
         maxRequestsPerDay,
@@ -350,14 +404,14 @@ export default function Export() {
       const generatedScript = await generateEmbedScript({
         embedCode: embed.embed_code,
         chatbotName: embed.name,
-        systemPrompt: agent.system_prompt || "You are a helpful AI assistant.",
+        systemPrompt: finalAgent.system_prompt || "You are a helpful AI assistant.",
         config: embedConfig,
       });
 
       // Update state
       setEmbedCode(embed.embed_code);
       setEmbedUrl(
-        `https://lux-llm-prod.vercel.app/embed/${embed.embed_code}.js`
+        `https://lux-llm-prod.vercel.app/api/embed/${embed.embed_code}.js`
       );
       setEmbedHtml(generateEmbedHTML(embed.embed_code));
       setEmbedIframe(generateIframeEmbed(embed.embed_code));
@@ -641,6 +695,25 @@ export default function Export() {
                     </div>
                   </div>
 
+                  {/* Preview Mode Warning */}
+                  {isPreviewMode && (
+                    <div className="bg-gradient-to-r from-[#ff6b35] to-[#f7931e] rounded-2xl p-4 border border-[#ff6b35]/30">
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                          <span className="text-[#ff6b35] text-sm font-bold">!</span>
+                        </div>
+                        <div>
+                          <p className="text-white font-medium text-sm">
+                            Preview Mode Active
+                          </p>
+                          <p className="text-white/90 text-xs">
+                            You're working with a preview agent. When you create an embed, we'll automatically save your agent first, then create the embed.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Rate Limiting */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -686,7 +759,7 @@ export default function Export() {
                   {/* Create Embed Button */}
                   <div className="text-center pt-4">
                     <Button
-                      onClick={createNewEmbed}
+                      onClick={handleCreateEmbed}
                       disabled={isCreatingEmbed || !embedConfig}
                       size="lg"
                       className="bg-gradient-to-r from-[#00ff00] to-[#00cc00] hover:from-[#00cc00] hover:to-[#00ff00] text-black px-12 py-4 font-medium rounded-2xl transition-all duration-300 hover:scale-105 shadow-glow-lg hover:shadow-glow disabled:opacity-50 disabled:cursor-not-allowed"
