@@ -192,7 +192,7 @@ export default async function handler(req, res) {
           function loadChatbot() {
             // Create script element
             const script = document.createElement('script');
-            script.src = '/api/embed/${embedCode}.js';
+            script.src = '/api/embed-script/${embedCode}.js'; // Corrected path
             script.async = true;
             
             // Add to page

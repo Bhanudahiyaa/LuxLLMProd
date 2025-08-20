@@ -82,7 +82,7 @@ export async function generateEmbedScript(
 
 // Generate embed HTML snippet
 export function generateEmbedHTML(embedCode: string): string {
-  return `<script src="https://lux-llm-prod.vercel.app/api/embed/${embedCode}.js"></script>`;
+  return `<script src="https://lux-llm-prod.vercel.app/api/embed-script/${embedCode}.js"></script>`;
 }
 
 // Generate iframe embed code
@@ -91,7 +91,7 @@ export function generateIframeEmbed(
   width: number = 400,
   height: number = 600
 ): string {
-  return `<iframe src="https://lux-llm-prod.vercel.app/api/embed/${embedCode}" width="${width}" height="${height}" style="border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);"></iframe>`;
+  return `<iframe src="https://lux-llm-prod.vercel.app/api/embed-preview/${embedCode}" width="${width}" height="${height}" style="border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);"></iframe>`;
 }
 
 // Generate integration instructions for different platforms
@@ -100,12 +100,12 @@ export function generateIntegrationInstructions(
 ): Record<string, string> {
   return {
     html: `<!-- Add this to your HTML <head> or before </body> -->
-<script src="https://lux-llm-prod.vercel.app/api/embed/${embedCode}.js"></script>`,
+<script src="https://lux-llm-prod.vercel.app/api/embed-script/${embedCode}.js"></script>`,
 
     react: `// Add this to your React component
 useEffect(() => {
   const script = document.createElement('script');
-  script.src = 'https://lux-llm-prod.vercel.app/api/embed/${embedCode}.js';
+  script.src = 'https://lux-llm-prod.vercel.app/api/embed-script/${embedCode}.js';
   script.async = true;
   document.body.appendChild(script);
   
@@ -115,16 +115,16 @@ useEffect(() => {
 }, []);`,
 
     shopify: `<!-- Add this to your Shopify theme's liquid file -->
-{{ 'https://lux-llm-prod.vercel.app/api/embed/' | append: '${embedCode}' | append: '.js' | script_tag }}`,
+{{ 'https://lux-llm-prod.vercel.app/api/embed-script/' | append: '${embedCode}' | append: '.js' | script_tag }}`,
 
     wix: `<!-- Add this to your Wix site's HTML element -->
-<iframe src="https://lux-llm-prod.vercel.app/api/embed/${embedCode}" width="400" height="600" style="border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);"></iframe>`,
+<iframe src="https://lux-llm-prod.vercel.app/api/embed-preview/${embedCode}" width="400" height="600" style="border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);"></iframe>`,
 
     wordpress: `<!-- Add this to your WordPress theme or use a custom HTML widget -->
-<script src="https://lux-llm-prod.vercel.app/api/embed/${embedCode}.js"></script>`,
+<script src="https://lux-llm-prod.vercel.app/api/embed-script/${embedCode}.js"></script>`,
 
     squarespace: `<!-- Add this to your Squarespace site's Code Block -->
-<script src="https://lux-llm-prod.vercel.app/api/embed/${embedCode}.js"></script>`,
+<script src="https://lux-llm-prod.vercel.app/api/embed-script/${embedCode}.js"></script>`,
   };
 }
 

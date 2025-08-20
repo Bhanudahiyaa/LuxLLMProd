@@ -420,7 +420,7 @@ export default function Export() {
       // Update state
       setEmbedCode(embed.embed_code);
       setEmbedUrl(
-        `https://lux-llm-prod.vercel.app/api/embed/${embed.embed_code}.js`
+        `https://lux-llm-prod.vercel.app/api/embed-script/${embed.embed_code}.js`
       );
       setEmbedHtml(generateEmbedHTML(embed.embed_code));
       setEmbedIframe(generateIframeEmbed(embed.embed_code));
@@ -904,7 +904,7 @@ export default function Export() {
                           <Button
                             onClick={() =>
                               window.open(
-                                `https://lux-llm-prod.vercel.app/api/embed/${embedCode}`,
+                                `https://lux-llm-prod.vercel.app/api/embed-preview/${embedCode}`,
                                 "_blank"
                               )
                             }

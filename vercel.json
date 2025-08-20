@@ -7,10 +7,10 @@
     "api/health.js": {
       "maxDuration": 10
     },
-    "api/embed/[embedCode].js": {
+    "api/embed-script/[embedCode].js": {
       "maxDuration": 30
     },
-    "api/embed/[embedCode]/index.js": {
+    "api/embed-preview/[embedCode].js": {
       "maxDuration": 30
     }
   },
