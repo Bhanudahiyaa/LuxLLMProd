@@ -47,7 +47,7 @@
       border: 2px solid ${CONFIG.theme.accentColor};
       border-radius: ${CONFIG.theme.borderRadius}px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-      font-family: ${CONFIG.theme.fontFamily}, system-ui, -apple-system, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       z-index: 10000;
       display: none;
       flex-direction: column;

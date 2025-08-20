@@ -19,7 +19,7 @@ const __dirname = dirname(__filename);
 const supabase = createClient(
   process.env.SUPABASE_URL || "https://cvetvxgzgfmiqdxdimzn.supabase.co",
   process.env.SUPABASE_ANON_KEY ||
-    "eyJhbGciOiJIUzI1NiIsInR9cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN2ZXR2eGd6Z2ZtaXFkeGRpbXpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0MTk0NTYsImV4cCI6MjA2OTk5NTQ1Nn0.pgNeUr3T2LQNL0qno1bxST6HgqbdIrCkJrkb-wOL5SE"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN2ZXR2eGd6Z2ZtaXFkeGRpbXpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0MTk0NTYsImV4cCI6MjA2OTk5NTQ1Nn0.pgNeUr3T2LQNL0qno1bxST6HgqbdIrCkJrkb-wOL5SE"
 );
 
 // OpenRouter API configuration
@@ -55,6 +55,30 @@ app.use(
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.static("public"));
+
+// Add CSP headers middleware
+app.use((req, res, next) => {
+  if (IS_PRODUCTION) {
+    // Set CSP headers for production
+    res.setHeader(
+      "Content-Security-Policy",
+      "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; font-src 'self' https: data:; img-src 'self' https: data: blob:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; connect-src 'self' https: wss:;"
+    );
+  }
+  next();
+});
+
+// Favicon route
+app.get("/favicon.ico", (req, res) => {
+  const faviconPath = path.join(__dirname, "public", "favicon.ico");
+  if (fs.existsSync(faviconPath)) {
+    res.setHeader("Content-Type", "image/x-icon");
+    res.setHeader("Cache-Control", "public, max-age=31536000");
+    res.sendFile(faviconPath);
+  } else {
+    res.status(404).send("Favicon not found");
+  }
+});
 
 // Health check endpoint
 app.get("/health", (req, res) => {
@@ -230,8 +254,7 @@ async function handlePublicChat(request) {
   } catch (error) {
     console.error("❌ Public chat error:", error);
     return {
-      message:
-        "Sorry, I'm experiencing technical difficulties. Please try again later.",
+      message: "Sorry, I'm experiencing technical difficulties. Please try again later.",
       sessionId: request.sessionId,
       error: "Internal server error",
     };
@@ -606,6 +629,7 @@ app.listen(PORT, () => {
     `🌍 Environment: ${IS_PRODUCTION ? "🚀 Production" : "🧪 Development"}`
   );
   console.log(`🔗 Production URL: ${PRODUCTION_URL}`);
+  console.log(`🔒 CSP Headers: ${IS_PRODUCTION ? "✅ Enabled" : "⚠️ Development Mode"}`);
 });
 
 export default app;
