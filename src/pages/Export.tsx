@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAgentService } from "../hooks/agentService";
+import { useEmbedService } from "../hooks/embedService";
 import { useToast, toast } from "../hooks/use-toast";
 import { useAuth } from "@clerk/clerk-react";
 import Navigation from "../components/Navigation";
@@ -14,8 +15,28 @@ import {
 } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
-import { Code, Globe, ExternalLink, Copy, Check, Loader2 } from "lucide-react";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
+import {
+  Code,
+  Globe,
+  ExternalLink,
+  Copy,
+  Check,
+  Loader2,
+  Settings,
+  Download,
+  Eye,
+} from "lucide-react";
 import { integrations } from "../lib/integrations";
+import {
+  generateEmbedScript,
+  generateEmbedHTML,
+  generateIframeEmbed,
+  generateIntegrationInstructions,
+} from "../lib/scriptGenerator";
+import { ChatbotConfig } from "../components/chatbot-preview";
 
 interface Integration {
   id: string;
@@ -30,6 +51,7 @@ export default function Export() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { getAgentsByUser } = useAgentService();
+  const { createEmbed } = useEmbedService();
 
   // Get platform logo URLs
   const getPlatformLogo = (platformName: string): string => {
@@ -68,6 +90,16 @@ export default function Export() {
   const [selectedIntegration, setSelectedIntegration] =
     useState<Integration | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [embedCode, setEmbedCode] = useState("");
+  const [embedUrl, setEmbedUrl] = useState("");
+  const [embedHtml, setEmbedHtml] = useState("");
+  const [embedIframe, setEmbedIframe] = useState("");
+  const [embedConfig, setEmbedConfig] = useState<ChatbotConfig | null>(null);
+  const [isCreatingEmbed, setIsCreatingEmbed] = useState(false);
+  const [embedName, setEmbedName] = useState("");
+  const [embedDescription, setEmbedDescription] = useState("");
+  const [maxRequestsPerHour, setMaxRequestsPerHour] = useState(100);
+  const [maxRequestsPerDay, setMaxRequestsPerDay] = useState(1000);
 
   // Add loading guard to prevent multiple simultaneous calls
   const [isLoadingAgents, setIsLoadingAgents] = useState(false);
@@ -289,6 +321,91 @@ export default function Export() {
     return `<script src="https://lux-llm-prod.vercel.app/embed/${agent.id}.js"></script>`;
   };
 
+  // Create new embed
+  const createNewEmbed = async () => {
+    if (!agent || !embedConfig) {
+      toast({
+        title: "Error",
+        description: "Missing agent or configuration data",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsCreatingEmbed(true);
+    try {
+      const { data: embed, error } = await createEmbed({
+        agentId: agent.id,
+        name: embedName || agent.name,
+        description: embedDescription,
+        maxRequestsPerHour,
+        maxRequestsPerDay,
+      });
+
+      if (error) {
+        throw new Error(error);
+      }
+
+      // Generate embed script
+      const generatedScript = await generateEmbedScript({
+        embedCode: embed.embed_code,
+        chatbotName: embed.name,
+        systemPrompt: agent.system_prompt || "You are a helpful AI assistant.",
+        config: embedConfig,
+      });
+
+      // Update state
+      setEmbedCode(embed.embed_code);
+      setEmbedUrl(
+        `https://lux-llm-prod.vercel.app/embed/${embed.embed_code}.js`
+      );
+      setEmbedHtml(generateEmbedHTML(embed.embed_code));
+      setEmbedIframe(generateIframeEmbed(embed.embed_code));
+
+      toast({
+        title: "Success",
+        description: "Embed created successfully!",
+      });
+    } catch (error) {
+      console.error("Error creating embed:", error);
+      toast({
+        title: "Error",
+        description:
+          "Failed to create embed: " +
+          (error instanceof Error ? error.message : "Unknown error"),
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreatingEmbed(false);
+    }
+  };
+
+  // Initialize embed config from agent data
+  useEffect(() => {
+    if (agent && !embedConfig) {
+      setEmbedConfig({
+        name: agent.name || "My Chatbot",
+        theme: "light",
+        primaryColor: "#3b82f6",
+        accentColor: "#e5e7eb",
+        backgroundColor: "#ffffff",
+        textColor: "#1f2937",
+        borderRadius: 12,
+        fontSize: 14,
+        fontFamily: "Inter",
+        position: "bottom-right",
+        welcomeMessage: "Hello! How can I help you today?",
+        systemPrompt: agent.system_prompt || "You are a helpful AI assistant.",
+        placeholder: "Type your message...",
+        avatar: agent.avatar_url || "",
+        showTypingIndicator: true,
+        enableSounds: false,
+        animationSpeed: "normal",
+      });
+      setEmbedName(agent.name || "My Chatbot");
+    }
+  }, [agent, embedConfig]);
+
   // Copy to clipboard
   const copyToClipboard = async (text: string, type: string) => {
     try {
@@ -392,8 +509,6 @@ export default function Export() {
     );
   }
 
-  const embedCode = generateEmbedCode();
-
   return (
     <div className="min-h-screen bg-[#1a1a1a]">
       <Navigation />
@@ -475,42 +590,261 @@ export default function Export() {
               </CardContent>
             </Card>
 
-            {/* Single Embed Code */}
+            {/* Embed Creation Form */}
             <Card className="mb-16 border-0 bg-gradient-to-br from-[#2a2a2a] to-[#1f1f1f] rounded-3xl overflow-hidden">
               <CardHeader className="pb-8">
                 <CardTitle className="flex items-center gap-4 text-2xl font-light text-white tracking-tight">
                   <div className="w-10 h-10 bg-gradient-to-br from-[#00ff00] to-[#00cc00] rounded-xl flex items-center justify-center shadow-glow">
-                    <Code className="h-5 w-5 text-black" />
+                    <Settings className="h-5 w-5 text-black" />
                   </div>
-                  Embed <span className="text-[#00ff00] font-normal">Code</span>
+                  Create{" "}
+                  <span className="text-[#00ff00] font-normal">Embed</span>
                 </CardTitle>
                 <p className="text-gray-400 font-light text-lg leading-relaxed">
-                  Copy and paste this single line of code into your website's
-                  HTML where you want the chatbot to appear.
+                  Configure your chatbot embed settings and generate the code to
+                  integrate it into any website.
                 </p>
               </CardHeader>
               <CardContent>
-                <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-2xl p-8 border border-[#333]/30">
-                  <div className="flex items-center justify-between">
-                    <pre className="bg-[#0a0a0a] text-[#00ff00] px-6 py-4 rounded-xl overflow-x-auto text-sm font-mono flex-1 mr-6 border border-[#333]/50 font-light">
-                      <code>{embedCode}</code>
-                    </pre>
+                <div className="space-y-6">
+                  {/* Basic Settings */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <Label
+                        htmlFor="embedName"
+                        className="text-white text-sm font-medium"
+                      >
+                        Embed Name
+                      </Label>
+                      <Input
+                        id="embedName"
+                        value={embedName}
+                        onChange={e => setEmbedName(e.target.value)}
+                        placeholder="My Website Chatbot"
+                        className="mt-2 bg-[#1a1a1a] border-[#333] text-white placeholder:text-gray-500"
+                      />
+                    </div>
+                    <div>
+                      <Label
+                        htmlFor="embedDescription"
+                        className="text-white text-sm font-medium"
+                      >
+                        Description (Optional)
+                      </Label>
+                      <Input
+                        id="embedDescription"
+                        value={embedDescription}
+                        onChange={e => setEmbedDescription(e.target.value)}
+                        placeholder="Customer support chatbot for my website"
+                        className="mt-2 bg-[#1a1a1a] border-[#333] text-white placeholder:text-gray-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Rate Limiting */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <Label
+                        htmlFor="maxRequestsPerHour"
+                        className="text-white text-sm font-medium"
+                      >
+                        Max Requests per Hour
+                      </Label>
+                      <Input
+                        id="maxRequestsPerHour"
+                        type="number"
+                        value={maxRequestsPerHour}
+                        onChange={e =>
+                          setMaxRequestsPerHour(parseInt(e.target.value) || 100)
+                        }
+                        min="10"
+                        max="1000"
+                        className="mt-2 bg-[#1a1a1a] border-[#333] text-white"
+                      />
+                    </div>
+                    <div>
+                      <Label
+                        htmlFor="maxRequestsPerDay"
+                        className="text-white text-sm font-medium"
+                      >
+                        Max Requests per Day
+                      </Label>
+                      <Input
+                        id="maxRequestsPerDay"
+                        type="number"
+                        value={maxRequestsPerDay}
+                        onChange={e =>
+                          setMaxRequestsPerDay(parseInt(e.target.value) || 1000)
+                        }
+                        min="100"
+                        max="10000"
+                        className="mt-2 bg-[#1a1a1a] border-[#333] text-white"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Create Embed Button */}
+                  <div className="text-center pt-4">
                     <Button
-                      onClick={() => copyToClipboard(embedCode, "Embed code")}
+                      onClick={createNewEmbed}
+                      disabled={isCreatingEmbed || !embedConfig}
                       size="lg"
-                      className="bg-gradient-to-r from-[#00ff00] to-[#00cc00] hover:from-[#00cc00] hover:to-[#00ff00] text-black px-8 py-4 whitespace-nowrap font-medium rounded-2xl transition-all duration-300 hover:scale-105 shadow-glow-lg hover:shadow-glow"
+                      className="bg-gradient-to-r from-[#00ff00] to-[#00cc00] hover:from-[#00cc00] hover:to-[#00ff00] text-black px-12 py-4 font-medium rounded-2xl transition-all duration-300 hover:scale-105 shadow-glow-lg hover:shadow-glow disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {copied ? (
-                        <Check className="h-5 w-5 mr-3" />
+                      {isCreatingEmbed ? (
+                        <>
+                          <Loader2 className="h-5 w-5 mr-3 animate-spin" />
+                          Creating Embed...
+                        </>
                       ) : (
-                        <Copy className="h-5 w-5 mr-3" />
+                        <>
+                          <Settings className="h-5 w-5 mr-3" />
+                          Create Embed
+                        </>
                       )}
-                      {copied ? "Copied!" : "Copy Code"}
                     </Button>
                   </div>
                 </div>
               </CardContent>
             </Card>
+
+            {/* Generated Embed Codes */}
+            {embedCode && (
+              <>
+                {/* Script Embed */}
+                <Card className="mb-8 border-0 bg-gradient-to-br from-[#2a2a2a] to-[#1f1f1f] rounded-3xl overflow-hidden">
+                  <CardHeader className="pb-6">
+                    <CardTitle className="flex items-center gap-3 text-xl font-light text-white tracking-tight">
+                      <div className="w-8 h-8 bg-gradient-to-br from-[#00ff00] to-[#00cc00] rounded-lg flex items-center justify-center shadow-glow">
+                        <Code className="h-4 w-4 text-black" />
+                      </div>
+                      Script{" "}
+                      <span className="text-[#00ff00] font-normal">Embed</span>
+                    </CardTitle>
+                    <p className="text-gray-400 font-light text-sm leading-relaxed">
+                      Add this script tag to your website's HTML head or before
+                      the closing body tag.
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-2xl p-6 border border-[#333]/30">
+                      <div className="flex items-center justify-between">
+                        <pre className="bg-[#0a0a0a] text-[#00ff00] px-4 py-3 rounded-xl overflow-x-auto text-sm font-mono flex-1 mr-4 border border-[#333]/50 font-light">
+                          <code>{embedHtml}</code>
+                        </pre>
+                        <Button
+                          onClick={() =>
+                            copyToClipboard(embedHtml, "Script embed code")
+                          }
+                          size="sm"
+                          className="bg-gradient-to-r from-[#00ff00] to-[#00cc00] hover:from-[#00cc00] hover:to-[#00ff00] text-black px-4 py-2 whitespace-nowrap font-medium rounded-xl transition-all duration-300 hover:scale-105 shadow-glow-lg"
+                        >
+                          {copied ? (
+                            <Check className="h-4 w-4" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Iframe Embed */}
+                <Card className="mb-8 border-0 bg-gradient-to-br from-[#2a2a2a] to-[#1f1f1f] rounded-3xl overflow-hidden">
+                  <CardHeader className="pb-6">
+                    <CardTitle className="flex items-center gap-3 text-xl font-light text-white tracking-tight">
+                      <div className="w-8 h-8 bg-gradient-to-br from-[#00ff00] to-[#00cc00] rounded-lg flex items-center justify-center shadow-glow">
+                        <Globe className="h-4 w-4 text-black" />
+                      </div>
+                      Iframe{" "}
+                      <span className="text-[#00ff00] font-normal">Embed</span>
+                    </CardTitle>
+                    <p className="text-gray-400 font-light text-sm leading-relaxed">
+                      Use this iframe code for platforms that don't support
+                      custom JavaScript.
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-2xl p-6 border border-[#333]/30">
+                      <div className="flex items-center justify-between">
+                        <pre className="bg-[#0a0a0a] text-[#00ff00] px-4 py-3 rounded-xl overflow-x-auto text-sm font-mono flex-1 mr-4 border border-[#333]/50 font-light">
+                          <code>{embedIframe}</code>
+                        </pre>
+                        <Button
+                          onClick={() =>
+                            copyToClipboard(embedIframe, "Iframe embed code")
+                          }
+                          size="sm"
+                          className="bg-gradient-to-r from-[#00ff00] to-[#00cc00] hover:from-[#00cc00] hover:to-[#00ff00] text-black px-4 py-2 whitespace-nowrap font-medium rounded-xl transition-all duration-300 hover:scale-105 shadow-glow-lg"
+                        >
+                          {copied ? (
+                            <Check className="h-4 w-4" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Preview and Test */}
+                <Card className="mb-16 border-0 bg-gradient-to-br from-[#2a2a2a] to-[#1f1f1f] rounded-3xl overflow-hidden">
+                  <CardHeader className="pb-6">
+                    <CardTitle className="flex items-center gap-3 text-xl font-light text-white tracking-tight">
+                      <div className="w-8 h-8 bg-gradient-to-br from-[#00ff00] to-[#00cc00] rounded-lg flex items-center justify-center shadow-glow">
+                        <Eye className="h-4 w-4 text-black" />
+                      </div>
+                      Test{" "}
+                      <span className="text-[#00ff00] font-normal">
+                        Your Embed
+                      </span>
+                    </CardTitle>
+                    <p className="text-gray-400 font-light text-sm leading-relaxed">
+                      Test your chatbot embed before adding it to your website.
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-2xl p-6 border border-[#333]/30">
+                      <div className="text-center space-y-4">
+                        <p className="text-gray-400 text-sm">
+                          Your embed code:{" "}
+                          <code className="bg-[#0a0a0a] text-[#00ff00] px-2 py-1 rounded text-xs border border-[#333]/50">
+                            {embedCode}
+                          </code>
+                        </p>
+                        <div className="flex gap-4 justify-center">
+                          <Button
+                            onClick={() =>
+                              window.open(
+                                `https://lux-llm-prod.vercel.app/embed/${embedCode}`,
+                                "_blank"
+                              )
+                            }
+                            variant="outline"
+                            className="border-[#00ff00] text-[#00ff00] hover:bg-[#00ff00] hover:text-black transition-all duration-300"
+                          >
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Preview Embed
+                          </Button>
+                          <Button
+                            onClick={() =>
+                              copyToClipboard(embedCode, "Embed code")
+                            }
+                            variant="outline"
+                            className="border-[#00ff00] text-[#00ff00] hover:bg-[#00ff00] hover:text-black transition-all duration-300"
+                          >
+                            <Copy className="h-4 w-4 mr-2" />
+                            Copy Embed Code
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            )}
 
             {/* API Configuration Note */}
             <Card className="mb-16 border-0 bg-gradient-to-br from-[#2a2a2a] to-[#1f1f1f] rounded-3xl overflow-hidden">
@@ -531,12 +865,14 @@ export default function Export() {
                     <strong className="text-[#00ff00] font-normal">
                       Important:
                     </strong>{" "}
-                    The generated code includes a call to{" "}
+                    The generated embed code includes a call to{" "}
                     <code className="bg-[#0a0a0a] text-[#00ff00] px-3 py-2 rounded-lg font-mono text-sm border border-[#333]/50 font-light">
-                      https://lux-llm-prod.vercel.app/api/chat
+                      https://lux-llm-prod.vercel.app/api/public-chat
                     </code>
-                    . Make sure this endpoint is accessible and properly
-                    configured to handle chat requests.
+                    . This endpoint handles all chat requests from embedded
+                    chatbots and uses your AI API key to provide responses. The
+                    system automatically tracks usage, prevents abuse, and
+                    stores conversations for analytics.
                   </p>
                 </div>
               </CardContent>

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { MessageCircle, Send, Minimize2, X, Sparkles } from "lucide-react";
 
-interface ChatbotConfig {
+export interface ChatbotConfig {
   name: string;
   theme: string;
   primaryColor: string;
