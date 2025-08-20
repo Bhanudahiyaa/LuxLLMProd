@@ -20,10 +20,6 @@
       "dest": "/api/$1"
     },
     {
-      "src": "/embed/(.*)",
-      "dest": "/api/embed/$1"
-    },
-    {
       "src": "/health",
       "dest": "/api/health"
     },
