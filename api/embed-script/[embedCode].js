@@ -65,8 +65,11 @@ function generateEmbedScript(embedCode, embedConfig) {
   const isProduction = process.env.NODE_ENV === "production";
   const apiBaseUrl = isProduction ? productionUrl : "http://localhost:3000";
 
-  return `
-// LuxLLM Chatbot Embed Script
+  // Escape any single quotes in the config values to prevent syntax errors
+  const escapedName = (embedConfig?.agents?.name || embedConfig?.name || "AI Assistant").replace(/'/g, "\\'");
+  const escapedPrompt = (embedConfig?.agents?.system_prompt || "You are a helpful AI assistant that can answer questions about technology, programming, and general knowledge.").replace(/'/g, "\\'");
+
+  return `// LuxLLM Chatbot Embed Script
 // Generated for: ${embedCode}
 // Environment: ${isProduction ? "production" : "development"}
 
@@ -76,19 +79,14 @@ function generateEmbedScript(embedCode, embedConfig) {
   // Configuration
   const config = {
     embedCode: '${embedCode}',
-    chatbotName: '${
-      embedConfig?.agents?.name || embedConfig?.name || "AI Assistant"
-    }',
-    systemPrompt: '${
-      embedConfig?.agents?.system_prompt ||
-      "You are a helpful AI assistant that can answer questions about technology, programming, and general knowledge."
-    }',
+    chatbotName: '${escapedName}',
+    systemPrompt: '${escapedPrompt}',
     primaryColor: '#3b82f6',
     backgroundColor: '#ffffff',
     textColor: '#1f2937',
     accentColor: '#e5e7eb',
-    borderRadius: '12',
-    fontSize: '14',
+    borderRadius: 12,
+    fontSize: 14,
     fontFamily: 'Inter',
     position: 'bottom-right',
     welcomeMessage: 'Hello! I\\'m your AI assistant. How can I help you today?',
@@ -161,9 +159,11 @@ function generateEmbedScript(embedCode, embedConfig) {
             align-items: center;
             justify-content: center;
           ">
-            🤖
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
           </div>
-          \${config.chatbotName}
+          <span>\${config.chatbotName}</span>
         </div>
 
         <!-- Messages Container -->
@@ -171,16 +171,19 @@ function generateEmbedScript(embedCode, embedConfig) {
           flex: 1;
           padding: 16px;
           overflow-y: auto;
-          background: \${config.backgroundColor};
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
         ">
-          <!-- Welcome Message -->
+          <!-- Welcome message -->
           <div style="
             background: \${config.accentColor};
             padding: 12px 16px;
             border-radius: 12px;
-            margin-bottom: 16px;
-            color: \${config.textColor};
             font-size: \${config.fontSize}px;
+            color: \${config.textColor};
+            max-width: 80%;
+            align-self: flex-start;
           ">
             \${config.welcomeMessage}
           </div>
@@ -190,35 +193,30 @@ function generateEmbedScript(embedCode, embedConfig) {
         <div style="
           padding: 16px;
           border-top: 1px solid \${config.accentColor};
-          background: \${config.backgroundColor};
+          display: flex;
+          gap: 8px;
         ">
-          <div style="
-            display: flex;
-            gap: 8px;
-            align-items: center;
+          <input id="luxllm-input" type="text" placeholder="\${config.placeholder}" style="
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid \${config.accentColor};
+            border-radius: 8px;
+            font-size: \${config.fontSize}px;
+            outline: none;
+            font-family: inherit;
+          " onkeypress="handleKeyPress(event)">
+          <button onclick="sendMessage()" style="
+            background: \${config.primaryColor};
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: \${config.fontSize}px;
+            font-family: inherit;
           ">
-            <input id="luxllm-input" type="text" placeholder="\${config.placeholder}" style="
-              flex: 1;
-              padding: 12px 16px;
-              border: 1px solid \${config.accentColor};
-              border-radius: 8px;
-              font-size: \${config.fontSize}px;
-              outline: none;
-              font-family: inherit;
-            " onkeypress="handleKeyPress(event)">
-            <button onclick="sendMessage()" style="
-              background: \${config.primaryColor};
-              color: white;
-              border: none;
-              padding: 12px 16px;
-              border-radius: 8px;
-              cursor: pointer;
-              font-size: \${config.fontSize}px;
-              font-family: inherit;
-            ">
-              Send
-            </button>
-          </div>
+            Send
+          </button>
         </div>
       </div>
     </div>
@@ -298,16 +296,13 @@ function generateEmbedScript(embedCode, embedConfig) {
       margin-bottom: 12px;
       font-size: \${config.fontSize}px;
       color: \${config.textColor};
-      font-style: italic;
+      max-width: 80%;
+      align-self: flex-start;
     \`;
-    typingDiv.textContent = 'AI is typing...';
-    
-    const messagesContainer = document.getElementById('luxllm-messages');
-    messagesContainer.appendChild(typingDiv);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    typingDiv.textContent = 'Typing...';
+    document.getElementById('luxllm-messages').appendChild(typingDiv);
     
     try {
-      // Call API
       const response = await fetch(\`\${config.apiBaseUrl}/api/public-chat\`, {
         method: 'POST',
         headers: {
@@ -319,19 +314,12 @@ function generateEmbedScript(embedCode, embedConfig) {
           sessionId: sessionId
         })
       });
-      
-      const data = await response.json();
-      
-      // Remove typing indicator
-      const typingIndicator = document.getElementById('typing-indicator');
-      if (typingIndicator) {
-        typingIndicator.remove();
-      }
-      
-      if (data.error) {
-        addMessage('Sorry, I encountered an error. Please try again.');
-      } else {
+
+      if (response.ok) {
+        const data = await response.json();
         addMessage(data.message);
+      } else {
+        addMessage('Sorry, I\\'m having trouble connecting. Please try again later.');
       }
     } catch (error) {
       console.error('Chat error:', error);
@@ -342,7 +330,7 @@ function generateEmbedScript(embedCode, embedConfig) {
         typingIndicator.remove();
       }
       
-      addMessage('Sorry, I\'m having trouble connecting. Please try again later.');
+      addMessage('Sorry, I\\'m having trouble connecting. Please try again later.');
     }
   }
 
@@ -350,6 +338,5 @@ function generateEmbedScript(embedCode, embedConfig) {
   window.toggleChat = toggleChat;
   window.sendMessage = sendMessage;
   window.handleKeyPress = handleKeyPress;
-})();
-`;
+})();`;
 }
