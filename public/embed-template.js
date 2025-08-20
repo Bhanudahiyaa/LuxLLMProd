@@ -24,7 +24,8 @@
     avatar: '{{AVATAR_URL}}',
     showTypingIndicator: {{SHOW_TYPING_INDICATOR}},
     enableSounds: {{ENABLE_SOUNDS}},
-    animationSpeed: '{{ANIMATION_SPEED}}'
+    animationSpeed: '{{ANIMATION_SPEED}}',
+    apiBaseUrl: '{{API_BASE_URL}}'
   };
 
   // Generate unique session ID
@@ -210,8 +211,11 @@
       }
 
       try {
-        // Send to API
-        const response = await fetch('https://lux-llm-prod.vercel.app/api/public-chat', {
+        // Send to API using the configured base URL
+        const apiUrl = CONFIG.apiBaseUrl + '/api/public-chat';
+        console.log('🤖 Sending message to:', apiUrl);
+        
+        const response = await fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -440,6 +444,7 @@
     });
 
     console.log('LuxLLM Chatbot initialized:', CONFIG.name);
+    console.log('API Base URL:', CONFIG.apiBaseUrl);
   }
 
   // Wait for DOM to be ready

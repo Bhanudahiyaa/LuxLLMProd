@@ -19,7 +19,7 @@ const __dirname = dirname(__filename);
 const supabase = createClient(
   process.env.SUPABASE_URL || "https://cvetvxgzgfmiqdxdimzn.supabase.co",
   process.env.SUPABASE_ANON_KEY ||
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN2ZXR2eGd6Z2ZtaXFkeGRpbXpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0MTk0NTYsImV4cCI6MjA2OTk5NTQ1Nn0.pgNeUr3T2LQNL0qno1bxST6HgqbdIrCkJrkb-wOL5SE"
+    "eyJhbGciOiJIUzI1NiIsInR9cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN2ZXR2eGd6Z2ZtaXFkeGRpbXpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0MTk0NTYsImV4cCI6MjA2OTk5NTQ1Nn0.pgNeUr3T2LQNL0qno1bxST6HgqbdIrCkJrkb-wOL5SE"
 );
 
 // OpenRouter API configuration
@@ -27,6 +27,10 @@ const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const OPENROUTER_API_KEY =
   process.env.OPENROUTER_API_KEY ||
   "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";
+
+// Production configuration
+const PRODUCTION_URL = "https://lux-llm-prod.vercel.app";
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
 // Mock embed configuration for testing (when database is not set up)
 const MOCK_EMBED_CONFIG = {
@@ -348,6 +352,9 @@ app.get("/embed/:embedCode.js", async (req, res) => {
         "{{SHOW_TYPING_INDICATOR}}": "true",
         "{{ENABLE_SOUNDS}}": "false",
         "{{ANIMATION_SPEED}}": "normal",
+        "{{API_BASE_URL}}": IS_PRODUCTION
+          ? PRODUCTION_URL
+          : `http://localhost:${PORT}`,
       };
 
       // Apply all replacements
@@ -371,6 +378,7 @@ app.get("/embed/:embedCode.js", async (req, res) => {
 // Embed preview endpoint (for testing)
 app.get("/embed/:embedCode", (req, res) => {
   const { embedCode } = req.params;
+  const baseUrl = IS_PRODUCTION ? PRODUCTION_URL : `http://localhost:${PORT}`;
 
   const html = `
     <!DOCTYPE html>
@@ -465,6 +473,14 @@ app.get("/embed/:embedCode", (req, res) => {
           background: #fef3c7;
           color: #92400e;
         }
+        .production-info {
+          background: #dbeafe;
+          border: 1px solid #3b82f6;
+          color: #1e40af;
+          padding: 15px;
+          border-radius: 8px;
+          margin: 20px 0;
+        }
       </style>
     </head>
     <body>
@@ -474,12 +490,28 @@ app.get("/embed/:embedCode", (req, res) => {
           <p>Testing your embedded chatbot</p>
         </div>
         
+        ${
+          IS_PRODUCTION
+            ? `
+        <div class="production-info">
+          <strong>🚀 Production Mode:</strong> This embed is running on your production server at ${PRODUCTION_URL}
+        </div>
+        `
+            : ""
+        }
+        
         <div class="embed-info">
           <h3>Embed Information</h3>
           <p><strong>Embed Code:</strong> <code>${embedCode}</code></p>
-          <p><strong>Script URL:</strong> <code>http://localhost:${PORT}/embed/${embedCode}.js</code></p>
-          <p><strong>Status:</strong> <span class="status-badge status-testing">🔄 Testing Mode</span></p>
-          <p><strong>Note:</strong> This is running in testing mode with mock configuration</p>
+          <p><strong>Script URL:</strong> <code>${baseUrl}/embed/${embedCode}.js</code></p>
+          <p><strong>Status:</strong> <span class="status-badge ${
+            IS_PRODUCTION ? "status-active" : "status-testing"
+          }">${IS_PRODUCTION ? "✅ Production" : "🔄 Testing Mode"}</span></p>
+          ${
+            IS_PRODUCTION
+              ? ""
+              : "<p><strong>Note:</strong> This is running in testing mode with mock configuration</p>"
+          }
         </div>
         
         <div class="test-section">
@@ -546,15 +578,34 @@ app.use((err, req, res, next) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📡 Public Chat API: http://localhost:${PORT}/api/public-chat`);
-  console.log(`📦 Embed Files: http://localhost:${PORT}/embed/[embedCode].js`);
-  console.log(`👀 Health Check: http://localhost:${PORT}/health`);
-  console.log(`🔍 Preview: http://localhost:${PORT}/embed/[embedCode]`);
+  console.log(
+    `📡 Public Chat API: ${
+      IS_PRODUCTION ? PRODUCTION_URL : `http://localhost:${PORT}`
+    }/api/public-chat`
+  );
+  console.log(
+    `📦 Embed Files: ${
+      IS_PRODUCTION ? PRODUCTION_URL : `http://localhost:${PORT}`
+    }/embed/[embedCode].js`
+  );
+  console.log(
+    `👀 Health Check: ${
+      IS_PRODUCTION ? PRODUCTION_URL : `http://localhost:${PORT}`
+    }/health`
+  );
+  console.log(
+    `🔍 Preview: ${
+      IS_PRODUCTION ? PRODUCTION_URL : `http://localhost:${PORT}`
+    }/embed/[embedCode]`
+  );
   console.log(
     `🤖 AI Integration: ${OPENROUTER_API_KEY ? "✅ Enabled" : "❌ Disabled"}`
   );
   console.log(`🗄️ Database: ${supabase ? "✅ Connected" : "❌ Disconnected"}`);
-  console.log(`🧪 Testing Mode: ✅ Enabled (mock configs for development)`);
+  console.log(
+    `🌍 Environment: ${IS_PRODUCTION ? "🚀 Production" : "🧪 Development"}`
+  );
+  console.log(`🔗 Production URL: ${PRODUCTION_URL}`);
 });
 
 export default app;
