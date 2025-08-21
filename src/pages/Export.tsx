@@ -353,14 +353,16 @@ export default function Export() {
         );
 
         // Get custom colors from the current form state or localStorage
-        const savedCustomizations = localStorage.getItem("chatbotCustomizations");
+        const savedCustomizations = localStorage.getItem(
+          "chatbotCustomizations"
+        );
         let customColors = {
           chat_bg_color: "#ffffff",
           chat_border_color: "#e5e7eb",
           user_msg_color: "#3b82f6",
           bot_msg_color: "#1f2937",
         };
-        
+
         if (savedCustomizations) {
           try {
             const parsed = JSON.parse(savedCustomizations);
@@ -370,9 +372,14 @@ export default function Export() {
               user_msg_color: parsed.user_msg_color || "#3b82f6",
               bot_msg_color: parsed.bot_msg_color || "#1f2937",
             };
-            console.log("Export page: Using saved customizations:", customColors);
+            console.log(
+              "Export page: Using saved customizations:",
+              customColors
+            );
           } catch (e) {
-            console.log("Export page: No saved customizations found, using defaults");
+            console.log(
+              "Export page: No saved customizations found, using defaults"
+            );
           }
         }
 
@@ -457,7 +464,10 @@ export default function Export() {
         animationSpeed: "normal",
       };
 
-      console.log("Export page: Embed config with customizations:", updatedEmbedConfig);
+      console.log(
+        "Export page: Embed config with customizations:",
+        updatedEmbedConfig
+      );
 
       // Update the embed config state
       setEmbedConfig(updatedEmbedConfig);

@@ -438,41 +438,79 @@ export default function ChatbotEditor() {
         const template = JSON.parse(decodeURIComponent(templateParam));
         console.log("Loading template:", template); // Debug log
 
-        // Check if user has existing customizations in localStorage
-        const existingCustomizations = localStorage.getItem(
-          "chatbotCustomizations"
-        );
-        let userColors: {
-          chat_bg?: string;
-          border_color?: string;
-          user_msg_color?: string;
-          bot_msg_color?: string;
-        } = {};
-
-        if (existingCustomizations) {
+        // Get user's saved customizations from localStorage
+        const savedCustomizations = localStorage.getItem("chatbotCustomizations");
+        let userColors = {
+          chat_bg: "#ffffff",
+          border_color: "#e5e7eb",
+          user_msg_color: "#3b82f6",
+          bot_msg_color: "#000000",
+        };
+        
+        if (savedCustomizations) {
           try {
-            userColors = JSON.parse(existingCustomizations);
-            console.log("Found existing user customizations:", userColors);
+            const parsed = JSON.parse(savedCustomizations);
+            userColors = {
+              chat_bg: parsed.chat_bg || "#ffffff",
+              border_color: parsed.border_color || "#e5e7eb",
+              user_msg_color: parsed.user_msg_color || "#3b82f6",
+              bot_msg_color: parsed.bot_msg_color || "#000000",
+            };
+            console.log("Found saved user customizations:", userColors);
           } catch (e) {
-            console.log("No existing customizations found");
+            console.log("No saved customizations found, using defaults");
           }
         }
 
-        // Update form with template data, preserving user customizations
+        // Check if template has custom colors (from templateConfigs)
+        let templateColors = null;
+        try {
+          // First check if template has custom_colors property
+          if (template.custom_colors) {
+            templateColors = {
+              chat_bg: template.custom_colors.chat_bg || "#ffffff",
+              border_color: template.custom_colors.border_color || "#e5e7eb",
+              user_msg_color: template.custom_colors.user_msg_color || "#3b82f6",
+              bot_msg_color: template.custom_colors.bot_msg_color || "#000000",
+            };
+            console.log("Found template custom colors:", templateColors);
+          } else {
+            // Try to get template-specific colors from templateConfigs
+            const templateConfigs = require("@/lib/templateConfigs").templateConfigs;
+            if (templateConfigs && templateConfigs[template.id]) {
+              const config = templateConfigs[template.id];
+              templateColors = {
+                chat_bg: config.backgroundColor || "#ffffff",
+                border_color: config.accentColor || "#e5e7eb",
+                user_msg_color: config.primaryColor || "#3b82f6",
+                bot_msg_color: config.textColor || "#000000",
+              };
+              console.log("Found template-specific colors from configs:", templateColors);
+            }
+          }
+        } catch (e) {
+          console.log("No template-specific colors found");
+        }
+
+        // Priority: Template colors > User saved colors > Defaults
+        const finalColors = templateColors || userColors;
+        console.log("Using final colors:", finalColors);
+
+        // Update form with template data and final colors
         const templateFormData = {
           name: template.name || template.title || "My Chatbot",
           avatar_url: template.avatar_url || "",
-          // Use user customizations if they exist, otherwise use template defaults
-          chat_bg: userColors.chat_bg || "#ffffff",
-          border_color: userColors.border_color || "#e5e7eb",
-          user_msg_color: userColors.user_msg_color || "#3b82f6",
-          bot_msg_color: userColors.bot_msg_color || "#000000",
+          // Use final colors (template > user > defaults)
+          chat_bg: finalColors.chat_bg,
+          border_color: finalColors.border_color,
+          user_msg_color: finalColors.user_msg_color,
+          bot_msg_color: finalColors.bot_msg_color,
           system_prompt:
             template.system_prompt || "You are a helpful assistant.",
         };
 
         console.log(
-          "Loading template form data with customizations:",
+          "Loading template form data with final colors:",
           templateFormData
         );
         reset(templateFormData);
@@ -480,6 +518,12 @@ export default function ChatbotEditor() {
         // Verify form was updated
         setTimeout(() => {
           console.log("Form after template load - name:", watch("name"));
+          console.log("Form after template load - colors:", {
+            chat_bg: watch("chat_bg"),
+            user_msg_color: watch("user_msg_color"),
+            bot_msg_color: watch("bot_msg_color"),
+            border_color: watch("border_color"),
+          });
         }, 100);
 
         // Save template data to localStorage for persistence
@@ -489,11 +533,11 @@ export default function ChatbotEditor() {
           avatar_url: template.avatar_url || "",
           system_prompt:
             template.system_prompt || "You are a helpful assistant.",
-          // Preserve user customizations
-          chat_bg: userColors.chat_bg || "#ffffff",
-          border_color: userColors.border_color || "#e5e7eb",
-          user_msg_color: userColors.user_msg_color || "#3b82f6",
-          bot_msg_color: userColors.bot_msg_color || "#000000",
+          // Save the final colors used
+          chat_bg: finalColors.chat_bg,
+          border_color: finalColors.border_color,
+          user_msg_color: finalColors.user_msg_color,
+          bot_msg_color: finalColors.bot_msg_color,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };

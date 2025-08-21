@@ -32,10 +32,16 @@ interface Template {
   category: string;
   description: string;
   excerpt: string;
-  avatar_url?: string;
-  heading?: string;
-  subheading?: string;
+  avatar_url: string;
+  heading: string;
+  subheading: string;
   system_prompt: string;
+  custom_colors?: {
+    chat_bg: string;
+    border_color: string;
+    user_msg_color: string;
+    bot_msg_color: string;
+  };
   created_at: string;
   date: string;
   logo: string;
@@ -103,6 +109,13 @@ const TEMPLATES: Template[] = [
     heading: "Instant Answers",
     subheading: "Help your users find answers fast.",
     system_prompt: "You are an FAQ answering AI assistant.",
+    // Add custom colors for FAQ Assistant
+    custom_colors: {
+      chat_bg: "#ffffff",
+      border_color: "#e5e7eb",
+      user_msg_color: "#ec4899", // Pink color
+      bot_msg_color: "#1f2937",
+    },
     created_at: "March 18, 2025",
     date: "March 18, 2025",
     logo: "❓",

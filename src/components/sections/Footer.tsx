@@ -56,7 +56,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="py-24 border-t border-border/30 relative">
+    <footer className="py-24 border-t border-border/30 relative before:content-[''] before:absolute before:left-1/2 before:bottom-0 before:-translate-x-1/2 before:w-[120%] before:h-60 before:rounded-t-full before:bg-[radial-gradient(ellipse_at_bottom,rgba(34,197,94,0.3),transparent)] before:opacity-80 before:blur-2xl before:pointer-events-none">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-12 mb-16">
           {/* Brand */}
