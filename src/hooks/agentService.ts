@@ -104,6 +104,12 @@ export function useAgentService() {
             heading: agentData.heading || null,
             subheading: agentData.subheading || null,
             system_prompt: agentData.system_prompt || null,
+            // Add UI customizations
+            chat_bg_color: agentData.chat_bg_color || '#ffffff',
+            chat_border_color: agentData.chat_border_color || '#e5e7eb',
+            user_msg_color: agentData.user_msg_color || '#3b82f6',
+            bot_msg_color: agentData.bot_msg_color || '#f3f4f6',
+            chat_name: agentData.chat_name || agentData.name,
           },
         ])
         .select()

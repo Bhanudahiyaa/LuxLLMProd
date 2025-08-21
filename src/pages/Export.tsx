@@ -420,8 +420,11 @@ export default function Export() {
         fontSize: 14, // Default
         fontFamily: "Inter", // Default
         position: "bottom-right", // Default
-        welcomeMessage: `Hello! I'm ${finalAgent.name || "your AI assistant"}. How can I help you today?`,
-        systemPrompt: finalAgent.system_prompt || "You are a helpful AI assistant.",
+        welcomeMessage: `Hello! I'm ${
+          finalAgent.name || "your AI assistant"
+        }. How can I help you today?`,
+        systemPrompt:
+          finalAgent.system_prompt || "You are a helpful AI assistant.",
         placeholder: "Type your message...",
         avatar: finalAgent.avatar_url || "",
         showTypingIndicator: true,
@@ -436,7 +439,8 @@ export default function Export() {
       const generatedScript = await generateEmbedScript({
         embedCode: embed.embed_code,
         chatbotName: finalAgent.name || embed.name,
-        systemPrompt: finalAgent.system_prompt || "You are a helpful AI assistant.",
+        systemPrompt:
+          finalAgent.system_prompt || "You are a helpful AI assistant.",
         config: updatedEmbedConfig,
       });
 

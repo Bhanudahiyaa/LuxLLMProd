@@ -35,7 +35,7 @@ const About = () => {
     {
       name: "Bhanu Pratap Singh",
       role: " Founder",
-      bio: "Former AI researcher at DeepMind with 10+ years in machine learning and product development.",
+      bio: "Former Backend Developer at FirstContact with 3+ years of experience in web development, AI and building products.",
       avatar: "👨‍💻",
     },
   ];
@@ -50,7 +50,7 @@ const About = () => {
       <Navigation />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 relative">
+      <section className="pt-24 pb-8 relative">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -70,7 +70,7 @@ const About = () => {
       </section>
 
       {/* Story Section */}
-      <section className="py-8 relative">
+      <section className="py-4 relative">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <motion.div
@@ -85,24 +85,22 @@ const About = () => {
               </h2>
               <div className="space-y-6 text-lg text-foreground/80 font-light leading-relaxed">
                 <p>
-                  t3Dotgg was born from a simple frustration: the AI landscape
-                  was becoming increasingly fragmented. Developers and
-                  researchers found themselves jumping between multiple
-                  platforms, each with their own interfaces, APIs, and
-                  limitations.
+                  Lux LLM was built to remove the complexity of AI chatbot
+                  deployment. Instead of juggling fragmented tools and heavy
+                  integrations, you get customizable, intelligent chatbots that
+                  drop into any website with a simple script tag.
                 </p>
                 <p>
-                  Our founders, coming from backgrounds at leading AI companies,
-                  recognized that the real power of artificial intelligence
-                  would only be unlocked when these tools became truly
-                  accessible and interoperable. We set out to build the platform
-                  we wished existed.
+                  Backed by experience from leading AI companies, we designed
+                  Lux LLM to be powerful, flexible, and developer friendly so
+                  you can focus on creating great user experiences, not managing
+                  infrastructure.
                 </p>
                 <p>
-                  Today, t3Dotgg serves thousands of developers, researchers,
-                  and businesses worldwide, providing them with seamless access
-                  to the most advanced AI models through a single, unified
-                  interface.
+                  Today, teams of all sizes from startups to global enterprises
+                  rely on Lux LLM to launch smarter chatbots, accelerate
+                  customer engagement, and shape the future of AI-driven
+                  conversations.
                 </p>
               </div>
             </motion.div>
@@ -111,7 +109,7 @@ const About = () => {
       </section>
 
       {/* Values Section */}
-      <section className="py-24 relative">
+      <section className="py-0 relative">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -154,7 +152,7 @@ const About = () => {
       </section>
 
       {/* Team Section */}
-      <section className="py-24 relative">
+      <section className="py-16 relative">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -167,11 +165,11 @@ const About = () => {
               Meet the Team
             </h2>
             <p className="text-xl text-foreground/70 font-light max-w-2xl mx-auto">
-              The brilliant minds behind t3Dotgg
+              The brilliant mind behind LuxLLM
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="flex justify-center md:grid-cols-2 lg:grid-cols-4 gap-8">
             {team.map((member, index) => (
               <motion.div
                 key={index}
@@ -179,7 +177,7 @@ const About = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="glass-card p-8 rounded-3xl text-center hover:bg-white/10 transition-all duration-500"
+                className="glass-card p-8 rounded-3xl text-center hover:bg-muted/10 transition-all duration-500"
               >
                 <div className="text-6xl mb-6">{member.avatar}</div>
                 <h3 className="text-xl font-light tracking-tighter mb-2">

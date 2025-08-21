@@ -597,48 +597,74 @@ export default function ChatbotEditor() {
   const onSubmit = async (data: ChatbotFormData) => {
     setSaving(true);
     try {
-      // Create a new agent with the chatbot settings
-      const { data: newAgent, error: createError } = await createAgent({
-        name: data.name,
-        avatar_url: data.avatar_url,
-        heading: data.name,
-        subheading: "AI-powered chatbot",
-        system_prompt: data.system_prompt,
-      });
+      if (agentId && agent) {
+        // Update existing agent
+        const { data: updatedAgent, error: updateError } = await updateAgent(agentId, {
+          name: data.name,
+          avatar_url: data.avatar_url,
+          heading: data.name,
+          subheading: "AI-powered chatbot",
+          system_prompt: data.system_prompt,
+          // Add UI customizations
+          chat_bg_color: data.chat_bg,
+          chat_border_color: data.border_color,
+          user_msg_color: data.user_msg_color,
+          bot_msg_color: data.bot_msg_color,
+          chat_name: data.name,
+        });
 
-      if (createError) {
-        toast.error("Failed to create agent: " + createError);
-        return;
+        if (updateError) {
+          toast.error("Failed to update agent: " + updateError);
+          return;
+        }
+
+        toast.success("Chatbot updated successfully!");
+      } else {
+        // Create a new agent with the chatbot settings
+        const { data: newAgent, error: createError } = await createAgent({
+          name: data.name,
+          avatar_url: data.avatar_url,
+          heading: data.name,
+          subheading: "AI-powered chatbot",
+          system_prompt: data.system_prompt,
+          // Add UI customizations
+          chat_bg_color: data.chat_bg,
+          chat_border_color: data.border_color,
+          user_msg_color: data.user_msg_color,
+          bot_msg_color: data.bot_msg_color,
+          chat_name: data.name,
+        });
+
+        if (createError) {
+          toast.error("Failed to create agent: " + createError);
+          return;
+        }
+
+        toast.success("Chatbot created successfully!");
+        
+        // Navigate to My Agents page for new agents
+        navigate("/build/agents");
       }
 
       // Save UI customization settings
       const { error: settingsError } = await saveChatbotSettings(data);
       if (settingsError) {
         console.warn("Failed to save UI settings:", settingsError);
-        // Continue anyway since the agent was created
+        // Continue anyway since the agent was created/updated
       }
 
-      // Update localStorage with the new agent data
-      if (newAgent) {
-        const agentDataToSave = {
-          ...newAgent,
-          chat_bg: data.chat_bg,
-          border_color: data.border_color,
-          user_msg_color: data.user_msg_color,
-          bot_msg_color: data.bot_msg_color,
-          updated_at: new Date().toISOString(),
-        };
-        localStorage.setItem("selectedAgent", JSON.stringify(agentDataToSave));
-        console.log("Updated localStorage with new agent:", agentDataToSave);
-      }
+      // Update localStorage with the agent data
+      const agentDataToSave = {
+        ...(agentId && agent ? agent : {}),
+        ...data,
+        updated_at: new Date().toISOString(),
+      };
+      localStorage.setItem("selectedAgent", JSON.stringify(agentDataToSave));
+      console.log("Updated localStorage with agent data:", agentDataToSave);
 
-      toast.success("Chatbot created successfully!");
-
-      // Navigate to My Agents page
-      navigate("/build/agents");
     } catch (error) {
       console.error("Error saving:", error);
-      toast.error("Failed to create chatbot");
+      toast.error("Failed to save chatbot");
     } finally {
       setSaving(false);
     }

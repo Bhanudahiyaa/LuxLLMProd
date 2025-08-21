@@ -9,30 +9,30 @@ const Contact = () => {
       icon: <EnvelopeSimple size={32} weight="light" />,
       title: "Email",
       description: "Get in touch with our team",
-      value: "hello@t3dotgg.com",
-      action: "mailto:hello@t3dotgg.com"
+      value: "LuxLLM69@gmail.com",
+      action: "mailto:LuxLLM69@gmail.com",
     },
     {
       icon: <Phone size={32} weight="light" />,
       title: "Phone",
       description: "Call us during business hours",
-      value: "+1 (555) 123-4567",
-      action: "tel:+15551234567"
+      value: "+91 9416293757",
+      action: "tel:+919416293757",
     },
     {
       icon: <MapPin size={32} weight="light" />,
       title: "Office",
       description: "Visit our headquarters",
-      value: "San Francisco, CA",
-      action: null
+      value: "Maharaja Agrasen Institute of Technology",
+      action: null,
     },
     {
       icon: <Clock size={32} weight="light" />,
       title: "Hours",
       description: "We're here to help",
-      value: "Mon-Fri 9AM-6PM PST",
-      action: null
-    }
+      value: "Mon-Fri 9AM-6PM IST",
+      action: null,
+    },
   ];
 
   return (
@@ -43,9 +43,9 @@ const Contact = () => {
       className="min-h-screen bg-background"
     >
       <Navigation />
-      
+
       {/* Hero Section */}
-      <section className="pt-32 pb-24 relative">
+      <section className="pt-24 pb-12 relative">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -57,14 +57,15 @@ const Contact = () => {
               Get in <span className="text-primary">Touch</span>
             </h1>
             <p className="text-xl md:text-2xl text-foreground/70 font-light leading-relaxed">
-              Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+              Have questions? We'd love to hear from you. Send us a message and
+              we'll respond as soon as possible.
             </p>
           </motion.div>
         </div>
       </section>
 
       {/* Contact Form & Info */}
-      <section className="py-24 relative">
+      <section className="py-8 relative">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-16 max-w-6xl mx-auto">
             {/* Contact Form */}
@@ -78,11 +79,14 @@ const Contact = () => {
               <h2 className="text-3xl font-light tracking-tighter mb-8">
                 Send us a message
               </h2>
-              
+
               <form className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="firstName" className="block text-sm font-light text-foreground/70 mb-2">
+                    <label
+                      htmlFor="firstName"
+                      className="block text-sm font-light text-foreground/70 mb-2"
+                    >
                       First Name
                     </label>
                     <input
@@ -90,11 +94,14 @@ const Contact = () => {
                       id="firstName"
                       name="firstName"
                       className="w-full px-4 py-3 bg-secondary/50 border border-border/50 rounded-xl text-foreground placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300"
-                      placeholder="John"
+                      placeholder="First Name"
                     />
                   </div>
                   <div>
-                    <label htmlFor="lastName" className="block text-sm font-light text-foreground/70 mb-2">
+                    <label
+                      htmlFor="lastName"
+                      className="block text-sm font-light text-foreground/70 mb-2"
+                    >
                       Last Name
                     </label>
                     <input
@@ -102,13 +109,16 @@ const Contact = () => {
                       id="lastName"
                       name="lastName"
                       className="w-full px-4 py-3 bg-secondary/50 border border-border/50 rounded-xl text-foreground placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300"
-                      placeholder="Doe"
+                      placeholder="Last Name"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-light text-foreground/70 mb-2">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-light text-foreground/70 mb-2"
+                  >
                     Email
                   </label>
                   <input
@@ -121,7 +131,10 @@ const Contact = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-light text-foreground/70 mb-2">
+                  <label
+                    htmlFor="subject"
+                    className="block text-sm font-light text-foreground/70 mb-2"
+                  >
                     Subject
                   </label>
                   <input
@@ -134,7 +147,10 @@ const Contact = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-light text-foreground/70 mb-2">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-light text-foreground/70 mb-2"
+                  >
                     Message
                   </label>
                   <textarea
@@ -169,7 +185,7 @@ const Contact = () => {
                 <h2 className="text-3xl font-light tracking-tighter mb-8">
                   Contact Information
                 </h2>
-                
+
                 <div className="space-y-6">
                   {contactInfo.map((info, index) => (
                     <motion.div
@@ -180,9 +196,7 @@ const Contact = () => {
                       viewport={{ once: true }}
                       className="flex items-start space-x-4"
                     >
-                      <div className="text-primary mt-1">
-                        {info.icon}
-                      </div>
+                      <div className="text-primary mt-1">{info.icon}</div>
                       <div className="flex-1">
                         <h3 className="text-lg font-light tracking-tighter mb-1">
                           {info.title}
@@ -220,7 +234,8 @@ const Contact = () => {
                   Enterprise Inquiries
                 </h3>
                 <p className="text-foreground/70 font-light mb-4">
-                  Looking for custom solutions or enterprise pricing? Our business team is ready to help.
+                  Looking for custom solutions or enterprise pricing? Our
+                  business team is ready to help.
                 </p>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
