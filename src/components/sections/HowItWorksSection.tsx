@@ -41,21 +41,18 @@ const defaultCards = [
 const features = [
   {
     step: "Step 1",
-    content:
-      "Describe what your agent should do, LuxLLM turns your prompt into Code, UI, and Logic.",
-    highlight: "Code, UI, and Logic",
+    content: "Choose from a ready-made template to quickly get started.",
+    highlight: "template",
   },
   {
     step: "Step 2",
-    content:
-      "Instantly receive the .env, logic, and demo files to run your AI Agent.",
-    highlight: "run your agent",
+    content: "Customise the UI and logic of your chatbot to match your needs.",
+    highlight: "Customise the UI",
   },
   {
     step: "Step 3",
-    content:
-      "Use your agent in real-time in chat, apps, or workflows and deploy anywhere.",
-    highlight: "real-time",
+    content: "Embed your chatbot seamlessly into your website or app.",
+    highlight: "Embed",
   },
 ];
 

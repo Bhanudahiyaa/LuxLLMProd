@@ -1,12 +1,25 @@
-import React, { useState, useEffect } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Copy, Eye, Download } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Copy, Check, MessageCircle, Zap, Code, Globe } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 interface ChatbotConfig {
@@ -21,8 +34,12 @@ interface ChatbotConfig {
   placeholder: string;
 }
 
-export default function Export() {
+export default function ExportPage() {
   const { isLoaded, isSignedIn } = useAuth();
+  const [copied, setCopied] = useState(false);
+  const [selectedIntegration, setSelectedIntegration] = useState<string | null>(
+    null
+  );
   const [config, setConfig] = useState<ChatbotConfig>({
     name: "My AI Assistant",
     system_prompt: "You are a helpful AI assistant.",
@@ -34,9 +51,6 @@ export default function Export() {
     welcome_message: "Hello! How can I help you today?",
     placeholder: "Type your message...",
   });
-
-  const [generatedScript, setGeneratedScript] = useState<string>("");
-  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   // Load current form state from localStorage
   useEffect(() => {
@@ -80,7 +94,7 @@ export default function Export() {
   // Generate the embed script with all customizations
   const generateEmbedScript = (config: ChatbotConfig): string => {
     const scriptId = `lux-llm-chatbot-${Date.now()}`;
-    
+
     return `<!-- LuxLLM Chatbot Embed Script -->
 <script id="${scriptId}">
 (function() {
@@ -322,68 +336,284 @@ export default function Export() {
 </script>`;
   };
 
-  // Generate script when config changes
-  useEffect(() => {
-    const script = generateEmbedScript(config);
-    setGeneratedScript(script);
-    
-    // Create preview URL
-    const previewHTML = `
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Chatbot Preview</title>
-    <style>
-        body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
-        .preview-container { max-width: 800px; margin: 0 auto; }
-        .preview-title { text-align: center; margin-bottom: 30px; }
-        .preview-info { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-    </style>
-</head>
-<body>
-    <div class="preview-container">
-        <div class="preview-title">
-            <h1>Chatbot Preview</h1>
-            <p>This is how your chatbot will look on any website</p>
-        </div>
-        <div class="preview-info">
-            <h3>Configuration:</h3>
-            <p><strong>Name:</strong> ${config.name}</p>
-            <p><strong>Colors:</strong> User: ${config.user_msg_color}, Bot: ${config.bot_msg_color}</p>
-            <p><strong>Background:</strong> ${config.chat_bg}</p>
-            <p><strong>Border:</strong> ${config.border_color}</p>
-        </div>
-    </div>
-    ${script}
-</body>
-</html>`;
-    
-    const blob = new Blob([previewHTML], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    setPreviewUrl(url);
-  }, [config]);
+  const embedScript = generateEmbedScript(config);
 
-  const copyToClipboard = async (text: string) => {
+  const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(text);
-      toast.success("Copied to clipboard!");
+      await navigator.clipboard.writeText(embedScript);
+      setCopied(true);
+      toast.success("Script copied to clipboard!");
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       toast.error("Failed to copy");
     }
   };
 
-  const downloadScript = () => {
-    const blob = new Blob([generatedScript], { type: 'text/javascript' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'lux-llm-chatbot.js';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success("Script downloaded!");
-  };
+  const integrations = [
+    {
+      name: "Webflow",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "No-Code",
+      difficulty: "Easy",
+      steps: [
+        "Open your Webflow project",
+        "Go to Project Settings > Custom Code",
+        "Paste the embed script in the Head Code section",
+        "Publish your site to see the chatbot live",
+      ],
+    },
+    {
+      name: "WordPress",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "CMS",
+      difficulty: "Easy",
+      steps: [
+        "Access your WordPress admin dashboard",
+        "Install a custom code plugin or use theme editor",
+        "Add the embed script to your header.php file",
+        "Save changes and view your site",
+      ],
+    },
+    {
+      name: "Bubble",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "No-Code",
+      difficulty: "Easy",
+      steps: [
+        "Open your Bubble app editor",
+        "Go to Settings > SEO/metatags",
+        "Add the script to the HTML header section",
+        "Deploy your app to production",
+      ],
+    },
+    {
+      name: "Wix",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "Website Builder",
+      difficulty: "Easy",
+      steps: [
+        "Open your Wix site editor",
+        "Add an HTML embed element to your page",
+        "Paste the embed script into the element",
+        "Publish your site to activate the chatbot",
+      ],
+    },
+    {
+      name: "Squarespace",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "CMS",
+      difficulty: "Easy",
+      steps: [
+        "Log into your Squarespace account",
+        "Go to Settings > Advanced > Code Injection",
+        "Paste the script in the Header section",
+        "Save and your chatbot will appear site-wide",
+      ],
+    },
+    {
+      name: "Notion",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "No-Code",
+      difficulty: "Medium",
+      steps: [
+        "Open your Notion page",
+        "Type /embed to add an embed block",
+        "Enter your widget URL in the embed",
+        "Resize and position as needed",
+      ],
+    },
+    {
+      name: "Framer",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "No-Code",
+      difficulty: "Easy",
+      steps: [
+        "Open your Framer project",
+        "Add a Code component to your page",
+        "Paste the embed script",
+        "Customize positioning and styling",
+      ],
+    },
+    {
+      name: "Carrd",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "Website Builder",
+      difficulty: "Easy",
+      steps: [
+        "Edit your Carrd site",
+        "Add an Embed element",
+        "Paste the script code",
+        "Publish your site",
+      ],
+    },
+    {
+      name: "Shopify",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "E-commerce",
+      difficulty: "Medium",
+      steps: [
+        "Access your Shopify admin",
+        "Go to Online Store > Themes",
+        "Edit code and find theme.liquid",
+        "Add script before closing </head> tag",
+      ],
+    },
+    {
+      name: "React",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "Framework",
+      difficulty: "Advanced",
+      steps: [
+        "Install the widget package via npm",
+        "Import the component in your React app",
+        "Add the component to your JSX",
+        "Configure props and styling",
+      ],
+    },
+    {
+      name: "Next.js",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "Framework",
+      difficulty: "Advanced",
+      steps: [
+        "Add the script to your _document.js file",
+        "Or use the Script component in your layout",
+        "Configure loading strategy",
+        "Deploy to see changes",
+      ],
+    },
+    {
+      name: "Vue.js",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "Framework",
+      difficulty: "Advanced",
+      steps: [
+        "Add script to your index.html",
+        "Or create a Vue component wrapper",
+        "Mount the widget in your app",
+        "Handle lifecycle events",
+      ],
+    },
+    {
+      name: "Angular",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "Framework",
+      difficulty: "Advanced",
+      steps: [
+        "Add script to index.html",
+        "Create an Angular service wrapper",
+        "Inject into your components",
+        "Handle Angular lifecycle",
+      ],
+    },
+    {
+      name: "Drupal",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "CMS",
+      difficulty: "Medium",
+      steps: [
+        "Log into Drupal admin",
+        "Go to Structure > Blocks",
+        "Create a custom HTML block",
+        "Add script and place in region",
+      ],
+    },
+    {
+      name: "Joomla",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "CMS",
+      difficulty: "Medium",
+      steps: [
+        "Access Joomla administrator",
+        "Go to Extensions > Templates",
+        "Edit your active template",
+        "Add script to index.php",
+      ],
+    },
+    {
+      name: "Ghost",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "CMS",
+      difficulty: "Easy",
+      steps: [
+        "Go to Ghost admin panel",
+        "Navigate to Settings > Code injection",
+        "Add script to Site Header",
+        "Save to activate across all pages",
+      ],
+    },
+    {
+      name: "Webflow CMS",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "CMS",
+      difficulty: "Easy",
+      steps: [
+        "Open Webflow Designer",
+        "Go to CMS Collections",
+        "Add embed field to collection",
+        "Insert script in collection template",
+      ],
+    },
+    {
+      name: "Elementor",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "Page Builder",
+      difficulty: "Easy",
+      steps: [
+        "Edit page with Elementor",
+        "Add HTML widget to page",
+        "Paste the embed script",
+        "Update page to publish changes",
+      ],
+    },
+    {
+      name: "Divi",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "Page Builder",
+      difficulty: "Easy",
+      steps: [
+        "Open Divi Builder",
+        "Add Code module to your page",
+        "Paste script in the code area",
+        "Save and view your page",
+      ],
+    },
+    {
+      name: "HubSpot",
+      logo: "/placeholder.svg?height=40&width=40",
+      category: "CRM",
+      difficulty: "Medium",
+      steps: [
+        "Go to HubSpot Settings",
+        "Navigate to Website > Pages",
+        "Edit your page template",
+        "Add script to header HTML",
+      ],
+    },
+  ];
+
+  const steps = [
+    {
+      title: "Copy the Script",
+      description: "Copy the embed script from the code box above",
+      icon: Copy,
+    },
+    {
+      title: "Choose Platform",
+      description: "Select your preferred platform from our integrations",
+      icon: Globe,
+    },
+    {
+      title: "Add to Site",
+      description: "Paste the script into your website's HTML",
+      icon: Code,
+    },
+    {
+      title: "Go Live",
+      description: "Your chatbot is now live and ready to engage users",
+      icon: Zap,
+    },
+  ];
 
   if (!isLoaded) {
     return <div>Loading...</div>;
@@ -394,211 +624,283 @@ export default function Export() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Export Your Chatbot</h1>
-        <p className="text-gray-600">
-          Generate a script tag with all your customizations and see a live preview.
-        </p>
-      </div>
+    <div className="min-h-screen bg-white">
+      {/* Header Section */}
+      <section className="pt-20 pb-16 px-4">
+        <div className="max-w-4xl mx-auto text-center space-y-6">
+          <h1 className="text-5xl font-bold text-gray-900 tracking-tight">Export & Integrate</h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Seamlessly embed, preview, and integrate across your favorite platforms.
+          </p>
+        </div>
+      </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Configuration Panel */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Chatbot Configuration</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="name">Chatbot Name</Label>
-              <Input
-                id="name"
-                value={config.name}
-                onChange={(e) => setConfig(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="My AI Assistant"
-              />
-            </div>
+      {/* Embedded Script Box */}
+      <section className="py-16 px-4">
+        <div className="max-w-4xl mx-auto">
+          <Card className="border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-gray-900">
+                <Code className="w-5 h-5 text-blue-600" />
+                Embed Script
+              </CardTitle>
+              <CardDescription>Copy this script and add it to your website to get started</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="relative">
+                <pre className="bg-gray-50 p-4 rounded-lg border text-sm font-mono overflow-x-auto">
+                  <code className="text-gray-900">{embedScript}</code>
+                </pre>
+                <Button
+                  onClick={copyToClipboard}
+                  size="sm"
+                  className="absolute top-2 right-2 bg-blue-600 hover:bg-blue-700"
+                >
+                  {copied ? (
+                    <Check className="w-4 h-4" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
+                  {copied ? "Copied!" : "Copy"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
 
-            <div>
-              <Label htmlFor="system_prompt">System Prompt</Label>
-              <Textarea
-                id="system_prompt"
-                value={config.system_prompt}
-                onChange={(e) => setConfig(prev => ({ ...prev, system_prompt: e.target.value }))}
-                placeholder="You are a helpful AI assistant."
-                rows={3}
-              />
-            </div>
+      {/* Implementation Guide */}
+      <section className="py-16 px-4 bg-gray-50">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Implementation Guide
+            </h2>
+            <p className="text-gray-600 text-lg">
+              Follow these simple steps to get your chatbot live
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {steps.map((step, index) => (
+              <Card
+                key={index}
+                className="text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <CardContent className="pt-6">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <step.icon className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <Badge variant="secondary" className="mb-3">
+                    Step {index + 1}
+                  </Badge>
+                  <h3 className="font-semibold text-gray-900 mb-2">
+                    {step.title}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {step.description}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            <div>
-              <Label htmlFor="welcome_message">Welcome Message</Label>
-              <Input
-                id="welcome_message"
-                value={config.welcome_message}
-                onChange={(e) => setConfig(prev => ({ ...prev, welcome_message: e.target.value }))}
-                placeholder="Hello! How can I help you today?"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="placeholder">Input Placeholder</Label>
-              <Input
-                id="placeholder"
-                value={config.placeholder}
-                onChange={(e) => setConfig(prev => ({ ...prev, placeholder: e.target.value }))}
-                placeholder="Type your message..."
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="chat_bg">Chat Background</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="chat_bg"
-                    type="color"
-                    value={config.chat_bg}
-                    onChange={(e) => setConfig(prev => ({ ...prev, chat_bg: e.target.value }))}
-                  />
-                  <Input
-                    value={config.chat_bg}
-                    onChange={(e) => setConfig(prev => ({ ...prev, chat_bg: e.target.value }))}
-                    placeholder="#ffffff"
-                  />
+      {/* Chatbot Preview */}
+      <section className="py-16 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Live Preview
+            </h2>
+            <p className="text-gray-600 text-lg">
+              See how your chatbot will look on your website
+            </p>
+          </div>
+          <Card className="max-w-md mx-auto shadow-2xl border-gray-200 hover:shadow-3xl transition-all duration-500">
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                    <MessageCircle className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="bg-gray-100 rounded-lg p-3 text-sm">
+                      {config.welcome_message}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 justify-end">
+                  <div className="flex-1 text-right">
+                    <div className="bg-blue-600 text-white rounded-lg p-3 text-sm inline-block">
+                      I'd like to learn more about your services
+                    </div>
+                  </div>
+                  <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                    <span className="text-xs">👤</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                    <MessageCircle className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="bg-gray-100 rounded-lg p-3 text-sm">
+                      I'd be happy to help! What specific area interests you
+                      most?
+                    </div>
+                  </div>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
 
-              <div>
-                <Label htmlFor="border_color">Border Color</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="border_color"
-                    type="color"
-                    value={config.border_color}
-                    onChange={(e) => setConfig(prev => ({ ...prev, border_color: e.target.value }))}
-                  />
-                  <Input
-                    value={config.border_color}
-                    onChange={(e) => setConfig(prev => ({ ...prev, border_color: e.target.value }))}
-                    placeholder="#e5e7eb"
-                  />
-                </div>
-              </div>
+      {/* Integrations Guide */}
+      <section className="py-16 px-4 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Platform Integrations
+            </h2>
+            <p className="text-gray-600 text-lg">
+              Choose your platform and get step-by-step integration instructions
+            </p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {integrations.map((integration, index) => (
+              <Dialog key={integration.name}>
+                <DialogTrigger asChild>
+                  <Card
+                    className="cursor-pointer hover:shadow-lg hover:scale-105 transition-all duration-300 border-gray-200"
+                    style={{ animationDelay: `${index * 30}ms` }}
+                  >
+                    <CardContent className="p-4 text-center space-y-3">
+                      <div className="w-12 h-12 mx-auto mb-2 rounded-lg bg-white border border-gray-200 flex items-center justify-center">
+                        <img
+                          src={integration.logo || "/placeholder.svg"}
+                          alt={`${integration.name} logo`}
+                          className="w-8 h-8 object-contain"
+                        />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 text-sm">
+                          {integration.name}
+                        </h3>
+                        <Badge variant="secondary" className="text-xs mt-1">
+                          {integration.category}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Click for integration guide
+                      </p>
+                    </CardContent>
+                  </Card>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-white border border-gray-200 flex items-center justify-center">
+                        <img
+                          src={integration.logo || "/placeholder.svg"}
+                          alt={`${integration.name} logo`}
+                          className="w-6 h-6 object-contain"
+                        />
+                      </div>
+                      <div>
+                        <DialogTitle className="text-lg font-semibold">
+                          {integration.name} Integration
+                        </DialogTitle>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge variant="outline" className="text-xs">
+                            {integration.category}
+                          </Badge>
+                          <Badge
+                            variant={
+                              integration.difficulty === "Easy"
+                                ? "default"
+                                : integration.difficulty === "Medium"
+                                ? "secondary"
+                                : "destructive"
+                            }
+                            className="text-xs"
+                          >
+                            {integration.difficulty}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                    <DialogDescription className="text-sm text-gray-600">
+                      Step-by-step guide to integrate your chatbot with{" "}
+                      {integration.name}
+                    </DialogDescription>
+                  </DialogHeader>
 
-              <div>
-                <Label htmlFor="user_msg_color">User Message Color</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="user_msg_color"
-                    type="color"
-                    value={config.user_msg_color}
-                    onChange={(e) => setConfig(prev => ({ ...prev, user_msg_color: e.target.value }))}
-                  />
-                  <Input
-                    value={config.user_msg_color}
-                    onChange={(e) => setConfig(prev => ({ ...prev, user_msg_color: e.target.value }))}
-                    placeholder="#3b82f6"
-                  />
-                </div>
-              </div>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-medium flex items-center gap-2">
+                        <Code className="w-4 h-4" />
+                        Instructions
+                      </h4>
+                    </div>
+                    <div className="space-y-3">
+                      {integration.steps.map((step, stepIndex) => (
+                        <div key={stepIndex} className="flex items-start gap-3">
+                          <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
+                            {stepIndex + 1}
+                          </div>
+                          <p className="text-sm text-gray-900 leading-relaxed">
+                            {step}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
-              <div>
-                <Label htmlFor="bot_msg_color">Bot Message Color</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="bot_msg_color"
-                    type="color"
-                    value={config.bot_msg_color}
-                    onChange={(e) => setConfig(prev => ({ ...prev, bot_msg_color: e.target.value }))}
-                  />
-                  <Input
-                    value={config.bot_msg_color}
-                    onChange={(e) => setConfig(prev => ({ ...prev, bot_msg_color: e.target.value }))}
-                    placeholder="#1f2937"
-                  />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Export Panel */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Export & Preview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="script" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="script">Script Tag</TabsTrigger>
-                <TabsTrigger value="preview">Live Preview</TabsTrigger>
-                <TabsTrigger value="download">Download</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="script" className="space-y-4">
-                <div>
-                  <Label>Generated Script Tag</Label>
-                  <div className="relative">
-                    <Textarea
-                      value={generatedScript}
-                      readOnly
-                      rows={15}
-                      className="font-mono text-sm"
-                    />
+                  <div className="flex gap-3 pt-4 border-t">
                     <Button
+                      variant="outline"
+                      className="flex-1 bg-transparent"
                       size="sm"
-                      className="absolute top-2 right-2"
-                      onClick={() => copyToClipboard(generatedScript)}
                     >
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copy
+                      <Globe className="w-4 h-4 mr-2" />
+                      Visit {integration.name}
+                    </Button>
+                    <Button
+                      className="flex-1 bg-blue-600 hover:bg-blue-700"
+                      size="sm"
+                    >
+                      Start Integration
                     </Button>
                   </div>
-                  <p className="text-sm text-gray-600 mt-2">
-                    Copy this script tag and paste it into any website's HTML to embed your chatbot.
-                  </p>
-                </div>
-              </TabsContent>
+                </DialogContent>
+              </Dialog>
+            ))}
+          </div>
+        </div>
+      </section>
 
-              <TabsContent value="preview" className="space-y-4">
-                <div>
-                  <Label>Live Preview</Label>
-                  <div className="border rounded-lg overflow-hidden">
-                    <iframe
-                      src={previewUrl}
-                      className="w-full h-96"
-                      title="Chatbot Preview"
-                    />
-                  </div>
-                  <Button
-                    className="w-full mt-4"
-                    onClick={() => window.open(previewUrl, '_blank')}
-                  >
-                    <Eye className="w-4 h-4 mr-2" />
-                    Open Preview in New Tab
-                  </Button>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="download" className="space-y-4">
-                <div>
-                  <Label>Download Script File</Label>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Download the JavaScript file to host on your own server.
-                  </p>
-                  <Button
-                    className="w-full"
-                    onClick={downloadScript}
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Download lux-llm-chatbot.js
-                  </Button>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Call-to-Action */}
+      <section className="py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          <h2 className="text-4xl font-bold text-gray-900">
+            Ready to Export?
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Start engaging with your users today. It takes less than 5 minutes
+            to get up and running.
+          </p>
+          <Button
+            size="lg"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+          >
+            <Zap className="w-5 h-5 mr-2" />
+            Get Started Now
+          </Button>
+        </div>
+      </section>
     </div>
   );
 }
