@@ -49,7 +49,7 @@ const Footer = () => {
 
   const companyLinks = [
     { label: "About", href: "/about" },
-    { label: "Blog", href: "/blog" },
+
     { label: "Contact", href: "/contact" },
     { label: "Privacy", href: "#" },
     { label: "Terms", href: "#" },
@@ -191,26 +191,6 @@ const Footer = () => {
           <p className="text-foreground/60 font-light mb-4 md:mb-0">
             © 2025 LuxLLM ❤️. All rights reserved.
           </p>
-          <div className="flex space-x-6">
-            <a
-              href="#"
-              className="text-foreground/60 hover:text-primary transition-colors duration-300 font-light text-sm"
-            >
-              Privacy Policy
-            </a>
-            <a
-              href="#"
-              className="text-foreground/60 hover:text-primary transition-colors duration-300 font-light text-sm"
-            >
-              Terms of Service
-            </a>
-            <a
-              href="#"
-              className="text-foreground/60 hover:text-primary transition-colors duration-300 font-light text-sm"
-            >
-              Cookie Policy
-            </a>
-          </div>
         </motion.div>
       </div>
     </footer>

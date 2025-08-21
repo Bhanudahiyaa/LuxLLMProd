@@ -352,7 +352,31 @@ export default function Export() {
           "Export page: Preview mode detected, creating real agent first..."
         );
 
-        // Create a real agent from the preview data
+        // Get custom colors from the current form state or localStorage
+        const savedCustomizations = localStorage.getItem("chatbotCustomizations");
+        let customColors = {
+          chat_bg_color: "#ffffff",
+          chat_border_color: "#e5e7eb",
+          user_msg_color: "#3b82f6",
+          bot_msg_color: "#1f2937",
+        };
+        
+        if (savedCustomizations) {
+          try {
+            const parsed = JSON.parse(savedCustomizations);
+            customColors = {
+              chat_bg_color: parsed.chat_bg || "#ffffff",
+              chat_border_color: parsed.border_color || "#e5e7eb",
+              user_msg_color: parsed.user_msg_color || "#3b82f6",
+              bot_msg_color: parsed.bot_msg_color || "#1f2937",
+            };
+            console.log("Export page: Using saved customizations:", customColors);
+          } catch (e) {
+            console.log("Export page: No saved customizations found, using defaults");
+          }
+        }
+
+        // Create a real agent from the preview data with custom colors
         const agentData = {
           name: agent.name || "My Chatbot",
           avatar_url: agent.avatar_url,
@@ -360,11 +384,12 @@ export default function Export() {
           subheading: agent.subheading,
           system_prompt:
             agent.system_prompt || "You are a helpful AI assistant.",
-          chat_bg_color: agent.chat_bg_color || "#ffffff",
-          chat_border_color: agent.chat_border_color || "#e5e7eb",
-          user_msg_color: agent.user_msg_color || "#3b82f6",
-          bot_msg_color: agent.bot_msg_color || "#1f2937",
-          chat_name: agent.chat_name || agent.name || "My Chatbot",
+          // Use custom colors instead of defaults
+          chat_bg_color: customColors.chat_bg_color,
+          chat_border_color: customColors.chat_border_color,
+          user_msg_color: customColors.user_msg_color,
+          bot_msg_color: customColors.bot_msg_color,
+          chat_name: agent.name || "My Chatbot",
         };
 
         const { data: newAgent, error: agentError } = await createAgent(
@@ -431,6 +456,8 @@ export default function Export() {
         enableSounds: false,
         animationSpeed: "normal",
       };
+
+      console.log("Export page: Embed config with customizations:", updatedEmbedConfig);
 
       // Update the embed config state
       setEmbedConfig(updatedEmbedConfig);

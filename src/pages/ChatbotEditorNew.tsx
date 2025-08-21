@@ -379,7 +379,8 @@ export default function ChatbotEditor() {
           // Use agent's actual customizations if they exist, otherwise fall back to user settings
           chat_bg: foundAgent.chat_bg_color || uiSettings.chat_bg,
           border_color: foundAgent.chat_border_color || uiSettings.border_color,
-          user_msg_color: foundAgent.user_msg_color || uiSettings.user_msg_color,
+          user_msg_color:
+            foundAgent.user_msg_color || uiSettings.user_msg_color,
           bot_msg_color: foundAgent.bot_msg_color || uiSettings.bot_msg_color,
         };
 
@@ -438,14 +439,16 @@ export default function ChatbotEditor() {
         console.log("Loading template:", template); // Debug log
 
         // Check if user has existing customizations in localStorage
-        const existingCustomizations = localStorage.getItem("chatbotCustomizations");
+        const existingCustomizations = localStorage.getItem(
+          "chatbotCustomizations"
+        );
         let userColors: {
           chat_bg?: string;
           border_color?: string;
           user_msg_color?: string;
           bot_msg_color?: string;
         } = {};
-        
+
         if (existingCustomizations) {
           try {
             userColors = JSON.parse(existingCustomizations);
@@ -468,7 +471,10 @@ export default function ChatbotEditor() {
             template.system_prompt || "You are a helpful assistant.",
         };
 
-        console.log("Loading template form data with customizations:", templateFormData);
+        console.log(
+          "Loading template form data with customizations:",
+          templateFormData
+        );
         reset(templateFormData);
 
         // Verify form was updated
@@ -553,7 +559,7 @@ export default function ChatbotEditor() {
       user_msg_color: userMsgColor,
       bot_msg_color: botMsgColor,
     };
-    
+
     // Save customizations whenever colors change
     saveUserCustomizations(colors);
   }, [chatBg, borderColor, userMsgColor, botMsgColor]);
