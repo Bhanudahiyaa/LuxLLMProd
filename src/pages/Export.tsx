@@ -54,31 +54,36 @@ export default function ExportPage() {
     // Load chatbot customizations from localStorage
     const customizations = localStorage.getItem("chatbotCustomizations");
     const selectedAgent = localStorage.getItem("selectedAgent");
-    
+
     let config: ChatbotConfig | null = null;
-    
+
     if (selectedAgent) {
       try {
         const agent = JSON.parse(selectedAgent);
         config = {
           name: agent.name || "Portfolio Bot",
-          description: agent.description || "Customer support chatbot for my website",
-          systemPrompt: agent.system_prompt || "You are a helpful AI assistant.",
+          description:
+            agent.description || "Customer support chatbot for my website",
+          systemPrompt:
+            agent.system_prompt || "You are a helpful AI assistant.",
           avatar: agent.avatar_url || "",
           chatBgColor: agent.chat_bg || "#ffffff",
           chatBorderColor: agent.border_color || "#e5e7eb",
           userMsgColor: agent.user_msg_color || "#3b82f6",
           botMsgColor: agent.bot_msg_color || "#1f2937",
-          welcomeMessage: agent.welcome_message || "Hello! How can I help you today?",
+          welcomeMessage:
+            agent.welcome_message || "Hello! How can I help you today?",
           placeholder: agent.placeholder || "Type your message...",
         };
         setEmbedName(agent.name || "Portfolio Bot");
-        setDescription(agent.description || "Customer support chatbot for my website");
+        setDescription(
+          agent.description || "Customer support chatbot for my website"
+        );
       } catch (e) {
         console.log("Error parsing selected agent:", e);
       }
     }
-    
+
     if (customizations && !config) {
       try {
         const colors = JSON.parse(customizations);
@@ -98,19 +103,19 @@ export default function ExportPage() {
         console.log("Error parsing chatbot customizations:", e);
       }
     }
-    
+
     if (config) {
       setChatbotConfig(config);
       console.log("Loaded chatbot config:", config);
     }
   }, []);
 
-    const generateEmbedScript = () => {
+  const generateEmbedScript = () => {
     if (!chatbotConfig || !embedCode) return "";
-    
+
     // Generate a complete working embed script with all customizations
     const scriptId = `lux-llm-chatbot-${Date.now()}`;
-    
+
     return `<!-- LuxLLM Customized Chatbot Embed Script -->
 <script id="${scriptId}">
 (function() {
@@ -533,7 +538,7 @@ export default function ExportPage() {
               <CardContent>
                 {chatbotConfig ? (
                   <div className="w-full h-80 bg-gray-700 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center relative overflow-hidden">
-                    {/* Working Chatbot Preview */}
+                    {/* Working Chatbot Preview - Exact replica of editor */}
                     <div 
                       className="absolute bottom-4 right-4 w-80 h-64 bg-white rounded-xl shadow-2xl border-2 flex flex-col"
                       style={{
@@ -554,12 +559,20 @@ export default function ExportPage() {
                               src={chatbotConfig.avatar} 
                               alt="Avatar" 
                               className="w-6 h-6 rounded-full"
+                                                          onError={(e) => {
+                              const target = e.currentTarget as HTMLImageElement;
+                              target.style.display = 'none';
+                              const nextElement = target.nextElementSibling as HTMLElement;
+                              if (nextElement) nextElement.style.display = 'flex';
+                            }}
                             />
-                          ) : (
-                            <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-                              <span className="text-white text-xs">🤖</span>
-                            </div>
-                          )}
+                          ) : null}
+                          <div 
+                            className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center"
+                            style={{ display: chatbotConfig.avatar ? 'none' : 'flex' }}
+                          >
+                            <span className="text-white text-xs">🤖</span>
+                          </div>
                           <span className="text-white font-medium text-sm">
                             {chatbotConfig.name}
                           </span>
@@ -606,11 +619,17 @@ export default function ExportPage() {
                       </div>
                     </div>
                     
-                    {/* Color Info */}
+                    {/* Color Info - Show exact values */}
                     <div className="absolute top-2 left-2 text-xs text-gray-400 bg-gray-800/80 p-2 rounded">
+                      <div className="font-medium mb-1">Current Settings:</div>
+                      <div>Name: {chatbotConfig.name}</div>
                       <div>Primary: {chatbotConfig.userMsgColor}</div>
                       <div>Background: {chatbotConfig.chatBgColor}</div>
                       <div>Text: {chatbotConfig.botMsgColor}</div>
+                      <div>Border: {chatbotConfig.chatBorderColor}</div>
+                      <div className="mt-1 text-yellow-400">
+                        System: {chatbotConfig.systemPrompt.substring(0, 50)}...
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -782,11 +801,17 @@ export default function ExportPage() {
                     </p>
                   </div>
                   <div className="flex gap-3">
-                    <Button className="bg-green-500 hover:bg-green-600 text-white">
+                    <Button 
+                      onClick={() => window.open(`https://lux-llm-prod.vercel.app/api/embed-preview/${embedCode}`, '_blank')}
+                      className="bg-green-500 hover:bg-green-600 text-white"
+                    >
                       <Eye className="w-4 h-4 mr-2" />
                       Preview Embed
                     </Button>
-                    <Button className="bg-green-500 hover:bg-green-600 text-white">
+                    <Button 
+                      onClick={() => copyToClipboard(embedCode, "embedCode")}
+                      className="bg-green-500 hover:bg-green-600 text-white"
+                    >
                       <Copy className="w-4 h-4 mr-2" />
                       Copy Embed Code
                     </Button>
@@ -816,6 +841,106 @@ export default function ExportPage() {
             </Card>
           </div>
         </div>
+
+        {/* Live Test Chatbot */}
+        {chatbotConfig && (
+          <div className="mt-12">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-white mb-2">
+                Test Your Chatbot Live
+              </h2>
+              <p className="text-gray-400">
+                Try out your customized chatbot right here before embedding it
+              </p>
+            </div>
+            
+            <div className="max-w-md mx-auto">
+              <Card className="bg-gray-800 border-gray-700">
+                <CardContent className="p-0">
+                  <div 
+                    className="w-full h-96 rounded-xl flex flex-col"
+                    style={{
+                      backgroundColor: chatbotConfig.chatBgColor,
+                      borderColor: chatbotConfig.chatBorderColor,
+                      borderRadius: '12px',
+                      fontFamily: 'Inter, sans-serif'
+                    }}
+                  >
+                    {/* Header */}
+                    <div 
+                      className="p-3 rounded-t-xl flex items-center justify-between"
+                      style={{ backgroundColor: chatbotConfig.userMsgColor }}
+                    >
+                      <div className="flex items-center gap-2">
+                        {chatbotConfig.avatar ? (
+                          <img 
+                            src={chatbotConfig.avatar} 
+                            alt="Avatar" 
+                            className="w-6 h-6 rounded-full"
+                            onError={(e) => {
+                              const target = e.currentTarget as HTMLImageElement;
+                              target.style.display = 'none';
+                              const nextElement = target.nextElementSibling as HTMLElement;
+                              if (nextElement) nextElement.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div 
+                          className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center"
+                          style={{ display: chatbotConfig.avatar ? 'none' : 'flex' }}
+                        >
+                          <span className="text-white text-xs">🤖</span>
+                        </div>
+                        <span className="text-white font-medium text-sm">
+                          {chatbotConfig.name}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span className="text-white/80 text-xs">Online</span>
+                      </div>
+                    </div>
+                    
+                    {/* Messages */}
+                    <div className="flex-1 p-3 overflow-y-auto">
+                      <div 
+                        className="inline-block p-2 rounded-lg text-sm max-w-[80%]"
+                        style={{
+                          backgroundColor: chatbotConfig.chatBorderColor,
+                          color: chatbotConfig.botMsgColor
+                        }}
+                      >
+                        {chatbotConfig.welcomeMessage}
+                      </div>
+                    </div>
+                    
+                    {/* Input */}
+                    <div className="p-3 border-t border-gray-200">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder={chatbotConfig.placeholder}
+                          className="flex-1 px-3 py-2 text-sm border rounded-lg outline-none"
+                          style={{
+                            borderColor: chatbotConfig.chatBorderColor,
+                            backgroundColor: chatbotConfig.chatBgColor,
+                            color: chatbotConfig.botMsgColor
+                          }}
+                        />
+                        <button 
+                          className="w-8 h-8 rounded-full flex items-center justify-center"
+                          style={{ backgroundColor: chatbotConfig.userMsgColor }}
+                        >
+                          <span className="text-white text-xs">→</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
 
         {/* Platform Integrations */}
         <div className="mt-12">
