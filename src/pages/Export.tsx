@@ -53,45 +53,55 @@ export default function ExportPage() {
   useEffect(() => {
     // Load chatbot customizations from localStorage
     const customizations = localStorage.getItem("chatbotCustomizations");
-    if (customizations) {
+    const selectedAgent = localStorage.getItem("selectedAgent");
+    
+    let config: ChatbotConfig | null = null;
+    
+    if (selectedAgent) {
       try {
-        const config = JSON.parse(customizations);
-        setChatbotConfig(config);
-        setEmbedName(config.name || "Portfolio Bot");
-        setDescription(
-          config.description || "Customer support chatbot for my website"
-        );
+        const agent = JSON.parse(selectedAgent);
+        config = {
+          name: agent.name || "Portfolio Bot",
+          description: agent.description || "Customer support chatbot for my website",
+          systemPrompt: agent.system_prompt || "You are a helpful AI assistant.",
+          avatar: agent.avatar_url || "",
+          chatBgColor: agent.chat_bg || "#ffffff",
+          chatBorderColor: agent.border_color || "#e5e7eb",
+          userMsgColor: agent.user_msg_color || "#3b82f6",
+          botMsgColor: agent.bot_msg_color || "#1f2937",
+          welcomeMessage: agent.welcome_message || "Hello! How can I help you today?",
+          placeholder: agent.placeholder || "Type your message...",
+        };
+        setEmbedName(agent.name || "Portfolio Bot");
+        setDescription(agent.description || "Customer support chatbot for my website");
+      } catch (e) {
+        console.log("Error parsing selected agent:", e);
+      }
+    }
+    
+    if (customizations && !config) {
+      try {
+        const colors = JSON.parse(customizations);
+        config = {
+          name: "Portfolio Bot",
+          description: "Customer support chatbot for my website",
+          systemPrompt: "You are a helpful AI assistant.",
+          avatar: "",
+          chatBgColor: colors.chat_bg || "#ffffff",
+          chatBorderColor: colors.border_color || "#e5e7eb",
+          userMsgColor: colors.user_msg_color || "#3b82f6",
+          botMsgColor: colors.bot_msg_color || "#1f2937",
+          welcomeMessage: "Hello! How can I help you today?",
+          placeholder: "Type your message...",
+        };
       } catch (e) {
         console.log("Error parsing chatbot customizations:", e);
       }
     }
-
-    // Also try to get from selectedAgent
-    const selectedAgent = localStorage.getItem("selectedAgent");
-    if (selectedAgent) {
-      try {
-        const agent = JSON.parse(selectedAgent);
-        setChatbotConfig(prev => ({
-          ...prev,
-          name: agent.name || "Portfolio Bot",
-          systemPrompt:
-            agent.system_prompt || "You are a helpful AI assistant.",
-          avatar: agent.avatar_url || "",
-          chatBgColor: agent.chat_bg_color || "#ffffff",
-          chatBorderColor: agent.chat_border_color || "#e5e7eb",
-          userMsgColor: agent.user_msg_color || "#3b82f6",
-          botMsgColor: agent.bot_msg_color || "#1f2937",
-          welcomeMessage:
-            agent.welcome_message || "Hello! How can I help you today?",
-          placeholder: agent.placeholder || "Type your message...",
-        }));
-        setEmbedName(agent.name || "Portfolio Bot");
-        setDescription(
-          agent.description || "Customer support chatbot for my website"
-        );
-      } catch (e) {
-        console.log("Error parsing selected agent:", e);
-      }
+    
+    if (config) {
+      setChatbotConfig(config);
+      console.log("Loaded chatbot config:", config);
     }
   }, []);
 
@@ -118,7 +128,9 @@ export default function ExportPage() {
     welcomeMessage: '${chatbotConfig.welcomeMessage.replace(/'/g, "\\'")}',
     placeholder: '${chatbotConfig.placeholder.replace(/'/g, "\\'")}',
     apiUrl: 'https://lux-llm-prod.vercel.app/api/public-chat',
-    embedCode: '${embedCode}'
+    embedCode: '${embedCode}',
+    borderRadius: '12px',
+    fontFamily: 'Inter, sans-serif'
   };
 
   // Create chatbot HTML with customizations
@@ -128,7 +140,7 @@ export default function ExportPage() {
       bottom: 20px;
       right: 20px;
       z-index: 10000;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: \${config.fontFamily}, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     ">
       <!-- Chat Button -->
       <div id="chat-button" style="
@@ -157,7 +169,7 @@ export default function ExportPage() {
         height: 500px;
         background: \${config.chatBg};
         border: 2px solid \${config.borderColor};
-        border-radius: 12px;
+        border-radius: \${config.borderRadius};
         display: none;
         flex-direction: column;
         box-shadow: 0 8px 32px rgba(0,0,0,0.12);
@@ -167,12 +179,12 @@ export default function ExportPage() {
           padding: 16px;
           background: \${config.userMsgColor};
           color: white;
-          border-radius: 10px 10px 0 0;
+          border-radius: \${config.borderRadius} \${config.borderRadius} 0 0;
           display: flex;
           align-items: center;
           gap: 12px;
         ">
-          \${config.avatarUrl ? \`<img src="\${config.avatarUrl}" style="width: 32px; height: 32px; border-radius: 50%;">\` : ''}
+          \${config.avatarUrl ? \`<img src="\${config.avatarUrl}" style="width: 32px; height: 32px; border-radius: 50%;">\` : '<div style="width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;"><span style="font-size: 16px;">🤖</span></div>'}
           <div>
             <div style="font-weight: 600; font-size: 16px;">\${config.name}</div>
             <div style="font-size: 12px; opacity: 0.8;">AI Assistant</div>
@@ -193,6 +205,7 @@ export default function ExportPage() {
             color: \${config.botMsgColor};
             font-size: 14px;
             line-height: 1.4;
+            max-width: 80%;
           ">\${config.welcomeMessage}</div>
         </div>
 
@@ -201,7 +214,7 @@ export default function ExportPage() {
           padding: 16px;
           border-top: 1px solid \${config.borderColor};
           background: \${config.chatBg};
-          border-radius: 0 0 10px 10px;
+          border-radius: 0 0 \${config.borderRadius} \${config.borderRadius};
         ">
           <div style="display: flex; gap: 8px;">
             <input type="text" id="chat-input" placeholder="\${config.placeholder}" style="
@@ -211,6 +224,8 @@ export default function ExportPage() {
               border-radius: 6px;
               font-size: 14px;
               outline: none;
+              background: \${config.chatBg};
+              color: \${config.botMsgColor};
             ">
             <button onclick="sendMessage()" style="
               padding: 12px 16px;
@@ -220,6 +235,7 @@ export default function ExportPage() {
               border-radius: 6px;
               cursor: pointer;
               font-size: 14px;
+              font-weight: 500;
             ">Send</button>
           </div>
         </div>
@@ -516,34 +532,89 @@ export default function ExportPage() {
               </CardHeader>
               <CardContent>
                 {chatbotConfig ? (
-                  <div className="w-full h-64 bg-gray-700 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
-                    <div className="text-center text-gray-400">
-                      <div className="w-16 h-16 bg-gray-600 rounded-full mx-auto mb-3 flex items-center justify-center">
-                        {chatbotConfig.avatar ? (
-                          <img
-                            src={chatbotConfig.avatar}
-                            alt="Avatar"
-                            className="w-12 h-12 rounded-full"
+                  <div className="w-full h-80 bg-gray-700 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center relative overflow-hidden">
+                    {/* Working Chatbot Preview */}
+                    <div 
+                      className="absolute bottom-4 right-4 w-80 h-64 bg-white rounded-xl shadow-2xl border-2 flex flex-col"
+                      style={{
+                        backgroundColor: chatbotConfig.chatBgColor,
+                        borderColor: chatbotConfig.chatBorderColor,
+                        borderRadius: '12px',
+                        fontFamily: 'Inter, sans-serif'
+                      }}
+                    >
+                      {/* Header */}
+                      <div 
+                        className="p-3 rounded-t-xl flex items-center justify-between"
+                        style={{ backgroundColor: chatbotConfig.userMsgColor }}
+                      >
+                        <div className="flex items-center gap-2">
+                          {chatbotConfig.avatar ? (
+                            <img 
+                              src={chatbotConfig.avatar} 
+                              alt="Avatar" 
+                              className="w-6 h-6 rounded-full"
+                            />
+                          ) : (
+                            <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                              <span className="text-white text-xs">🤖</span>
+                            </div>
+                          )}
+                          <span className="text-white font-medium text-sm">
+                            {chatbotConfig.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                          <span className="text-white/80 text-xs">Online</span>
+                        </div>
+                      </div>
+                      
+                      {/* Messages */}
+                      <div className="flex-1 p-3 overflow-hidden">
+                        <div 
+                          className="inline-block p-2 rounded-lg text-sm max-w-[80%]"
+                          style={{
+                            backgroundColor: chatbotConfig.chatBorderColor,
+                            color: chatbotConfig.botMsgColor
+                          }}
+                        >
+                          {chatbotConfig.welcomeMessage}
+                        </div>
+                      </div>
+                      
+                      {/* Input */}
+                      <div className="p-3 border-t border-gray-200">
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder={chatbotConfig.placeholder}
+                            className="flex-1 px-3 py-2 text-sm border rounded-lg outline-none"
+                            style={{
+                              borderColor: chatbotConfig.chatBorderColor,
+                              backgroundColor: chatbotConfig.chatBgColor,
+                              color: chatbotConfig.botMsgColor
+                            }}
                           />
-                        ) : (
-                          <Globe className="w-8 h-8 text-green-400" />
-                        )}
+                          <button 
+                            className="w-8 h-8 rounded-full flex items-center justify-center"
+                            style={{ backgroundColor: chatbotConfig.userMsgColor }}
+                          >
+                            <span className="text-white text-xs">→</span>
+                          </button>
+                        </div>
                       </div>
-                      <p className="font-medium text-white mb-1">
-                        {chatbotConfig.name}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        {chatbotConfig.welcomeMessage}
-                      </p>
-                      <div className="mt-3 text-xs text-gray-500">
-                        <p>Chat BG: {chatbotConfig.chatBgColor}</p>
-                        <p>User Msg: {chatbotConfig.userMsgColor}</p>
-                        <p>Bot Msg: {chatbotConfig.botMsgColor}</p>
-                      </div>
+                    </div>
+                    
+                    {/* Color Info */}
+                    <div className="absolute top-2 left-2 text-xs text-gray-400 bg-gray-800/80 p-2 rounded">
+                      <div>Primary: {chatbotConfig.userMsgColor}</div>
+                      <div>Background: {chatbotConfig.chatBgColor}</div>
+                      <div>Text: {chatbotConfig.botMsgColor}</div>
                     </div>
                   </div>
                 ) : (
-                  <div className="w-full h-64 bg-gray-700 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
+                  <div className="w-full h-80 bg-gray-700 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
                     <div className="text-center text-gray-400">
                       <Globe className="w-12 h-12 mx-auto mb-2" />
                       <p>No chatbot configuration found</p>
