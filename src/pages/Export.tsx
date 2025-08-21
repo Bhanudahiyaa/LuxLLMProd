@@ -408,13 +408,36 @@ export default function Export() {
         throw new Error(error);
       }
 
-      // Generate embed script
+      // Update embed config with actual agent customizations
+      const updatedEmbedConfig = {
+        name: finalAgent.name || "My Chatbot",
+        theme: "light", // Default theme
+        primaryColor: finalAgent.user_msg_color || "#3b82f6",
+        accentColor: finalAgent.chat_border_color || "#e5e7eb",
+        backgroundColor: finalAgent.chat_bg_color || "#ffffff",
+        textColor: finalAgent.bot_msg_color || "#1f2937",
+        borderRadius: 12, // Default
+        fontSize: 14, // Default
+        fontFamily: "Inter", // Default
+        position: "bottom-right", // Default
+        welcomeMessage: `Hello! I'm ${finalAgent.name || "your AI assistant"}. How can I help you today?`,
+        systemPrompt: finalAgent.system_prompt || "You are a helpful AI assistant.",
+        placeholder: "Type your message...",
+        avatar: finalAgent.avatar_url || "",
+        showTypingIndicator: true,
+        enableSounds: false,
+        animationSpeed: "normal",
+      };
+
+      // Update the embed config state
+      setEmbedConfig(updatedEmbedConfig);
+
+      // Generate embed script with actual agent data
       const generatedScript = await generateEmbedScript({
         embedCode: embed.embed_code,
-        chatbotName: embed.name,
-        systemPrompt:
-          finalAgent.system_prompt || "You are a helpful AI assistant.",
-        config: embedConfig,
+        chatbotName: finalAgent.name || embed.name,
+        systemPrompt: finalAgent.system_prompt || "You are a helpful AI assistant.",
+        config: updatedEmbedConfig,
       });
 
       // Update state

@@ -57,7 +57,14 @@ async function handlePublicChat(request) {
             id,
             name,
             system_prompt,
-            theme_config
+            avatar_url,
+            chat_bg_color,
+            chat_border_color,
+            user_msg_color,
+            bot_msg_color,
+            chat_name,
+            heading,
+            subheading
           )
         `
         )
@@ -69,6 +76,7 @@ async function handlePublicChat(request) {
         embedConfig = embed;
         embedId = embed.id;
         console.log("✅ Found real embed configuration:", embed.id);
+        console.log("✅ Agent data:", embed.agents);
       } else {
         console.log("⚠️ Using mock embed configuration for testing");
       }
@@ -128,6 +136,10 @@ async function handlePublicChat(request) {
     // Get system prompt
     const systemPrompt =
       embedConfig?.agents?.system_prompt || embedConfig.system_prompt || "You are a helpful AI assistant.";
+    
+    console.log("🤖 System prompt being used:", systemPrompt);
+    console.log("🤖 Agent system prompt:", embedConfig?.agents?.system_prompt);
+    console.log("🤖 Embed system prompt:", embedConfig.system_prompt);
 
     // Call OpenRouter AI API
     try {

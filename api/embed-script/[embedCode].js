@@ -30,9 +30,17 @@ export default async function handler(req, res) {
           `
           *,
           agents (
+            id,
             name,
             system_prompt,
-            theme_config
+            avatar_url,
+            chat_bg_color,
+            chat_border_color,
+            user_msg_color,
+            bot_msg_color,
+            chat_name,
+            heading,
+            subheading
           )
         `
         )
@@ -43,6 +51,7 @@ export default async function handler(req, res) {
       if (!error && embed) {
         embedConfig = embed;
         console.log("✅ Found embed configuration:", embed.id);
+        console.log("✅ Agent data:", embed.agents);
       } else {
         console.log("⚠️ Using default configuration for:", embedCode);
       }
@@ -72,30 +81,27 @@ function generateEmbedScript(embedCode, embedConfig) {
   const escapedName = (agent.name || embedConfig?.name || "AI Assistant").replace(/'/g, "\\'");
   const escapedPrompt = (agent.system_prompt || "You are a helpful AI assistant that can answer questions about technology, programming, and general knowledge.").replace(/'/g, "\\'");
   
-  // Extract theme configuration with fallbacks
-  const themeConfig = agent.theme_config || {};
-  
-  // Colors with fallbacks
-  const primaryColor = themeConfig.primary_color || agent.primary_color || '#3b82f6';
-  const backgroundColor = themeConfig.background_color || agent.background_color || '#ffffff';
-  const textColor = themeConfig.text_color || agent.text_color || '#1f2937';
-  const accentColor = themeConfig.accent_color || agent.accent_color || '#e5e7eb';
-  const chatBgColor = themeConfig.chat_bg_color || agent.chat_bg_color || '#ffffff';
-  const chatBorderColor = themeConfig.chat_border_color || agent.chat_border_color || '#e5e7eb';
+  // Use actual agent customizations with fallbacks
+  const primaryColor = agent.user_msg_color || '#3b82f6';
+  const backgroundColor = agent.chat_bg_color || '#ffffff';
+  const textColor = agent.bot_msg_color || '#1f2937';
+  const accentColor = agent.chat_border_color || '#e5e7eb';
+  const chatBgColor = agent.chat_bg_color || '#ffffff';
+  const chatBorderColor = agent.chat_border_color || '#e5e7eb';
   
   // UI settings with fallbacks
-  const borderRadius = themeConfig.border_radius || agent.border_radius || 12;
-  const fontSize = themeConfig.font_size || agent.font_size || 14;
-  const fontFamily = themeConfig.font_family || agent.font_family || 'Inter';
-  const position = themeConfig.position || agent.position || 'bottom-right';
-  const welcomeMessage = themeConfig.welcome_message || agent.welcome_message || "Hello! I'm your AI assistant. How can I help you today?";
-  const placeholder = themeConfig.placeholder || agent.placeholder || "Type your message...";
-  const avatarUrl = agent.avatar_url || themeConfig.avatar_url || '';
+  const borderRadius = 12; // Default
+  const fontSize = 14; // Default
+  const fontFamily = 'Inter'; // Default
+  const position = 'bottom-right'; // Default
+  const welcomeMessage = `Hello! I'm ${agent.name || "your AI assistant"}. How can I help you today?`;
+  const placeholder = "Type your message...";
+  const avatarUrl = agent.avatar_url || '';
   
   // Features
-  const showTypingIndicator = themeConfig.show_typing_indicator !== false;
-  const enableSounds = themeConfig.enable_sounds || false;
-  const animationSpeed = themeConfig.animation_speed || 'normal';
+  const showTypingIndicator = true;
+  const enableSounds = false;
+  const animationSpeed = 'normal';
 
   return `// LuxLLM Chatbot Embed Script
 // Generated for: ${embedCode}

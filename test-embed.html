@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Embed Script</title>
+    <title>Test Customized Chatbot Embed</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -38,61 +38,113 @@
             border: 1px solid #ddd;
             margin: 10px 0;
         }
+        .customization-info {
+            background: #fff3e0;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #ff9800;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.success { background: #e8f5e8; color: #2e7d32; }
+        .status.error { background: #ffebee; color: #c62828; }
+        .status.loading { background: #e3f2fd; color: #1565c0; }
     </style>
 </head>
 <body>
-    <h1>🤖 Chatbot Embed Test</h1>
+    <h1>🤖 Customized Chatbot Embed Test</h1>
     
     <div class="test-section">
         <h2>Test Instructions</h2>
         <div class="instructions">
-            <p><strong>This page tests your embed script functionality:</strong></p>
+            <p><strong>This page tests your customized chatbot embed system:</strong></p>
             <ol>
-                <li>The chatbot should appear as a floating button</li>
+                <li>The chatbot should appear with <strong>YOUR custom colors and settings</strong></li>
                 <li>Click the button to open the chat window</li>
                 <li>Type a message and press Enter or click Send</li>
-                <li>You should get an AI response from your OpenRouter API</li>
-                <li>All customized UI settings should be applied</li>
+                <li>You should get an AI response using <strong>YOUR custom system prompt</strong></li>
+                <li>All UI customizations from your editor should be visible</li>
             </ol>
         </div>
     </div>
 
     <div class="test-section">
-        <h2>Embed Script</h2>
+        <h2>Expected Customizations</h2>
+        <div class="customization-info">
+            <p><strong>Your chatbot should display:</strong></p>
+            <ul>
+                <li>✅ <strong>Custom name</strong> (from your agent settings)</li>
+                <li>✅ <strong>Custom colors</strong> (chat background, borders, messages)</li>
+                <li>✅ <strong>Custom avatar</strong> (if you set one)</li>
+                <li>✅ <strong>Custom system prompt</strong> (your AI personality/role)</li>
+                <li>✅ <strong>Custom welcome message</strong> (personalized greeting)</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Embed Script Status</h2>
         <p>The following script tag is loaded on this page:</p>
         <div class="embed-code">
             &lt;script src="https://lux-llm-prod.vercel.app/api/embed-script/embed-1755723257844-4w5sve.js"&gt;&lt;/script&gt;
         </div>
-        <p><strong>Status:</strong> <span id="status">Loading...</span></p>
+        <p><strong>Status:</strong> <span id="status" class="status loading">Loading...</span></p>
+        <p><strong>Agent Data:</strong> <span id="agent-data">Checking...</span></p>
     </div>
 
     <div class="test-section">
-        <h2>Expected Results</h2>
-        <ul>
-            <li>✅ Chatbot button appears (bottom-right corner)</li>
-            <li>✅ Clicking opens chat window</li>
-            <li>✅ Custom colors and styling applied</li>
-            <li>✅ Typing and sending messages works</li>
-            <li>✅ AI responses received from your API</li>
-            <li>✅ All UI customizations visible</li>
-        </ul>
+        <h2>Test Results</h2>
+        <div id="test-results">
+            <p>Run the tests below to verify your customized chatbot:</p>
+            <ul>
+                <li>🔍 <strong>Visual Check:</strong> Does the chatbot button appear with custom colors?</li>
+                <li>🔍 <strong>Functionality:</strong> Does clicking open the chat window?</li>
+                <li>🔍 <strong>Customization:</strong> Are your colors and settings applied?</li>
+                <li>🔍 <strong>AI Response:</strong> Does it respond using your system prompt?</li>
+            </ul>
+        </div>
     </div>
 
     <!-- Load the embed script -->
     <script src="https://lux-llm-prod.vercel.app/api/embed-script/embed-1755723257844-4w5sve.js"></script>
     
     <script>
-        // Check if script loaded successfully
+        // Check if script loaded successfully and get agent data
         setTimeout(() => {
             const status = document.getElementById('status');
+            const agentData = document.getElementById('agent-data');
+            
             if (window.toggleChat && window.sendMessage) {
-                status.innerHTML = '✅ <strong>Script loaded successfully!</strong>';
-                status.style.color = 'green';
+                status.innerHTML = '✅ Script loaded successfully!';
+                status.className = 'status success';
+                
+                // Try to get agent configuration from the loaded script
+                if (window.config) {
+                    agentData.innerHTML = `✅ Agent: ${window.config.chatbotName} | Colors: ${window.config.primaryColor}`;
+                } else {
+                    agentData.innerHTML = '⚠️ Agent config not accessible';
+                }
             } else {
-                status.innerHTML = '❌ <strong>Script failed to load</strong>';
-                status.style.color = 'red';
+                status.innerHTML = '❌ Script failed to load';
+                status.className = 'status error';
+                agentData.innerHTML = '❌ Cannot check agent data';
             }
-        }, 2000);
+        }, 3000);
+        
+        // Add some debugging
+        console.log('🚀 Test page loaded, waiting for embed script...');
+        window.addEventListener('load', () => {
+            console.log('🔍 Checking for chatbot functions...');
+            console.log('toggleChat available:', typeof window.toggleChat);
+            console.log('sendMessage available:', typeof window.sendMessage);
+            if (window.config) {
+                console.log('🤖 Chatbot config:', window.config);
+            }
+        });
     </script>
 </body>
 </html>

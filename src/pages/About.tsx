@@ -27,7 +27,7 @@ const About = () => {
       icon: <Target size={48} weight="light" />,
       title: "Focused",
       description:
-        "We maintain laser focus on building the best AI aggregation platform possible.",
+        "We maintain laser focus on building the best AI Chatbot platform possible.",
     },
   ];
 
@@ -37,24 +37,6 @@ const About = () => {
       role: " Founder",
       bio: "Former AI researcher at DeepMind with 10+ years in machine learning and product development.",
       avatar: "👨‍💻",
-    },
-    {
-      name: "Hardik Goel",
-      role: "CTO",
-      bio: "Ex-Google senior engineer who led the development of large-scale AI infrastructure systems.",
-      avatar: "👩‍💻",
-    },
-    {
-      name: "Arjun Rawat",
-      role: "Head of Product",
-      bio: "Product design veteran with experience at Stripe and Figma, focused on developer experiences.",
-      avatar: "👨‍🎨",
-    },
-    {
-      name: "Aaditya Malik",
-      role: "Head of AI Research",
-      bio: "PhD in Computer Science from Stanford, specializing in large language model optimization.",
-      avatar: "👩‍🔬",
     },
   ];
 
@@ -68,7 +50,7 @@ const About = () => {
       <Navigation />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-24 relative">
+      <section className="pt-32 pb-16 relative">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -77,18 +59,18 @@ const About = () => {
             className="max-w-4xl mx-auto text-center"
           >
             <h1 className="text-5xl md:text-7xl font-light tracking-tighter mb-6">
-              About <span className="text-primary">t3Dotgg</span>
+              About <span className="text-primary">LuxLLM</span>
             </h1>
-            <p className="text-xl md:text-2xl text-foreground/70 font-light leading-relaxed">
-              We're building the future of AI accessibility, one conversation at
-              a time.
+            <p className="text-xl md:text-2xl text-foreground/70 font-thin leading-relaxed">
+              Lux LLM is powering the evolution of AI chatbots faster, smarter,
+              limitless.
             </p>
           </motion.div>
         </div>
       </section>
 
       {/* Story Section */}
-      <section className="py-24 relative">
+      <section className="py-8 relative">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <motion.div
