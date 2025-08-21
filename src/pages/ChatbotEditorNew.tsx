@@ -370,12 +370,17 @@ export default function ChatbotEditor() {
         }
 
         // Set all form values at once using reset
+        // PRIORITY: Agent customizations > User settings > Defaults
         const agentFormData = {
           name: foundAgent.name,
           avatar_url: foundAgent.avatar_url || "",
           system_prompt:
             foundAgent.system_prompt || "You are a helpful assistant.",
-          ...uiSettings,
+          // Use agent's actual customizations if they exist, otherwise fall back to user settings
+          chat_bg: foundAgent.chat_bg_color || uiSettings.chat_bg,
+          border_color: foundAgent.chat_border_color || uiSettings.border_color,
+          user_msg_color: foundAgent.user_msg_color || uiSettings.user_msg_color,
+          bot_msg_color: foundAgent.bot_msg_color || uiSettings.bot_msg_color,
         };
 
         console.log("Resetting form with agent data:", agentFormData);
@@ -432,19 +437,38 @@ export default function ChatbotEditor() {
         const template = JSON.parse(decodeURIComponent(templateParam));
         console.log("Loading template:", template); // Debug log
 
-        // Update form with template data
+        // Check if user has existing customizations in localStorage
+        const existingCustomizations = localStorage.getItem("chatbotCustomizations");
+        let userColors: {
+          chat_bg?: string;
+          border_color?: string;
+          user_msg_color?: string;
+          bot_msg_color?: string;
+        } = {};
+        
+        if (existingCustomizations) {
+          try {
+            userColors = JSON.parse(existingCustomizations);
+            console.log("Found existing user customizations:", userColors);
+          } catch (e) {
+            console.log("No existing customizations found");
+          }
+        }
+
+        // Update form with template data, preserving user customizations
         const templateFormData = {
           name: template.name || template.title || "My Chatbot",
           avatar_url: template.avatar_url || "",
-          chat_bg: "#ffffff",
-          border_color: "#e5e7eb",
-          user_msg_color: "#3b82f6",
-          bot_msg_color: "#000000",
+          // Use user customizations if they exist, otherwise use template defaults
+          chat_bg: userColors.chat_bg || "#ffffff",
+          border_color: userColors.border_color || "#e5e7eb",
+          user_msg_color: userColors.user_msg_color || "#3b82f6",
+          bot_msg_color: userColors.bot_msg_color || "#000000",
           system_prompt:
             template.system_prompt || "You are a helpful assistant.",
         };
 
-        console.log("Loading template form data:", templateFormData);
+        console.log("Loading template form data with customizations:", templateFormData);
         reset(templateFormData);
 
         // Verify form was updated
@@ -459,10 +483,11 @@ export default function ChatbotEditor() {
           avatar_url: template.avatar_url || "",
           system_prompt:
             template.system_prompt || "You are a helpful assistant.",
-          chat_bg: "#ffffff",
-          border_color: "#e5e7eb",
-          user_msg_color: "#3b82f6",
-          bot_msg_color: "#000000",
+          // Preserve user customizations
+          chat_bg: userColors.chat_bg || "#ffffff",
+          border_color: userColors.border_color || "#e5e7eb",
+          user_msg_color: userColors.user_msg_color || "#3b82f6",
+          bot_msg_color: userColors.bot_msg_color || "#000000",
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
@@ -509,7 +534,31 @@ export default function ChatbotEditor() {
     }
   }, [searchParams, navigate, reset]);
 
-  // Cleanup effect to clear localStorage when switching agents or unmounting
+  // Save user customizations to localStorage when colors change
+  const saveUserCustomizations = (colors: {
+    chat_bg: string;
+    border_color: string;
+    user_msg_color: string;
+    bot_msg_color: string;
+  }) => {
+    localStorage.setItem("chatbotCustomizations", JSON.stringify(colors));
+    console.log("Saved user customizations:", colors);
+  };
+
+  // Watch for color changes and save customizations
+  useEffect(() => {
+    const colors = {
+      chat_bg: chatBg,
+      border_color: borderColor,
+      user_msg_color: userMsgColor,
+      bot_msg_color: botMsgColor,
+    };
+    
+    // Save customizations whenever colors change
+    saveUserCustomizations(colors);
+  }, [chatBg, borderColor, userMsgColor, botMsgColor]);
+
+  // Clear localStorage when switching agents or unmounting
   useEffect(() => {
     return () => {
       // Only clear if we're not actively using an agent
@@ -599,19 +648,22 @@ export default function ChatbotEditor() {
     try {
       if (agentId && agent) {
         // Update existing agent
-        const { data: updatedAgent, error: updateError } = await updateAgent(agentId, {
-          name: data.name,
-          avatar_url: data.avatar_url,
-          heading: data.name,
-          subheading: "AI-powered chatbot",
-          system_prompt: data.system_prompt,
-          // Add UI customizations
-          chat_bg_color: data.chat_bg,
-          chat_border_color: data.border_color,
-          user_msg_color: data.user_msg_color,
-          bot_msg_color: data.bot_msg_color,
-          chat_name: data.name,
-        });
+        const { data: updatedAgent, error: updateError } = await updateAgent(
+          agentId,
+          {
+            name: data.name,
+            avatar_url: data.avatar_url,
+            heading: data.name,
+            subheading: "AI-powered chatbot",
+            system_prompt: data.system_prompt,
+            // Add UI customizations
+            chat_bg_color: data.chat_bg,
+            chat_border_color: data.border_color,
+            user_msg_color: data.user_msg_color,
+            bot_msg_color: data.bot_msg_color,
+            chat_name: data.name,
+          }
+        );
 
         if (updateError) {
           toast.error("Failed to update agent: " + updateError);
@@ -641,7 +693,7 @@ export default function ChatbotEditor() {
         }
 
         toast.success("Chatbot created successfully!");
-        
+
         // Navigate to My Agents page for new agents
         navigate("/build/agents");
       }
@@ -661,7 +713,6 @@ export default function ChatbotEditor() {
       };
       localStorage.setItem("selectedAgent", JSON.stringify(agentDataToSave));
       console.log("Updated localStorage with agent data:", agentDataToSave);
-
     } catch (error) {
       console.error("Error saving:", error);
       toast.error("Failed to save chatbot");

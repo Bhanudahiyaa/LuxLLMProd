@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/sections/Footer";
 import { EnvelopeSimple, MapPin, Phone, Clock } from "phosphor-react";
 
 const Contact = () => {
+  const [emailSent, setEmailSent] = useState(false);
   const contactInfo = [
     {
       icon: <EnvelopeSimple size={32} weight="light" />,
@@ -34,6 +36,21 @@ const Contact = () => {
       action: null,
     },
   ];
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const subject = formData.get("subject");
+    const body = `Name: ${formData.get("firstName")} ${formData.get(
+      "lastName"
+    )}\nEmail: ${formData.get("email")}\n\nMessage:\n${formData.get(
+      "message"
+    )}`;
+    window.location.href = `mailto:bhanudahiya8@gmail.com?subject=${encodeURIComponent(
+      subject as string
+    )}&body=${encodeURIComponent(body)}`;
+    setEmailSent(true);
+  };
 
   return (
     <motion.div
@@ -80,7 +97,7 @@ const Contact = () => {
                 Send us a message
               </h2>
 
-              <form className="space-y-6">
+              <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label
@@ -171,6 +188,11 @@ const Contact = () => {
                   Send Message
                 </motion.button>
               </form>
+              {emailSent && (
+                <div className="mt-4 p-4 rounded-lg bg-green-500 text-white text-center">
+                  Email sent successfully!
+                </div>
+              )}
             </motion.div>
 
             {/* Contact Information */}
@@ -237,13 +259,14 @@ const Contact = () => {
                   Looking for custom solutions or enterprise pricing? Our
                   business team is ready to help.
                 </p>
-                <motion.button
+                <motion.a
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
+                  href="mailto:bhanudahiya8@gmail.com?subject=Enterprise Inquiry"
                   className="neuro-button px-6 py-3 text-sm font-medium rounded-xl hover:text-primary transition-all duration-300"
                 >
                   Contact Sales
-                </motion.button>
+                </motion.a>
               </motion.div>
             </motion.div>
           </div>

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   TwitterLogo,
@@ -7,20 +8,29 @@ import {
 } from "phosphor-react";
 
 const Footer = () => {
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = () => {
+    if (email.trim()) {
+      setSubscribed(true);
+      setEmail("");
+    }
+  };
   const socialLinks = [
     {
       icon: <TwitterLogo size={24} weight="light" />,
-      href: "#",
+      href: "https://x.com/iBhanuDahiya",
       label: "Twitter",
     },
     {
       icon: <GithubLogo size={24} weight="light" />,
-      href: "#",
+      href: "https://github.com/Bhanudahiyaa",
       label: "GitHub",
     },
     {
       icon: <LinkedinLogo size={24} weight="light" />,
-      href: "#",
+      href: "https://www.linkedin.com/in/bhanupratap1/",
       label: "LinkedIn",
     },
     {
@@ -73,6 +83,8 @@ const Footer = () => {
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   viewport={{ once: true }}
                   href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-foreground/60 hover:text-primary transition-colors duration-300"
                   aria-label={link.label}
                 >
@@ -146,16 +158,24 @@ const Footer = () => {
             <div className="space-y-3">
               <input
                 type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 className="w-full px-4 py-3 bg-secondary/50 border border-border/50 rounded-xl text-foreground placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300"
               />
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                onClick={handleSubscribe}
                 className="w-full neuro-button py-3 text-sm font-medium rounded-xl hover:text-primary transition-all duration-300"
               >
                 Subscribe
               </motion.button>
+              {subscribed && (
+                <div className="mt-2 text-green-500 text-sm">
+                  Successfully subscribed!
+                </div>
+              )}
             </div>
           </motion.div>
         </div>
