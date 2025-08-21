@@ -28,8 +28,8 @@ const FeaturesSection = () => {
           <GridItem
             area="md:[grid-area:1/1/2/7] xl:[grid-area:1/1/2/5]"
             icon={<Brain className="h-4 w-4" />}
-            title="Universal AI Model Access"
-            description="Instant access to top LLMs like OpenAI, Anthropic, and Google via a unified abstraction layer."
+            title="Fully Customisable AI Chatbots"
+            description="Build and deploy AI chatbots with customizable UI and logic in seconds."
           />
           <GridItem
             area="md:[grid-area:1/7/2/13] xl:[grid-area:2/1/3/5]"
@@ -47,14 +47,14 @@ const FeaturesSection = () => {
             area="md:[grid-area:2/7/3/13] xl:[grid-area:1/8/2/13]"
             icon={<Smartphone className="h-4 w-4" />}
             title="Mobile Ready Design"
-            description="Fully responsive interface that works seamlessly across all devices and platforms, all agent components remain mobile accessible and responsive.
+            description="Fully responsive interface that works seamlessly across all devices and platforms, all Chatbots remain mobile accessible and responsive.
 "
           />
           <GridItem
             area="md:[grid-area:3/1/4/13] xl:[grid-area:2/8/3/13]"
             icon={<Database className="h-4 w-4" />}
-            title="Smart Model Routing"
-            description="Context-aware router dynamically selects the optimal model per prompt, maximizing relevance and speed."
+            title="One Click Integrations"
+            description="Integrate your AI chatbots into your website with a single line of code."
           />
         </ul>
       </div>

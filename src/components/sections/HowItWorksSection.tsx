@@ -8,9 +8,9 @@ import { FeatureSteps } from "../ui/feature-section";
 const defaultCards = [
   {
     icon: <Wand className="size-4 text-primary" />,
-    title: "Prompt",
-    description: "Describe your agent",
-    date: "Just now",
+    title: "Template",
+    description: "Choose Template",
+    date: "Today",
     iconClassName: "text-primary",
     titleClassName: "text-foreground",
     className:
@@ -18,9 +18,9 @@ const defaultCards = [
   },
   {
     icon: <Plug className="size-4 text-primary" />,
-    title: "Import",
-    description: "Import your agent ",
-    date: "2 days ago",
+    title: "Customise",
+    description: "Customize your Chatbot",
+    date: "Today",
     iconClassName: "text-primary",
     titleClassName: "text-foreground",
     className:
@@ -28,8 +28,8 @@ const defaultCards = [
   },
   {
     icon: <Code2 className="size-4 text-primary" />,
-    title: "Deploy",
-    description: "Deploy your agent",
+    title: "Embed",
+    description: "Embed your Chatbot",
     date: "Today",
     iconClassName: "text-primary",
     titleClassName: "text-foreground",

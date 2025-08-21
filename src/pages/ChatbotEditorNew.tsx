@@ -439,14 +439,16 @@ export default function ChatbotEditor() {
         console.log("Loading template:", template); // Debug log
 
         // Get user's saved customizations from localStorage
-        const savedCustomizations = localStorage.getItem("chatbotCustomizations");
+        const savedCustomizations = localStorage.getItem(
+          "chatbotCustomizations"
+        );
         let userColors = {
           chat_bg: "#ffffff",
           border_color: "#e5e7eb",
           user_msg_color: "#3b82f6",
           bot_msg_color: "#000000",
         };
-        
+
         if (savedCustomizations) {
           try {
             const parsed = JSON.parse(savedCustomizations);
@@ -470,13 +472,15 @@ export default function ChatbotEditor() {
             templateColors = {
               chat_bg: template.custom_colors.chat_bg || "#ffffff",
               border_color: template.custom_colors.border_color || "#e5e7eb",
-              user_msg_color: template.custom_colors.user_msg_color || "#3b82f6",
+              user_msg_color:
+                template.custom_colors.user_msg_color || "#3b82f6",
               bot_msg_color: template.custom_colors.bot_msg_color || "#000000",
             };
             console.log("Found template custom colors:", templateColors);
           } else {
             // Try to get template-specific colors from templateConfigs
-            const templateConfigs = require("@/lib/templateConfigs").templateConfigs;
+            const templateConfigs =
+              require("@/lib/templateConfigs").templateConfigs;
             if (templateConfigs && templateConfigs[template.id]) {
               const config = templateConfigs[template.id];
               templateColors = {
@@ -485,7 +489,10 @@ export default function ChatbotEditor() {
                 user_msg_color: config.primaryColor || "#3b82f6",
                 bot_msg_color: config.textColor || "#000000",
               };
-              console.log("Found template-specific colors from configs:", templateColors);
+              console.log(
+                "Found template-specific colors from configs:",
+                templateColors
+              );
             }
           }
         } catch (e) {
