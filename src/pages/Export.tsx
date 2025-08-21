@@ -1,7 +1,5 @@
 "use client";
-
 import { useState, useEffect } from "react";
-import { useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,63 +8,61 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Copy, Check, MessageCircle, Zap, Code, Globe } from "lucide-react";
-import { toast } from "react-hot-toast";
+  Copy,
+  Plus,
+  Eye,
+  Globe,
+  Code,
+  Settings,
+  Users,
+  Palette,
+  Download,
+} from "lucide-react";
+import { useAuth } from "@clerk/clerk-react";
 
 interface ChatbotConfig {
   name: string;
-  system_prompt: string;
-  avatar_url: string;
-  chat_bg: string;
-  border_color: string;
-  user_msg_color: string;
-  bot_msg_color: string;
-  welcome_message: string;
+  description: string;
+  systemPrompt: string;
+  avatar: string;
+  chatBgColor: string;
+  chatBorderColor: string;
+  userMsgColor: string;
+  botMsgColor: string;
+  welcomeMessage: string;
   placeholder: string;
 }
 
 export default function ExportPage() {
-  const { isLoaded, isSignedIn } = useAuth();
-  const [copied, setCopied] = useState(false);
-  const [selectedIntegration, setSelectedIntegration] = useState<string | null>(
+  const { isSignedIn, isLoaded } = useAuth();
+  const [copied, setCopied] = useState<string | null>(null);
+  const [embedName, setEmbedName] = useState("Portfolio Bot");
+  const [description, setDescription] = useState(
+    "Customer support chatbot for my website"
+  );
+  const [maxRequestsPerHour, setMaxRequestsPerHour] = useState("100");
+  const [maxRequestsPerDay, setMaxRequestsPerDay] = useState("1000");
+  const [chatbotConfig, setChatbotConfig] = useState<ChatbotConfig | null>(
     null
   );
-  const [config, setConfig] = useState<ChatbotConfig>({
-    name: "My AI Assistant",
-    system_prompt: "You are a helpful AI assistant.",
-    avatar_url: "",
-    chat_bg: "#ffffff",
-    border_color: "#e5e7eb",
-    user_msg_color: "#3b82f6",
-    bot_msg_color: "#1f2937",
-    welcome_message: "Hello! How can I help you today?",
-    placeholder: "Type your message...",
-  });
+  const [embedCode, setEmbedCode] = useState("");
 
-  // Load current form state from localStorage
   useEffect(() => {
-    const savedCustomizations = localStorage.getItem("chatbotCustomizations");
-    if (savedCustomizations) {
+    // Load chatbot customizations from localStorage
+    const customizations = localStorage.getItem("chatbotCustomizations");
+    if (customizations) {
       try {
-        const parsed = JSON.parse(savedCustomizations);
-        setConfig(prev => ({
-          ...prev,
-          chat_bg: parsed.chat_bg || prev.chat_bg,
-          border_color: parsed.border_color || prev.border_color,
-          user_msg_color: parsed.user_msg_color || prev.user_msg_color,
-          bot_msg_color: parsed.bot_msg_color || prev.bot_msg_color,
-        }));
+        const config = JSON.parse(customizations);
+        setChatbotConfig(config);
+        setEmbedName(config.name || "Portfolio Bot");
+        setDescription(
+          config.description || "Customer support chatbot for my website"
+        );
       } catch (e) {
-        console.log("No saved customizations found");
+        console.log("Error parsing chatbot customizations:", e);
       }
     }
 
@@ -74,47 +70,58 @@ export default function ExportPage() {
     const selectedAgent = localStorage.getItem("selectedAgent");
     if (selectedAgent) {
       try {
-        const parsed = JSON.parse(selectedAgent);
-        setConfig(prev => ({
+        const agent = JSON.parse(selectedAgent);
+        setChatbotConfig(prev => ({
           ...prev,
-          name: parsed.name || prev.name,
-          system_prompt: parsed.system_prompt || prev.system_prompt,
-          avatar_url: parsed.avatar_url || prev.avatar_url,
-          chat_bg: parsed.chat_bg || prev.chat_bg,
-          border_color: parsed.border_color || prev.border_color,
-          user_msg_color: parsed.user_msg_color || prev.user_msg_color,
-          bot_msg_color: parsed.bot_msg_color || prev.bot_msg_color,
+          name: agent.name || "Portfolio Bot",
+          systemPrompt:
+            agent.system_prompt || "You are a helpful AI assistant.",
+          avatar: agent.avatar_url || "",
+          chatBgColor: agent.chat_bg_color || "#ffffff",
+          chatBorderColor: agent.chat_border_color || "#e5e7eb",
+          userMsgColor: agent.user_msg_color || "#3b82f6",
+          botMsgColor: agent.bot_msg_color || "#1f2937",
+          welcomeMessage:
+            agent.welcome_message || "Hello! How can I help you today?",
+          placeholder: agent.placeholder || "Type your message...",
         }));
+        setEmbedName(agent.name || "Portfolio Bot");
+        setDescription(
+          agent.description || "Customer support chatbot for my website"
+        );
       } catch (e) {
-        console.log("No selected agent found");
+        console.log("Error parsing selected agent:", e);
       }
     }
   }, []);
 
-  // Generate the embed script with all customizations
-  const generateEmbedScript = (config: ChatbotConfig): string => {
+    const generateEmbedScript = () => {
+    if (!chatbotConfig || !embedCode) return "";
+    
+    // Generate a complete working embed script with all customizations
     const scriptId = `lux-llm-chatbot-${Date.now()}`;
-
-    return `<!-- LuxLLM Chatbot Embed Script -->
+    
+    return `<!-- LuxLLM Customized Chatbot Embed Script -->
 <script id="${scriptId}">
 (function() {
   'use strict';
   
   // Configuration with all your customizations
   const config = {
-    name: '${config.name.replace(/'/g, "\\'")}',
-    systemPrompt: '${config.system_prompt.replace(/'/g, "\\'")}',
-    avatarUrl: '${config.avatar_url || ""}',
-    chatBg: '${config.chat_bg}',
-    borderColor: '${config.border_color}',
-    userMsgColor: '${config.user_msg_color}',
-    botMsgColor: '${config.bot_msg_color}',
-    welcomeMessage: '${config.welcome_message.replace(/'/g, "\\'")}',
-    placeholder: '${config.placeholder.replace(/'/g, "\\'")}',
-    apiUrl: '${window.location.origin}/api/public-chat'
+    name: '${chatbotConfig.name.replace(/'/g, "\\'")}',
+    systemPrompt: '${chatbotConfig.systemPrompt.replace(/'/g, "\\'")}',
+    avatarUrl: '${chatbotConfig.avatar || ""}',
+    chatBg: '${chatbotConfig.chatBgColor}',
+    borderColor: '${chatbotConfig.chatBorderColor}',
+    userMsgColor: '${chatbotConfig.userMsgColor}',
+    botMsgColor: '${chatbotConfig.botMsgColor}',
+    welcomeMessage: '${chatbotConfig.welcomeMessage.replace(/'/g, "\\'")}',
+    placeholder: '${chatbotConfig.placeholder.replace(/'/g, "\\'")}',
+    apiUrl: 'https://lux-llm-prod.vercel.app/api/public-chat',
+    embedCode: '${embedCode}'
   };
 
-  // Create chatbot HTML
+  // Create chatbot HTML with customizations
   const chatbotHTML = \`
     <div id="lux-llm-chatbot" style="
       position: fixed;
@@ -260,7 +267,7 @@ export default function ExportPage() {
         body: JSON.stringify({
           message: message,
           systemPrompt: config.systemPrompt,
-          embedCode: 'custom-${Date.now()}'
+          embedCode: config.embedCode
         })
       });
 
@@ -331,576 +338,448 @@ export default function ExportPage() {
     }
   });
 
-  console.log('LuxLLM Chatbot loaded with customizations:', config);
+  console.log('LuxLLM Customized Chatbot loaded:', config);
 })();
 </script>`;
   };
 
-  const embedScript = generateEmbedScript(config);
+  const generateIframeEmbed = () => {
+    if (!embedCode) return "";
 
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(embedScript);
-      setCopied(true);
-      toast.success("Script copied to clipboard!");
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      toast.error("Failed to copy");
-    }
+    return `<iframe src="https://lux-llm-prod.vercel.app/api/embed-preview/${embedCode}" width="400" height="600" frameborder="0" style="border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);"></iframe>`;
   };
 
-  const integrations = [
-    {
-      name: "Webflow",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "No-Code",
-      difficulty: "Easy",
-      steps: [
-        "Open your Webflow project",
-        "Go to Project Settings > Custom Code",
-        "Paste the embed script in the Head Code section",
-        "Publish your site to see the chatbot live",
-      ],
-    },
-    {
-      name: "WordPress",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "CMS",
-      difficulty: "Easy",
-      steps: [
-        "Access your WordPress admin dashboard",
-        "Install a custom code plugin or use theme editor",
-        "Add the embed script to your header.php file",
-        "Save changes and view your site",
-      ],
-    },
-    {
-      name: "Bubble",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "No-Code",
-      difficulty: "Easy",
-      steps: [
-        "Open your Bubble app editor",
-        "Go to Settings > SEO/metatags",
-        "Add the script to the HTML header section",
-        "Deploy your app to production",
-      ],
-    },
-    {
-      name: "Wix",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "Website Builder",
-      difficulty: "Easy",
-      steps: [
-        "Open your Wix site editor",
-        "Add an HTML embed element to your page",
-        "Paste the embed script into the element",
-        "Publish your site to activate the chatbot",
-      ],
-    },
-    {
-      name: "Squarespace",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "CMS",
-      difficulty: "Easy",
-      steps: [
-        "Log into your Squarespace account",
-        "Go to Settings > Advanced > Code Injection",
-        "Paste the script in the Header section",
-        "Save and your chatbot will appear site-wide",
-      ],
-    },
-    {
-      name: "Notion",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "No-Code",
-      difficulty: "Medium",
-      steps: [
-        "Open your Notion page",
-        "Type /embed to add an embed block",
-        "Enter your widget URL in the embed",
-        "Resize and position as needed",
-      ],
-    },
-    {
-      name: "Framer",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "No-Code",
-      difficulty: "Easy",
-      steps: [
-        "Open your Framer project",
-        "Add a Code component to your page",
-        "Paste the embed script",
-        "Customize positioning and styling",
-      ],
-    },
-    {
-      name: "Carrd",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "Website Builder",
-      difficulty: "Easy",
-      steps: [
-        "Edit your Carrd site",
-        "Add an Embed element",
-        "Paste the script code",
-        "Publish your site",
-      ],
-    },
-    {
-      name: "Shopify",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "E-commerce",
-      difficulty: "Medium",
-      steps: [
-        "Access your Shopify admin",
-        "Go to Online Store > Themes",
-        "Edit code and find theme.liquid",
-        "Add script before closing </head> tag",
-      ],
-    },
-    {
-      name: "React",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "Framework",
-      difficulty: "Advanced",
-      steps: [
-        "Install the widget package via npm",
-        "Import the component in your React app",
-        "Add the component to your JSX",
-        "Configure props and styling",
-      ],
-    },
-    {
-      name: "Next.js",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "Framework",
-      difficulty: "Advanced",
-      steps: [
-        "Add the script to your _document.js file",
-        "Or use the Script component in your layout",
-        "Configure loading strategy",
-        "Deploy to see changes",
-      ],
-    },
-    {
-      name: "Vue.js",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "Framework",
-      difficulty: "Advanced",
-      steps: [
-        "Add script to your index.html",
-        "Or create a Vue component wrapper",
-        "Mount the widget in your app",
-        "Handle lifecycle events",
-      ],
-    },
-    {
-      name: "Angular",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "Framework",
-      difficulty: "Advanced",
-      steps: [
-        "Add script to index.html",
-        "Create an Angular service wrapper",
-        "Inject into your components",
-        "Handle Angular lifecycle",
-      ],
-    },
-    {
-      name: "Drupal",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "CMS",
-      difficulty: "Medium",
-      steps: [
-        "Log into Drupal admin",
-        "Go to Structure > Blocks",
-        "Create a custom HTML block",
-        "Add script and place in region",
-      ],
-    },
-    {
-      name: "Joomla",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "CMS",
-      difficulty: "Medium",
-      steps: [
-        "Access Joomla administrator",
-        "Go to Extensions > Templates",
-        "Edit your active template",
-        "Add script to index.php",
-      ],
-    },
-    {
-      name: "Ghost",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "CMS",
-      difficulty: "Easy",
-      steps: [
-        "Go to Ghost admin panel",
-        "Navigate to Settings > Code injection",
-        "Add script to Site Header",
-        "Save to activate across all pages",
-      ],
-    },
-    {
-      name: "Webflow CMS",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "CMS",
-      difficulty: "Easy",
-      steps: [
-        "Open Webflow Designer",
-        "Go to CMS Collections",
-        "Add embed field to collection",
-        "Insert script in collection template",
-      ],
-    },
-    {
-      name: "Elementor",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "Page Builder",
-      difficulty: "Easy",
-      steps: [
-        "Edit page with Elementor",
-        "Add HTML widget to page",
-        "Paste the embed script",
-        "Update page to publish changes",
-      ],
-    },
-    {
-      name: "Divi",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "Page Builder",
-      difficulty: "Easy",
-      steps: [
-        "Open Divi Builder",
-        "Add Code module to your page",
-        "Paste script in the code area",
-        "Save and view your page",
-      ],
-    },
-    {
-      name: "HubSpot",
-      logo: "/placeholder.svg?height=40&width=40",
-      category: "CRM",
-      difficulty: "Medium",
-      steps: [
-        "Go to HubSpot Settings",
-        "Navigate to Website > Pages",
-        "Edit your page template",
-        "Add script to header HTML",
-      ],
-    },
-  ];
+  const copyToClipboard = async (text: string, type: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(type);
+    setTimeout(() => setCopied(null), 2000);
+  };
 
-  const steps = [
-    {
-      title: "Copy the Script",
-      description: "Copy the embed script from the code box above",
-      icon: Copy,
-    },
-    {
-      title: "Choose Platform",
-      description: "Select your preferred platform from our integrations",
-      icon: Globe,
-    },
-    {
-      title: "Add to Site",
-      description: "Paste the script into your website's HTML",
-      icon: Code,
-    },
-    {
-      title: "Go Live",
-      description: "Your chatbot is now live and ready to engage users",
-      icon: Zap,
-    },
+  const handleCreateEmbed = async () => {
+    // Generate a unique embed code
+    const newEmbedCode = `embed-${Date.now()}-${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
+    setEmbedCode(newEmbedCode);
+  };
+
+  const platformIntegrations = [
+    { name: "WordPress", description: "Add to header.php or use plugin" },
+    { name: "Shopify", description: "Edit theme.liquid file" },
+    { name: "Wix", description: "Use HTML embed element" },
+    { name: "Squarespace", description: "Code injection in header" },
+    { name: "GoDaddy", description: "Website builder custom code" },
+    { name: "Google Sites", description: "Embed HTML element" },
+    { name: "Joomla", description: "Template customization" },
+    { name: "Drupal", description: "Block configuration" },
+    { name: "BigCommerce", description: "Theme editor" },
+    { name: "Weebly", description: "Custom HTML element" },
+    { name: "Unbounce", description: "Page builder code" },
+    { name: "Framer", description: "Code component" },
+    { name: "Duda", description: "Widget integration" },
+    { name: "Ghost", description: "Code injection" },
+    { name: "Blogger", description: "Template HTML" },
+    { name: "Tumblr", description: "Custom theme" },
+    { name: "Yola", description: "HTML widget" },
+    { name: "Cargo", description: "Custom code" },
+    { name: "Piwigo", description: "Template modification" },
+    { name: "LiveJournal", description: "Custom CSS" },
+    { name: "Jigsy", description: "HTML editor" },
+    { name: "IM Creator", description: "Custom widget" },
   ];
 
   if (!isLoaded) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
   if (!isSignedIn) {
-    return <div>Please sign in to access the export page.</div>;
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-center text-white">
+          <h1 className="text-2xl font-bold mb-4">
+            Please sign in to access Export
+          </h1>
+          <p className="text-gray-400">
+            You need to be authenticated to export your chatbot.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header Section */}
-      <section className="pt-20 pb-16 px-4">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          <h1 className="text-5xl font-bold text-gray-900 tracking-tight">Export & Integrate</h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Seamlessly embed, preview, and integrate across your favorite platforms.
+    <div className="min-h-screen bg-gray-900 text-white flex">
+      {/* Left Sidebar */}
+      <div className="w-64 bg-gray-800 border-r border-gray-700 p-6">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-green-400">LuxLLM</h1>
+        </div>
+
+        <nav className="space-y-6">
+          <div>
+            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+              BUILD
+            </h3>
+            <ul className="space-y-2">
+              <li className="text-gray-300 hover:text-white cursor-pointer">
+                Templates
+              </li>
+              <li className="text-gray-300 hover:text-white cursor-pointer">
+                Premium
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+              MANAGE
+            </h3>
+            <ul className="space-y-2">
+              <li className="text-gray-300 hover:text-white cursor-pointer">
+                My Agents
+              </li>
+              <li className="text-gray-300 hover:text-white cursor-pointer">
+                Customize
+              </li>
+              <li className="text-green-400 flex items-center gap-2">
+                <Code className="w-4 h-4" />
+                Export
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+              HELP
+            </h3>
+            <ul className="space-y-2">
+              <li className="text-gray-300 hover:text-white cursor-pointer">
+                How it Works
+              </li>
+              <li className="text-gray-300 hover:text-white cursor-pointer">
+                Quick Start
+              </li>
+              <li className="text-gray-300 hover:text-white cursor-pointer">
+                Pricing
+              </li>
+              <li className="text-gray-300 hover:text-white cursor-pointer">
+                Blog
+              </li>
+              <li className="text-gray-300 hover:text-white cursor-pointer">
+                Team
+              </li>
+              <li className="text-gray-300 hover:text-white cursor-pointer">
+                Support
+              </li>
+              <li className="text-gray-300 hover:text-white cursor-pointer">
+                About
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 p-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <Code className="w-8 h-8 text-green-400" />
+            <h1 className="text-3xl font-bold text-green-400">
+              Export Chatbot
+            </h1>
+          </div>
+          <p className="text-gray-400 text-lg">
+            Seamlessly integrate your AI chatbot into any website with our
+            elegant embed solutions.
           </p>
         </div>
-      </section>
 
-      {/* Embedded Script Box */}
-      <section className="py-16 px-4">
-        <div className="max-w-4xl mx-auto">
-          <Card className="border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-gray-900">
-                <Code className="w-5 h-5 text-blue-600" />
-                Embed Script
-              </CardTitle>
-              <CardDescription>Copy this script and add it to your website to get started</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="relative">
-                <pre className="bg-gray-50 p-4 rounded-lg border text-sm font-mono overflow-x-auto">
-                  <code className="text-gray-900">{embedScript}</code>
-                </pre>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left Column */}
+          <div className="space-y-8">
+            {/* Chatbot Preview */}
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <Globe className="w-6 h-6 text-green-400" />
+                  <CardTitle>Chatbot Preview</CardTitle>
+                </div>
+                <CardDescription className="text-gray-400">
+                  Your customized '{embedName}' chatbot will appear seamlessly
+                  on any website where you embed the code below.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {chatbotConfig ? (
+                  <div className="w-full h-64 bg-gray-700 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
+                    <div className="text-center text-gray-400">
+                      <div className="w-16 h-16 bg-gray-600 rounded-full mx-auto mb-3 flex items-center justify-center">
+                        {chatbotConfig.avatar ? (
+                          <img
+                            src={chatbotConfig.avatar}
+                            alt="Avatar"
+                            className="w-12 h-12 rounded-full"
+                          />
+                        ) : (
+                          <Globe className="w-8 h-8 text-green-400" />
+                        )}
+                      </div>
+                      <p className="font-medium text-white mb-1">
+                        {chatbotConfig.name}
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        {chatbotConfig.welcomeMessage}
+                      </p>
+                      <div className="mt-3 text-xs text-gray-500">
+                        <p>Chat BG: {chatbotConfig.chatBgColor}</p>
+                        <p>User Msg: {chatbotConfig.userMsgColor}</p>
+                        <p>Bot Msg: {chatbotConfig.botMsgColor}</p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full h-64 bg-gray-700 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
+                    <div className="text-center text-gray-400">
+                      <Globe className="w-12 h-12 mx-auto mb-2" />
+                      <p>No chatbot configuration found</p>
+                      <p className="text-sm">
+                        Go to /editor to customize your chatbot first
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Create Embed */}
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <Plus className="w-6 h-6 text-green-400" />
+                  <CardTitle>Create Embed</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Embed Name
+                  </label>
+                  <Input
+                    value={embedName}
+                    onChange={e => setEmbedName(e.target.value)}
+                    className="bg-gray-700 border-gray-600 text-white"
+                    placeholder="Enter embed name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Description (Optional)
+                  </label>
+                  <Textarea
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
+                    className="bg-gray-700 border-gray-600 text-white"
+                    placeholder="Enter description"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Max Requests per Hour
+                    </label>
+                    <Input
+                      value={maxRequestsPerHour}
+                      onChange={e => setMaxRequestsPerHour(e.target.value)}
+                      className="bg-gray-700 border-gray-600 text-white"
+                      type="number"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Max Requests per Day
+                    </label>
+                    <Input
+                      value={maxRequestsPerDay}
+                      onChange={e => setMaxRequestsPerDay(e.target.value)}
+                      className="bg-gray-700 border-gray-600 text-white"
+                      type="number"
+                    />
+                  </div>
+                </div>
                 <Button
-                  onClick={copyToClipboard}
-                  size="sm"
-                  className="absolute top-2 right-2 bg-blue-600 hover:bg-blue-700"
+                  onClick={handleCreateEmbed}
+                  className="w-full bg-green-500 hover:bg-green-600 text-white"
+                  disabled={!chatbotConfig}
                 >
-                  {copied ? (
-                    <Check className="w-4 h-4" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
-                  {copied ? "Copied!" : "Copy"}
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Embed
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+                {!chatbotConfig && (
+                  <p className="text-sm text-yellow-400 text-center">
+                    ⚠️ Please customize your chatbot in the /editor page first
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
 
-      {/* Implementation Guide */}
-      <section className="py-16 px-4 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Implementation Guide
+          {/* Right Column */}
+          <div className="space-y-8">
+            {/* Script Embed */}
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <Code className="w-6 h-6 text-green-400" />
+                  <CardTitle>Script Embed</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="relative">
+                  <textarea
+                    value={generateEmbedScript()}
+                    readOnly
+                    className="w-full h-32 bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm font-mono text-white resize-none"
+                    placeholder="Create an embed first to generate the script..."
+                  />
+                  <Button
+                    onClick={() =>
+                      copyToClipboard(generateEmbedScript(), "script")
+                    }
+                    className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white"
+                    size="sm"
+                    disabled={!embedCode}
+                  >
+                    {copied === "script" ? (
+                      "Copied!"
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Iframe Embed */}
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <Globe className="w-6 h-6 text-green-400" />
+                  <CardTitle>Iframe Embed</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="relative">
+                  <textarea
+                    value={generateIframeEmbed()}
+                    readOnly
+                    className="w-full h-20 bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm font-mono text-white resize-none"
+                    placeholder="Create an embed first to generate the iframe..."
+                  />
+                  <Button
+                    onClick={() =>
+                      copyToClipboard(generateIframeEmbed(), "iframe")
+                    }
+                    className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white"
+                    size="sm"
+                    disabled={!embedCode}
+                  >
+                    {copied === "iframe" ? (
+                      "Copied!"
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Test Your Embed */}
+            {embedCode && (
+              <Card className="bg-gray-800 border-gray-700">
+                <CardHeader>
+                  <CardTitle>Test Your Embed</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="bg-gray-700 border border-gray-600 rounded-lg p-3">
+                    <p className="text-sm text-gray-300">
+                      Your embed code: {embedCode}
+                    </p>
+                  </div>
+                  <div className="flex gap-3">
+                    <Button className="bg-green-500 hover:bg-green-600 text-white">
+                      <Eye className="w-4 h-4 mr-2" />
+                      Preview Embed
+                    </Button>
+                    <Button className="bg-green-500 hover:bg-green-600 text-white">
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copy Embed Code
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* API Configuration */}
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <CardTitle>API Configuration</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-gray-700 border border-green-500 rounded-lg p-4">
+                  <p className="text-sm text-gray-300">
+                    <strong className="text-green-400">Important:</strong> The
+                    embed code calls an API endpoint (
+                    <code className="text-green-400">
+                      https://lux-llm-prod.vercel.app/api/public-chat
+                    </code>
+                    ) for handling chat requests, tracking usage, and storing
+                    conversations.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Platform Integrations */}
+        <div className="mt-12">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-white mb-2">
+              Platform Integrations
             </h2>
-            <p className="text-gray-600 text-lg">
-              Follow these simple steps to get your chatbot live
+            <p className="text-gray-400">
+              Step-by-step instructions for embedding your chatbot on popular
+              platforms
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {steps.map((step, index) => (
+
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {platformIntegrations.map((platform, index) => (
               <Card
                 key={index}
-                className="text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className="bg-gray-800 border-gray-700 hover:border-green-500 transition-colors cursor-pointer"
               >
-                <CardContent className="pt-6">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <step.icon className="w-6 h-6 text-blue-600" />
+                <CardContent className="p-4 text-center">
+                  <div className="w-12 h-12 bg-gray-700 rounded-lg mx-auto mb-3 flex items-center justify-center">
+                    <Globe className="w-6 h-6 text-green-400" />
                   </div>
-                  <Badge variant="secondary" className="mb-3">
-                    Step {index + 1}
-                  </Badge>
-                  <h3 className="font-semibold text-gray-900 mb-2">
-                    {step.title}
+                  <h3 className="font-medium text-white text-sm mb-1">
+                    {platform.name}
                   </h3>
-                  <p className="text-sm text-gray-600">
-                    {step.description}
+                  <p className="text-xs text-gray-400">
+                    {platform.description}
                   </p>
                 </CardContent>
               </Card>
             ))}
           </div>
         </div>
-      </section>
-
-      {/* Chatbot Preview */}
-      <section className="py-16 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Live Preview
-            </h2>
-            <p className="text-gray-600 text-lg">
-              See how your chatbot will look on your website
-            </p>
-          </div>
-          <Card className="max-w-md mx-auto shadow-2xl border-gray-200 hover:shadow-3xl transition-all duration-500">
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                    <MessageCircle className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="bg-gray-100 rounded-lg p-3 text-sm">
-                      {config.welcome_message}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 justify-end">
-                  <div className="flex-1 text-right">
-                    <div className="bg-blue-600 text-white rounded-lg p-3 text-sm inline-block">
-                      I'd like to learn more about your services
-                    </div>
-                  </div>
-                  <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                    <span className="text-xs">👤</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                    <MessageCircle className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="bg-gray-100 rounded-lg p-3 text-sm">
-                      I'd be happy to help! What specific area interests you
-                      most?
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Integrations Guide */}
-      <section className="py-16 px-4 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Platform Integrations
-            </h2>
-            <p className="text-gray-600 text-lg">
-              Choose your platform and get step-by-step integration instructions
-            </p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {integrations.map((integration, index) => (
-              <Dialog key={integration.name}>
-                <DialogTrigger asChild>
-                  <Card
-                    className="cursor-pointer hover:shadow-lg hover:scale-105 transition-all duration-300 border-gray-200"
-                    style={{ animationDelay: `${index * 30}ms` }}
-                  >
-                    <CardContent className="p-4 text-center space-y-3">
-                      <div className="w-12 h-12 mx-auto mb-2 rounded-lg bg-white border border-gray-200 flex items-center justify-center">
-                        <img
-                          src={integration.logo || "/placeholder.svg"}
-                          alt={`${integration.name} logo`}
-                          className="w-8 h-8 object-contain"
-                        />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 text-sm">
-                          {integration.name}
-                        </h3>
-                        <Badge variant="secondary" className="text-xs mt-1">
-                          {integration.category}
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-gray-500">
-                        Click for integration guide
-                      </p>
-                    </CardContent>
-                  </Card>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-white border border-gray-200 flex items-center justify-center">
-                        <img
-                          src={integration.logo || "/placeholder.svg"}
-                          alt={`${integration.name} logo`}
-                          className="w-6 h-6 object-contain"
-                        />
-                      </div>
-                      <div>
-                        <DialogTitle className="text-lg font-semibold">
-                          {integration.name} Integration
-                        </DialogTitle>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className="text-xs">
-                            {integration.category}
-                          </Badge>
-                          <Badge
-                            variant={
-                              integration.difficulty === "Easy"
-                                ? "default"
-                                : integration.difficulty === "Medium"
-                                ? "secondary"
-                                : "destructive"
-                            }
-                            className="text-xs"
-                          >
-                            {integration.difficulty}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                    <DialogDescription className="text-sm text-gray-600">
-                      Step-by-step guide to integrate your chatbot with{" "}
-                      {integration.name}
-                    </DialogDescription>
-                  </DialogHeader>
-
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-1">
-                      <h4 className="text-sm font-medium flex items-center gap-2">
-                        <Code className="w-4 h-4" />
-                        Instructions
-                      </h4>
-                    </div>
-                    <div className="space-y-3">
-                      {integration.steps.map((step, stepIndex) => (
-                        <div key={stepIndex} className="flex items-start gap-3">
-                          <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
-                            {stepIndex + 1}
-                          </div>
-                          <p className="text-sm text-gray-900 leading-relaxed">
-                            {step}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 pt-4 border-t">
-                    <Button
-                      variant="outline"
-                      className="flex-1 bg-transparent"
-                      size="sm"
-                    >
-                      <Globe className="w-4 h-4 mr-2" />
-                      Visit {integration.name}
-                    </Button>
-                    <Button
-                      className="flex-1 bg-blue-600 hover:bg-blue-700"
-                      size="sm"
-                    >
-                      Start Integration
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Call-to-Action */}
-      <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
-          <h2 className="text-4xl font-bold text-gray-900">
-            Ready to Export?
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Start engaging with your users today. It takes less than 5 minutes
-            to get up and running.
-          </p>
-          <Button
-            size="lg"
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-          >
-            <Zap className="w-5 h-5 mr-2" />
-            Get Started Now
-          </Button>
-        </div>
-      </section>
+      </div>
     </div>
   );
 }
