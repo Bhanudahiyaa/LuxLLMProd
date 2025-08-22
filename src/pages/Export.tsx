@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@clerk/clerk-react";
 import { useChatbotSettingsService } from "@/hooks/chatbotSettingsService";
+import { getThemeById, themePresets } from "@/lib/themes";
 
 interface ChatbotConfig {
   name: string;
@@ -35,6 +36,10 @@ interface ChatbotConfig {
   botMsgColor: string;
   welcomeMessage: string;
   placeholder: string;
+  theme?: string;
+  borderRadius?: number;
+  fontSize?: number;
+  fontFamily?: string;
 }
 
 export default function ExportPage() {
@@ -233,8 +238,10 @@ export default function ExportPage() {
     welcomeMessage: '${chatbotConfig.welcomeMessage.replace(/'/g, "\\'")}',
     placeholder: '${chatbotConfig.placeholder.replace(/'/g, "\\'")}',
     apiUrl: 'https://lux-llm-prod.vercel.app/api/public-chat',
-    borderRadius: '12px',
-    fontFamily: 'Inter, sans-serif'
+    borderRadius: '${chatbotConfig.borderRadius || 12}px',
+    fontSize: '${chatbotConfig.fontSize || 14}px',
+    fontFamily: '${chatbotConfig.fontFamily || "Inter"}, sans-serif',
+    theme: '${chatbotConfig.theme || "modern"}'
   };
 
   console.log("Loading chatbot with EXACT config:", config);
@@ -275,11 +282,13 @@ export default function ExportPage() {
         height: 500px;
         background: \${config.chatBg};
         border: 2px solid \${config.borderColor};
-        border-radius: \${config.borderRadius};
-        display: none;
-        flex-direction: column;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-      ">
+              border-radius: \${config.borderRadius};
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      font-size: \${config.fontSize};
+      font-family: \${config.fontFamily};
+    ">
         <!-- Header -->
         <div style="
           padding: 16px;
@@ -520,6 +529,22 @@ export default function ExportPage() {
       if (dbSettings && !error) {
         console.log("Refreshed configuration from database:", dbSettings);
 
+        // Determine theme based on colors (fallback to modern if no match)
+        let themeId = "modern";
+        let theme = getThemeById(themeId);
+
+        // Try to match colors to a theme
+        for (const preset of themePresets) {
+          if (
+            preset.config.primaryColor === dbSettings.user_msg_color &&
+            preset.config.backgroundColor === dbSettings.chat_bg
+          ) {
+            themeId = preset.id;
+            theme = preset;
+            break;
+          }
+        }
+
         const config: ChatbotConfig = {
           name: dbSettings.name || "Portfolio Bot",
           description: "AI chatbot for my website",
@@ -532,6 +557,10 @@ export default function ExportPage() {
           botMsgColor: dbSettings.bot_msg_color || "#1f2937",
           welcomeMessage: "Hello! How can I help you today?",
           placeholder: "Type your message...",
+          theme: themeId,
+          borderRadius: theme ? theme.config.borderRadius : 12,
+          fontSize: theme ? theme.config.fontSize : 14,
+          fontFamily: theme ? theme.config.fontFamily : "Inter",
         };
 
         setChatbotConfig(config);
@@ -561,20 +590,20 @@ export default function ExportPage() {
 
     try {
       // Call the public chat API
-             const response = await fetch(
-         "https://lux-llm-prod.vercel.app/api/public-chat",
-         {
-           method: "POST",
-           headers: {
-             "Content-Type": "application/json",
-           },
-           body: JSON.stringify({
-             message: inputMessage,
-             embedCode: "export-test-chatbot",
-             sessionId: "export-test-session",
-           }),
-         }
-       );
+      const response = await fetch(
+        "https://lux-llm-prod.vercel.app/api/public-chat",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: inputMessage,
+            embedCode: "export-test-chatbot",
+            sessionId: "export-test-session",
+          }),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -1102,8 +1131,11 @@ export default function ExportPage() {
                     style={{
                       backgroundColor: chatbotConfig.chatBgColor,
                       borderColor: chatbotConfig.chatBorderColor,
-                      borderRadius: "12px",
-                      fontFamily: "Inter, sans-serif",
+                      borderRadius: `${chatbotConfig.borderRadius || 12}px`,
+                      fontFamily: `${
+                        chatbotConfig.fontFamily || "Inter"
+                      }, sans-serif`,
+                      fontSize: `${chatbotConfig.fontSize || 14}px`,
                     }}
                   >
                     {/* Header */}
