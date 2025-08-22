@@ -114,7 +114,7 @@ export default function ChatbotEditor() {
   const { getChatbotSettings, saveChatbotSettings } =
     useChatbotSettingsService();
   const { getAgentsByUser, updateAgent, createAgent } = useAgentService();
-  const { getToken } = useAuth();
+  const { getToken, userId } = useAuth();
 
   // Form setup with default values
   const {
@@ -681,6 +681,25 @@ export default function ChatbotEditor() {
     // Save to localStorage for export page
     localStorage.setItem("exportChatbotConfig", JSON.stringify(completeConfig));
     console.log("Saved export configuration:", completeConfig);
+
+    // Also save to database in real-time for persistence
+    if (userId && !loading) {
+      saveChatbotSettings({
+        name: completeConfig.name,
+        avatar_url: completeConfig.avatar_url,
+        chat_bg: completeConfig.chat_bg,
+        border_color: completeConfig.border_color,
+        user_msg_color: completeConfig.user_msg_color,
+        bot_msg_color: completeConfig.bot_msg_color,
+        system_prompt: completeConfig.system_prompt,
+      }).then(({ error }) => {
+        if (error) {
+          console.warn("Failed to save UI settings to database:", error);
+        } else {
+          console.log("UI settings saved to database successfully");
+        }
+      });
+    }
   }, [
     watch("name"),
     watch("avatar_url"),
@@ -693,6 +712,9 @@ export default function ChatbotEditor() {
     placeholderState,
     agent?.description,
     agent?.created_at,
+    userId,
+    loading,
+    saveChatbotSettings,
   ]);
 
   // Send message function

@@ -22,6 +22,7 @@ import {
   Download,
 } from "lucide-react";
 import { useAuth } from "@clerk/clerk-react";
+import { useChatbotSettingsService } from "@/hooks/chatbotSettingsService";
 
 interface ChatbotConfig {
   name: string;
@@ -38,6 +39,7 @@ interface ChatbotConfig {
 
 export default function ExportPage() {
   const { isSignedIn, isLoaded } = useAuth();
+  const { getChatbotSettings } = useChatbotSettingsService();
   const [copied, setCopied] = useState<string | null>(null);
   const [embedName, setEmbedName] = useState("Portfolio Bot");
   const [description, setDescription] = useState(
@@ -51,94 +53,131 @@ export default function ExportPage() {
   const [embedCode, setEmbedCode] = useState("");
 
   useEffect(() => {
-    // Load chatbot customizations from localStorage
-    const customizations = localStorage.getItem("chatbotCustomizations");
-    const selectedAgent = localStorage.getItem("selectedAgent");
-    const exportConfig = localStorage.getItem("exportChatbotConfig");
-
-    let config: ChatbotConfig | null = null;
-
-    // Priority: exportChatbotConfig (from editor) > selectedAgent > customizations
-    if (exportConfig) {
+    // Load chatbot customizations from database first, then localStorage
+    const loadChatbotConfig = async () => {
       try {
-        const exportData = JSON.parse(exportConfig);
-        console.log("Loaded export configuration:", exportData);
+        // First try to load from database (most up-to-date)
+        const { data: dbSettings, error } = await getChatbotSettings();
         
-        config = {
-          name: exportData.name || "Portfolio Bot",
-          description: exportData.description || "AI chatbot for my website",
-          systemPrompt: exportData.system_prompt || "You are a helpful AI assistant.",
-          avatar: exportData.avatar_url || "",
-          chatBgColor: exportData.chat_bg || "#ffffff",
-          chatBorderColor: exportData.border_color || "#e5e7eb",
-          userMsgColor: exportData.user_msg_color || "#3b82f6",
-          botMsgColor: exportData.bot_msg_color || "#1f2937",
-          welcomeMessage: exportData.welcome_message || "Hello! How can I help you today?",
-          placeholder: exportData.placeholder || "Type your message...",
-        };
-        
-        setEmbedName(exportData.name || "Portfolio Bot");
-        setDescription(exportData.description || "AI chatbot for my website");
-        
-        console.log("Using export configuration:", config);
-      } catch (e) {
-        console.log("Error parsing export config:", e);
+        if (dbSettings && !error) {
+          console.log("Loaded configuration from database:", dbSettings);
+          
+          const config: ChatbotConfig = {
+            name: dbSettings.name || "Portfolio Bot",
+            description: "AI chatbot for my website",
+            systemPrompt: dbSettings.system_prompt || "You are a helpful AI assistant.",
+            avatar: dbSettings.avatar_url || "",
+            chatBgColor: dbSettings.chat_bg || "#ffffff",
+            chatBorderColor: dbSettings.border_color || "#e5e7eb",
+            userMsgColor: dbSettings.user_msg_color || "#3b82f6",
+            botMsgColor: dbSettings.bot_msg_color || "#1f2937",
+            welcomeMessage: "Hello! How can I help you today?",
+            placeholder: "Type your message...",
+          };
+          
+          setChatbotConfig(config);
+          setEmbedName(dbSettings.name || "Portfolio Bot");
+          setDescription("AI chatbot for my website");
+          console.log("Using database configuration:", config);
+          return;
+        }
+      } catch (dbError) {
+        console.log("Database load failed, trying localStorage:", dbError);
       }
-    }
 
-    if (!config && selectedAgent) {
-      try {
-        const agent = JSON.parse(selectedAgent);
-        config = {
-          name: agent.name || "Portfolio Bot",
-          description:
-            agent.description || "Customer support chatbot for my website",
-          systemPrompt:
-            agent.system_prompt || "You are a helpful AI assistant.",
-          avatar: agent.avatar_url || "",
-          chatBgColor: agent.chat_bg || "#ffffff",
-          chatBorderColor: agent.border_color || "#e5e7eb",
-          userMsgColor: agent.user_msg_color || "#3b82f6",
-          botMsgColor: agent.bot_msg_color || "#1f2937",
-          welcomeMessage:
-            agent.welcome_message || "Hello! How can I help you today?",
-          placeholder: agent.placeholder || "Type your message...",
-        };
-        setEmbedName(agent.name || "Portfolio Bot");
-        setDescription(
-          agent.description || "Customer support chatbot for my website"
-        );
-      } catch (e) {
-        console.log("Error parsing selected agent:", e);
+      // Fallback to localStorage
+      const customizations = localStorage.getItem("chatbotCustomizations");
+      const selectedAgent = localStorage.getItem("selectedAgent");
+      const exportConfig = localStorage.getItem("exportChatbotConfig");
+
+      let config: ChatbotConfig | null = null;
+
+      // Priority: exportChatbotConfig (from editor) > selectedAgent > customizations
+      if (exportConfig) {
+        try {
+          const exportData = JSON.parse(exportConfig);
+          console.log("Loaded export configuration from localStorage:", exportData);
+          
+          config = {
+            name: exportData.name || "Portfolio Bot",
+            description: exportData.description || "AI chatbot for my website",
+            systemPrompt:
+              exportData.system_prompt || "You are a helpful AI assistant.",
+            avatar: exportData.avatar_url || "",
+            chatBgColor: exportData.chat_bg || "#ffffff",
+            chatBorderColor: exportData.border_color || "#e5e7eb",
+            userMsgColor: exportData.user_msg_color || "#3b82f6",
+            botMsgColor: exportData.bot_msg_color || "#1f2937",
+            welcomeMessage:
+              exportData.welcome_message || "Hello! How can I help you today?",
+            placeholder: exportData.placeholder || "Type your message...",
+          };
+          
+          setEmbedName(exportData.name || "Portfolio Bot");
+          setDescription(exportData.description || "AI chatbot for my website");
+          
+          console.log("Using export configuration from localStorage:", config);
+        } catch (e) {
+          console.log("Error parsing export config:", e);
+        }
       }
-    }
 
-    if (!config && customizations) {
-      try {
-        const colors = JSON.parse(customizations);
-        config = {
-          name: "Portfolio Bot",
-          description: "Customer support chatbot for my website",
-          systemPrompt: "You are a helpful AI assistant.",
-          avatar: "",
-          chatBgColor: colors.chat_bg || "#ffffff",
-          chatBorderColor: colors.border_color || "#e5e7eb",
-          userMsgColor: colors.user_msg_color || "#3b82f6",
-          botMsgColor: colors.bot_msg_color || "#1f2937",
-          welcomeMessage: "Hello! How can I help you today?",
-          placeholder: "Type your message...",
-        };
-      } catch (e) {
-        console.log("Error parsing customizations:", e);
+      if (!config && selectedAgent) {
+        try {
+          const agent = JSON.parse(selectedAgent);
+          config = {
+            name: agent.name || "Portfolio Bot",
+            description:
+              agent.description || "Customer support chatbot for my website",
+            systemPrompt:
+              agent.system_prompt || "You are a helpful AI assistant.",
+            avatar: agent.avatar_url || "",
+            chatBgColor: agent.chat_bg || "#ffffff",
+            chatBorderColor: agent.border_color || "#e5e7eb",
+            userMsgColor: agent.user_msg_color || "#3b82f6",
+            botMsgColor: agent.bot_msg_color || "#1f2937",
+            welcomeMessage:
+              agent.welcome_message || "Hello! How can I help you today?",
+            placeholder: agent.placeholder || "Type your message...",
+          };
+          setEmbedName(agent.name || "Portfolio Bot");
+          setDescription(
+            agent.description || "Customer support chatbot for my website"
+          );
+        } catch (e) {
+          console.log("Error parsing selected agent:", e);
+        }
       }
-    }
 
-    if (config) {
-      setChatbotConfig(config);
-      console.log("Final chatbot config loaded:", config);
-    } else {
-      console.log("No chatbot configuration found");
-    }
+      if (!config && customizations) {
+        try {
+          const colors = JSON.parse(customizations);
+          config = {
+            name: "Portfolio Bot",
+            description: "Customer support chatbot for my website",
+            systemPrompt: "You are a helpful AI assistant.",
+            avatar: "",
+            chatBgColor: colors.chat_bg || "#ffffff",
+            chatBorderColor: colors.border_color || "#e5e7eb",
+            userMsgColor: colors.user_msg_color || "#3b82f6",
+            botMsgColor: colors.bot_msg_color || "#1f2937",
+            welcomeMessage: "Hello! How can I help you today?",
+            placeholder: "Type your message...",
+          };
+        } catch (e) {
+          console.log("Error parsing customizations:", e);
+        }
+      }
+
+      if (config) {
+        setChatbotConfig(config);
+        console.log("Final chatbot config loaded:", config);
+      } else {
+        console.log("No chatbot configuration found");
+      }
+    };
+
+    loadChatbotConfig();
   }, []);
 
   const generateEmbedScript = () => {
@@ -400,7 +439,9 @@ export default function ExportPage() {
     if (!chatbotConfig) return "";
 
     return `<iframe 
-      src="https://lux-llm-prod.vercel.app/api/embed-preview/${embedCode || 'default'}"
+      src="https://lux-llm-prod.vercel.app/api/embed-preview/${
+        embedCode || "default"
+      }"
       width="400" 
       height="600" 
       frameborder="0" 
@@ -435,11 +476,41 @@ export default function ExportPage() {
       name: embedName,
       description: description,
       maxRequestsPerHour: parseInt(maxRequestsPerHour),
-      maxRequestsPerDay: parseInt(maxRequestsPerDay)
+      maxRequestsPerDay: parseInt(maxRequestsPerDay),
     };
 
     localStorage.setItem(`embed-${newEmbedCode}`, JSON.stringify(embedConfig));
     console.log("Created embed with configuration:", embedConfig);
+  };
+
+  // Function to refresh configuration from database
+  const refreshConfig = async () => {
+    try {
+      const { data: dbSettings, error } = await getChatbotSettings();
+      if (dbSettings && !error) {
+        console.log("Refreshed configuration from database:", dbSettings);
+        
+        const config: ChatbotConfig = {
+          name: dbSettings.name || "Portfolio Bot",
+          description: "AI chatbot for my website",
+          systemPrompt: dbSettings.system_prompt || "You are a helpful AI assistant.",
+          avatar: dbSettings.avatar_url || "",
+          chatBgColor: dbSettings.chat_bg || "#ffffff",
+          chatBorderColor: dbSettings.border_color || "#e5e7eb",
+          userMsgColor: dbSettings.user_msg_color || "#3b82f6",
+          botMsgColor: dbSettings.bot_msg_color || "#1f2937",
+          welcomeMessage: "Hello! How can I help you today?",
+          placeholder: "Type your message...",
+        };
+        
+        setChatbotConfig(config);
+        setEmbedName(dbSettings.name || "Portfolio Bot");
+        setDescription("AI chatbot for my website");
+        console.log("Configuration refreshed successfully");
+      }
+    } catch (error) {
+      console.error("Failed to refresh configuration:", error);
+    }
   };
 
   const platformIntegrations = [
@@ -584,9 +655,18 @@ export default function ExportPage() {
             {/* Chatbot Preview */}
             <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
-                <div className="flex items-center gap-3">
-                  <Globe className="w-6 h-6 text-green-400" />
-                  <CardTitle>Chatbot Preview</CardTitle>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Globe className="w-6 h-6 text-green-400" />
+                    <CardTitle>Chatbot Preview</CardTitle>
+                  </div>
+                  <Button 
+                    onClick={refreshConfig}
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    🔄 Refresh
+                  </Button>
                 </div>
                 <CardDescription className="text-gray-400">
                   Your customized '{embedName}' chatbot will appear seamlessly
