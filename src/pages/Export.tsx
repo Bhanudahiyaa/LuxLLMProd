@@ -62,8 +62,6 @@ export default function ExportPage() {
   const [embedCode, setEmbedCode] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
-  // Chat functionality for the test chatbot
-
   useEffect(() => {
     // Load chatbot customizations from database first, then localStorage
     const loadChatbotConfig = async () => {
@@ -86,6 +84,10 @@ export default function ExportPage() {
             botMsgColor: dbSettings.bot_msg_color || "#1f2937",
             welcomeMessage: "Hello! How can I help you today?",
             placeholder: "Type your message...",
+            borderRadius: 12,
+            fontSize: 14,
+            fontFamily: "Inter",
+            theme: "modern"
           };
 
           setChatbotConfig(config);
@@ -127,6 +129,10 @@ export default function ExportPage() {
             welcomeMessage:
               exportData.welcome_message || "Hello! How can I help you today?",
             placeholder: exportData.placeholder || "Type your message...",
+            borderRadius: exportData.border_radius || 12,
+            fontSize: exportData.font_size || 14,
+            fontFamily: exportData.font_family || "Inter",
+            theme: exportData.theme || "modern"
           };
 
           setEmbedName(exportData.name || "Portfolio Bot");
@@ -155,6 +161,10 @@ export default function ExportPage() {
             welcomeMessage:
               agent.welcome_message || "Hello! How can I help you today?",
             placeholder: agent.placeholder || "Type your message...",
+            borderRadius: agent.border_radius || 12,
+            fontSize: agent.font_size || 14,
+            fontFamily: agent.font_family || "Inter",
+            theme: agent.theme || "modern"
           };
           setEmbedName(agent.name || "Portfolio Bot");
           setDescription(
@@ -179,6 +189,10 @@ export default function ExportPage() {
             botMsgColor: colors.bot_msg_color || "#1f2937",
             welcomeMessage: "Hello! How can I help you today?",
             placeholder: "Type your message...",
+            borderRadius: 12,
+            fontSize: 14,
+            fontFamily: "Inter",
+            theme: "modern"
           };
         } catch (e) {
           console.log("Error parsing customizations:", e);
@@ -199,261 +213,24 @@ export default function ExportPage() {
   const generateEmbedScript = () => {
     if (!chatbotConfig) return "";
 
-    // Generate a complete working embed script with EXACT customizations from editor
-    const scriptId = `lux-llm-chatbot-${Date.now()}`;
+    // Generate a simple script tag that loads the embed script with configuration
+    const configParam = encodeURIComponent(JSON.stringify({
+      name: chatbotConfig.name,
+      systemPrompt: chatbotConfig.systemPrompt,
+      avatar: chatbotConfig.avatar || "",
+      chatBgColor: chatbotConfig.chatBgColor,
+      chatBorderColor: chatbotConfig.chatBorderColor,
+      userMsgColor: chatbotConfig.userMsgColor,
+      botMsgColor: chatbotConfig.botMsgColor,
+      welcomeMessage: chatbotConfig.welcomeMessage,
+      placeholder: chatbotConfig.placeholder,
+      borderRadius: chatbotConfig.borderRadius || 12,
+      fontSize: chatbotConfig.fontSize || 14,
+      fontFamily: chatbotConfig.fontFamily || "Inter",
+      theme: chatbotConfig.theme || "modern"
+    }));
 
-    return `<!-- LuxLLM Customized Chatbot Embed Script -->
-<script id="${scriptId}">
-(function() {
-  'use strict';
-  
-  // Configuration with EXACT customizations from editor
-  const config = {
-    name: '${chatbotConfig.name.replace(/'/g, "\\'")}',
-    systemPrompt: '${chatbotConfig.systemPrompt.replace(/'/g, "\\'")}',
-    avatarUrl: '${chatbotConfig.avatar || ""}',
-    chatBg: '${chatbotConfig.chatBgColor}',
-    borderColor: '${chatbotConfig.chatBorderColor}',
-    userMsgColor: '${chatbotConfig.userMsgColor}',
-    botMsgColor: '${chatbotConfig.botMsgColor}',
-    welcomeMessage: '${chatbotConfig.welcomeMessage.replace(/'/g, "\\'")}',
-    placeholder: '${chatbotConfig.placeholder.replace(/'/g, "\\'")}',
-    apiUrl: 'https://lux-llm-prod.vercel.app/api/public-chat',
-    borderRadius: '${chatbotConfig.borderRadius || 12}px',
-    fontSize: '${chatbotConfig.fontSize || 14}px',
-    fontFamily: '${chatbotConfig.fontFamily || "Inter"}, sans-serif',
-    theme: '${chatbotConfig.theme || "modern"}',
-    embedCode: '${embedCode || "default"}'
-  };
-
-  console.log("Loading chatbot with EXACT config:", config);
-
-  // Create chatbot HTML with customizations
-  const chatbotHTML = \`
-    <div id="lux-llm-chatbot" style="
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 10000;
-      font-family: \${config.fontFamily}, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    ">
-      <!-- Chat Button -->
-      <div id="chat-button" style="
-        width: 60px;
-        height: 60px;
-        background: \${config.userMsgColor};
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        transition: transform 0.2s;
-      " onclick="toggleChat()">
-        <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
-          <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
-        </svg>
-      </div>
-
-      <!-- Chat Window -->
-      <div id="chat-window" style="
-        position: absolute;
-        bottom: 80px;
-        right: 0;
-        width: 350px;
-        height: 500px;
-        background: \${config.chatBg};
-        border: 2px solid \${config.borderColor};
-              border-radius: \${config.borderRadius};
-      display: none;
-      flex-direction: column;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-      font-size: \${config.fontSize};
-      font-family: \${config.fontFamily};
-    ">
-        <!-- Header -->
-        <div style="
-          padding: 16px;
-          background: \${config.userMsgColor};
-          color: white;
-          border-radius: \${config.borderRadius} \${config.borderRadius} 0 0;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        ">
-          \${config.avatarUrl ? \`<img src="\${config.avatarUrl}" style="width: 32px; height: 32px; border-radius: 50%;">\` : '<div style="width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;"><span style="font-size: 16px;">🤖</span></div>'}
-          <div>
-            <div style="font-weight: 600; font-size: 16px;">\${config.name}</div>
-            <div style="font-size: 12px; opacity: 0.8;">\${config.name} Bot</div>
-          </div>
-        </div>
-
-        <!-- Messages -->
-        <div id="chat-messages" style="
-          flex: 1;
-          padding: 16px;
-          overflow-y: auto;
-          background: \${config.chatBg};
-        ">
-          <div style="
-            padding: 12px 16px;
-            background: \${config.borderColor};
-            border-radius: 8px;
-            color: \${config.botMsgColor};
-            font-size: 14px;
-            line-height: 1.4;
-            max-width: 80%;
-          ">\${config.welcomeMessage}</div>
-        </div>
-
-        <!-- Input -->
-        <div style="
-          padding: 16px;
-          border-top: 1px solid \${config.borderColor};
-          background: \${config.chatBg};
-          border-radius: 0 0 \${config.borderRadius} \${config.borderRadius};
-        ">
-          <div style="display: flex; gap: 8px;">
-            <input type="text" id="chat-input" placeholder="\${config.placeholder}" style="
-              flex: 1;
-              padding: 12px;
-              border: 1px solid \${config.borderColor};
-              border-radius: 6px;
-              font-size: 14px;
-              outline: none;
-              background: \${config.chatBg};
-              color: \${config.botMsgColor};
-            ">
-            <button onclick="sendMessage()" style="
-              padding: 12px 16px;
-              background: \${config.userMsgColor};
-              color: white;
-              border: none;
-              border-radius: 6px;
-              cursor: pointer;
-              font-size: 14px;
-              font-weight: 500;
-            ">Send</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  \`;
-
-  // Insert chatbot into page
-  document.body.insertAdjacentHTML('beforeend', chatbotHTML);
-
-  // Chat functionality
-  let isOpen = false;
-
-  window.toggleChat = function() {
-    const chatWindow = document.getElementById('chat-window');
-    const chatButton = document.getElementById('chat-button');
-    
-    if (isOpen) {
-      chatWindow.style.display = 'none';
-      chatButton.style.transform = 'scale(1)';
-    } else {
-      chatWindow.style.display = 'flex';
-      chatButton.style.transform = 'scale(1.1)';
-    }
-    isOpen = !isOpen;
-  };
-
-  window.sendMessage = async function() {
-    const input = document.getElementById('chat-input');
-    const message = input.value.trim();
-    if (!message) return;
-
-    // Add user message
-    addMessage(message, 'user');
-    input.value = '';
-
-    // Show typing indicator
-    addTypingIndicator();
-
-    try {
-      // Send to API
-      const response = await fetch(config.apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: message,
-          embedCode: config.embedCode,
-          sessionId: 'session-' + Date.now()
-        })
-      });
-
-      const data = await response.json();
-      
-      // Remove typing indicator
-      removeTypingIndicator();
-      
-      // Add bot response
-      if (data.response) {
-        addMessage(data.response, 'bot');
-      } else {
-        addMessage('Sorry, I encountered an error. Please try again.', 'bot');
-      }
-    } catch (error) {
-      removeTypingIndicator();
-      addMessage('Sorry, I encountered an error. Please try again.', 'bot');
-    }
-  };
-
-  function addMessage(text, sender) {
-    const messages = document.getElementById('chat-messages');
-    const messageDiv = document.createElement('div');
-    messageDiv.style.cssText = \`
-      margin: 8px 0;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 14px;
-      line-height: 1.4;
-      max-width: 80%;
-      \${sender === 'user' 
-        ? \`background: \${config.userMsgColor}; color: white; margin-left: auto;\`
-        : \`background: \${config.borderColor}; color: \${config.botMsgColor};\`
-      }
-    \`;
-    messageDiv.textContent = text;
-    messages.appendChild(messageDiv);
-    messages.scrollTop = messages.scrollHeight;
-  }
-
-  function addTypingIndicator() {
-    const messages = document.getElementById('chat-messages');
-    const typingDiv = document.createElement('div');
-    typingDiv.id = 'typing-indicator';
-    typingDiv.style.cssText = \`
-      margin: 8px 0;
-      padding: 12px 16px;
-      background: \${config.borderColor};
-      color: \${config.botMsgColor};
-      border-radius: 8px;
-      font-size: 14px;
-      font-style: italic;
-    \`;
-    typingDiv.textContent = 'Typing...';
-    messages.appendChild(typingDiv);
-    messages.scrollTop = messages.scrollHeight;
-  }
-
-  function removeTypingIndicator() {
-    const typing = document.getElementById('typing-indicator');
-    if (typing) typing.remove();
-  }
-
-  // Enter key support
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && document.activeElement.id === 'chat-input') {
-      sendMessage();
-    }
-  });
-
-  console.log('LuxLLM Customized Chatbot loaded:', config);
-})();
-</script>`;
+    return `<script src="https://lux-llm-prod.vercel.app/api/embed-script/${embedCode || "default"}?config=${configParam}" async></script>`;
   };
 
   const generateIframeEmbed = () => {
@@ -516,7 +293,6 @@ export default function ExportPage() {
         is_active: true,
       };
 
-      // Save to database
       const { data, error } = await createEmbed(embedConfig);
 
       if (error) {
@@ -525,23 +301,20 @@ export default function ExportPage() {
         return;
       }
 
-      // Set the embed code for the UI
       setEmbedCode(newEmbedCode);
       console.log("Created embed with configuration:", data);
 
       // Also save to localStorage as backup
-      localStorage.setItem(
-        `embed-${newEmbedCode}`,
-        JSON.stringify({
-          embedCode: newEmbedCode,
-          chatbotConfig: chatbotConfig,
-          createdAt: new Date().toISOString(),
-          name: embedName,
-          description: description,
-          maxRequestsPerHour: parseInt(maxRequestsPerHour),
-          maxRequestsPerDay: parseInt(maxRequestsPerDay),
-        })
-      );
+      localStorage.setItem(`embed-${newEmbedCode}`, JSON.stringify({
+        embedCode: newEmbedCode,
+        chatbotConfig: chatbotConfig,
+        createdAt: new Date().toISOString(),
+        name: embedName,
+        description: description,
+        maxRequestsPerHour: parseInt(maxRequestsPerHour),
+        maxRequestsPerDay: parseInt(maxRequestsPerDay),
+      }));
+
     } catch (error) {
       console.error("Error creating embed:", error);
       alert("Failed to create embed. Please try again.");
@@ -550,103 +323,12 @@ export default function ExportPage() {
     }
   };
 
-  // Function to refresh configuration from database
-  const refreshConfig = async () => {
-    try {
-      const { data: dbSettings, error } = await getChatbotSettings();
-      if (dbSettings && !error) {
-        console.log("Refreshed configuration from database:", dbSettings);
-
-        // Determine theme based on colors (fallback to modern if no match)
-        let themeId = "modern";
-        let theme = getThemeById(themeId);
-
-        // Try to match colors to a theme
-        for (const preset of themePresets) {
-          if (
-            preset.config.primaryColor === dbSettings.user_msg_color &&
-            preset.config.backgroundColor === dbSettings.chat_bg
-          ) {
-            themeId = preset.id;
-            theme = preset;
-            break;
-          }
-        }
-
-        const config: ChatbotConfig = {
-          name: dbSettings.name || "Portfolio Bot",
-          description: "AI chatbot for my website",
-          systemPrompt:
-            dbSettings.system_prompt || "You are a helpful AI assistant.",
-          avatar: dbSettings.avatar_url || "",
-          chatBgColor: dbSettings.chat_bg || "#ffffff",
-          chatBorderColor: dbSettings.border_color || "#e5e7eb",
-          userMsgColor: dbSettings.user_msg_color || "#3b82f6",
-          botMsgColor: dbSettings.bot_msg_color || "#1f2937",
-          welcomeMessage: "Hello! How can I help you today?",
-          placeholder: "Type your message...",
-          theme: themeId,
-          borderRadius: theme ? theme.config.borderRadius : 12,
-          fontSize: theme ? theme.config.fontSize : 14,
-          fontFamily: theme ? theme.config.fontFamily : "Inter",
-        };
-
-        setChatbotConfig(config);
-        setEmbedName(dbSettings.name || "Portfolio Bot");
-        setDescription("AI chatbot for my website");
-        console.log("Configuration refreshed successfully");
-      }
-    } catch (error) {
-      console.error("Failed to refresh configuration:", error);
-    }
-  };
-
-  const platformIntegrations = [
-    { name: "WordPress", description: "Add to header.php or use plugin" },
-    { name: "Shopify", description: "Edit theme.liquid file" },
-    { name: "Wix", description: "Use HTML embed element" },
-    { name: "Squarespace", description: "Code injection in header" },
-    { name: "GoDaddy", description: "Website builder custom code" },
-    { name: "Google Sites", description: "Embed HTML element" },
-    { name: "Joomla", description: "Template customization" },
-    { name: "Drupal", description: "Block configuration" },
-    { name: "BigCommerce", description: "Theme editor" },
-    { name: "Weebly", description: "Custom HTML element" },
-    { name: "Unbounce", description: "Page builder code" },
-    { name: "Framer", description: "Code component" },
-    { name: "Duda", description: "Widget integration" },
-    { name: "Ghost", description: "Code injection" },
-    { name: "Blogger", description: "Template HTML" },
-    { name: "Tumblr", description: "Custom theme" },
-    { name: "Yola", description: "HTML widget" },
-    { name: "Cargo", description: "Custom code" },
-    { name: "Piwigo", description: "Template modification" },
-    { name: "LiveJournal", description: "Custom CSS" },
-    { name: "Jigsy", description: "HTML editor" },
-    { name: "IM Creator", description: "Custom widget" },
-  ];
-
   if (!isLoaded) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        Loading...
-      </div>
-    );
+    return <div>Loading...</div>;
   }
 
   if (!isSignedIn) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center text-white">
-          <h1 className="text-2xl font-bold mb-4">
-            Please sign in to access Export
-          </h1>
-          <p className="text-gray-400">
-            You need to be authenticated to export your chatbot.
-          </p>
-        </div>
-      </div>
-    );
+    return <div>Please sign in to access this page.</div>;
   }
 
   return (
@@ -687,51 +369,78 @@ export default function ExportPage() {
               {/* Chatbot Preview */}
               <Card>
                 <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Globe className="w-6 h-6 text-primary" />
-                      <CardTitle>Chatbot Preview</CardTitle>
-                    </div>
-                    <Button onClick={refreshConfig} size="sm" variant="outline">
-                      🔄 Refresh
-                    </Button>
-                  </div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Eye className="w-5 h-5 text-primary" />
+                    Current Settings
+                  </CardTitle>
                   <CardDescription>
-                    Your customized '{embedName}' chatbot will appear seamlessly
-                    on any website where you embed the code below.
+                    Your chatbot configuration from the editor
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
                   {chatbotConfig ? (
-                    <div className="w-full h-80 bg-muted rounded-lg border-2 border-dashed border-border flex items-center justify-center relative overflow-hidden">
-                      {/* Working Chatbot Preview - Exact replica of editor */}
-
-                      {/* Color Info - Show exact values */}
-                      <div className="absolute top-2 left-2 text-xs text-muted-foreground bg-background/80 p-2 rounded">
-                        <div className="font-medium mb-1">
-                          Current Settings:
+                    <>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">
+                            Name
+                          </label>
+                          <p className="text-foreground font-medium">
+                            {chatbotConfig.name}
+                          </p>
                         </div>
-                        <div>Name: {chatbotConfig.name}</div>
-                        <div>Primary: {chatbotConfig.userMsgColor}</div>
-                        <div>Background: {chatbotConfig.chatBgColor}</div>
-                        <div>Text: {chatbotConfig.botMsgColor}</div>
-                        <div>Border: {chatbotConfig.chatBorderColor}</div>
-                        <div className="mt-1 text-yellow-600">
-                          System: {chatbotConfig.systemPrompt.substring(0, 50)}
-                          ...
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">
+                            Theme
+                          </label>
+                          <p className="text-foreground font-medium">
+                            {chatbotConfig.theme || "Modern"}
+                          </p>
                         </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="w-full h-80 bg-muted rounded-lg border-2 border-dashed border-border flex items-center justify-center">
-                      <div className="text-center text-muted-foreground">
-                        <Globe className="w-12 h-12 mx-auto mb-2" />
-                        <p>No chatbot configuration found</p>
-                        <p className="text-sm">
-                          Go to /editor to customize your chatbot first
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">
+                            Primary Color
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="w-4 h-4 rounded border"
+                              style={{ backgroundColor: chatbotConfig.userMsgColor }}
+                            />
+                            <span className="text-foreground font-mono text-sm">
+                              {chatbotConfig.userMsgColor}
+                            </span>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">
+                            Background
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="w-4 h-4 rounded border"
+                              style={{ backgroundColor: chatbotConfig.chatBgColor }}
+                            />
+                            <span className="text-foreground font-mono text-sm">
+                              {chatbotConfig.chatBgColor}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Welcome Message
+                        </label>
+                        <p className="text-foreground text-sm">
+                          {chatbotConfig.welcomeMessage}
                         </p>
                       </div>
-                    </div>
+                    </>
+                  ) : (
+                    <p className="text-muted-foreground">
+                      No chatbot configuration found. Please customize your chatbot first.
+                    </p>
                   )}
                 </CardContent>
               </Card>
@@ -739,67 +448,67 @@ export default function ExportPage() {
               {/* Create Embed */}
               <Card>
                 <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Plus className="w-6 h-6 text-primary" />
-                    <CardTitle>Create Embed</CardTitle>
-                  </div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Plus className="w-5 h-5 text-primary" />
+                    Create Embed
+                  </CardTitle>
+                  <CardDescription>
+                    Generate a unique embed code for your chatbot
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label className="text-sm font-medium text-foreground">
                       Embed Name
                     </label>
                     <Input
                       value={embedName}
-                      onChange={e => setEmbedName(e.target.value)}
-                      placeholder="Enter embed name"
+                      onChange={(e) => setEmbedName(e.target.value)}
+                      placeholder="My Website Chatbot"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Description (Optional)
+                    <label className="text-sm font-medium text-foreground">
+                      Description
                     </label>
                     <Textarea
                       value={description}
-                      onChange={e => setDescription(e.target.value)}
-                      placeholder="Enter description"
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Describe your chatbot's purpose"
+                      rows={3}
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
-                        Max Requests per Hour
+                      <label className="text-sm font-medium text-foreground">
+                        Max Requests/Hour
                       </label>
                       <Input
-                        value={maxRequestsPerHour}
-                        onChange={e => setMaxRequestsPerHour(e.target.value)}
                         type="number"
+                        value={maxRequestsPerHour}
+                        onChange={(e) => setMaxRequestsPerHour(e.target.value)}
+                        placeholder="100"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
-                        Max Requests per Day
+                      <label className="text-sm font-medium text-foreground">
+                        Max Requests/Day
                       </label>
                       <Input
-                        value={maxRequestsPerDay}
-                        onChange={e => setMaxRequestsPerDay(e.target.value)}
                         type="number"
+                        value={maxRequestsPerDay}
+                        onChange={(e) => setMaxRequestsPerDay(e.target.value)}
+                        placeholder="1000"
                       />
                     </div>
                   </div>
                   <Button
                     onClick={handleCreateEmbed}
+                    disabled={isCreating || !chatbotConfig}
                     className="w-full"
-                    disabled={!chatbotConfig || isCreating}
                   >
-                    <Plus className="w-4 h-4 mr-2" />
                     {isCreating ? "Creating..." : "Create Embed"}
                   </Button>
-                  {!chatbotConfig && (
-                    <p className="text-sm text-yellow-600 text-center">
-                      ⚠️ Please customize your chatbot in the /editor page first
-                    </p>
-                  )}
                 </CardContent>
               </Card>
             </div>
@@ -809,32 +518,33 @@ export default function ExportPage() {
               {/* Script Embed */}
               <Card>
                 <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Code className="w-6 h-6 text-primary" />
-                    <CardTitle>Script Embed</CardTitle>
-                  </div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Code className="w-5 h-5 text-primary" />
+                    Script Embed
+                  </CardTitle>
+                  <CardDescription>
+                    Add this script tag to your website's HTML
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="relative">
-                    <textarea
-                      value={generateEmbedScript()}
-                      readOnly
-                      className="w-full h-32 bg-muted border border-border rounded-lg p-3 text-sm font-mono resize-none"
-                      placeholder="Create an embed first to generate the script..."
-                    />
+                    <pre className="bg-muted p-4 rounded-lg border text-sm font-mono overflow-x-auto">
+                      <code className="text-foreground">
+                        {generateEmbedScript()}
+                      </code>
+                    </pre>
                     <Button
-                      onClick={() =>
-                        copyToClipboard(generateEmbedScript(), "script")
-                      }
-                      className="absolute top-2 right-2"
+                      onClick={() => copyToClipboard(generateEmbedScript(), "script")}
                       size="sm"
-                      disabled={!embedCode}
+                      className="absolute top-2 right-2"
+                      variant="outline"
                     >
                       {copied === "script" ? (
-                        "Copied!"
+                        <Copy className="w-4 h-4" />
                       ) : (
                         <Copy className="w-4 h-4" />
                       )}
+                      {copied === "script" ? "Copied!" : "Copy"}
                     </Button>
                   </div>
                 </CardContent>
@@ -843,32 +553,33 @@ export default function ExportPage() {
               {/* Iframe Embed */}
               <Card>
                 <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Globe className="w-6 h-6 text-primary" />
-                    <CardTitle>Iframe Embed</CardTitle>
-                  </div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Globe className="w-5 h-5 text-primary" />
+                    Iframe Embed
+                  </CardTitle>
+                  <CardDescription>
+                    Embed the chatbot as an iframe element
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="relative">
-                    <textarea
-                      value={generateIframeEmbed()}
-                      readOnly
-                      className="w-full h-20 bg-muted border border-border rounded-lg p-3 text-sm font-mono resize-none"
-                      placeholder="Create an embed first to generate the iframe..."
-                    />
+                    <pre className="bg-muted p-4 rounded-lg border text-sm font-mono overflow-x-auto">
+                      <code className="text-foreground">
+                        {generateIframeEmbed()}
+                      </code>
+                    </pre>
                     <Button
-                      onClick={() =>
-                        copyToClipboard(generateIframeEmbed(), "iframe")
-                      }
-                      className="absolute top-2 right-2"
+                      onClick={() => copyToClipboard(generateIframeEmbed(), "iframe")}
                       size="sm"
-                      disabled={!embedCode}
+                      className="absolute top-2 right-2"
+                      variant="outline"
                     >
                       {copied === "iframe" ? (
-                        "Copied!"
+                        <Copy className="w-4 h-4" />
                       ) : (
                         <Copy className="w-4 h-4" />
                       )}
+                      {copied === "iframe" ? "Copied!" : "Copy"}
                     </Button>
                   </div>
                 </CardContent>
@@ -878,32 +589,26 @@ export default function ExportPage() {
               {embedCode && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Test Your Embed</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                      <Eye className="w-5 h-5 text-primary" />
+                      Test Your Embed
+                    </CardTitle>
+                    <CardDescription>
+                      Preview how your chatbot will look on websites
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="bg-muted border border-border rounded-lg p-3">
-                      <p className="text-sm text-foreground">
-                        Your embed code: {embedCode}
+                  <CardContent>
+                    <div className="space-y-4">
+                      <p className="text-sm text-muted-foreground">
+                        Click the button below to open a preview page where you can test your chatbot.
                       </p>
-                    </div>
-                    <div className="flex gap-3">
                       <Button
-                        onClick={() =>
-                          window.open(
-                            `https://lux-llm-prod.vercel.app/api/embed-preview/${embedCode}`,
-                            "_blank"
-                          )
-                        }
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        Preview Embed
-                      </Button>
-                      <Button
-                        onClick={() => copyToClipboard(embedCode, "embedCode")}
+                        onClick={() => window.open(`/api/embed-preview/${embedCode}`, '_blank')}
+                        className="w-full"
                         variant="outline"
                       >
-                        <Copy className="w-4 h-4 mr-2" />
-                        Copy Embed Code
+                        <Eye className="w-4 h-4 mr-2" />
+                        Open Preview
                       </Button>
                     </div>
                   </CardContent>
@@ -913,19 +618,54 @@ export default function ExportPage() {
               {/* API Configuration */}
               <Card>
                 <CardHeader>
-                  <CardTitle>API Configuration</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <Settings className="w-5 h-5 text-primary" />
+                    API Configuration
+                  </CardTitle>
+                  <CardDescription>
+                    Your chatbot's API endpoint and configuration
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="bg-muted border border-primary rounded-lg p-4">
-                    <p className="text-sm text-foreground">
-                      <strong className="text-primary">Important:</strong> The
-                      embed code calls an API endpoint (
-                      <code className="text-primary">
-                        https://lux-llm-prod.vercel.app/api/public-chat
-                      </code>
-                      ) for handling chat requests, tracking usage, and storing
-                      conversations.
-                    </p>
+                <CardContent className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-foreground">
+                      API Endpoint
+                    </label>
+                    <div className="relative">
+                      <Input
+                        value="https://lux-llm-prod.vercel.app/api/public-chat"
+                        readOnly
+                        className="pr-20"
+                      />
+                      <Button
+                        onClick={() => copyToClipboard("https://lux-llm-prod.vercel.app/api/public-chat", "api")}
+                        size="sm"
+                        className="absolute right-1 top-1"
+                        variant="outline"
+                      >
+                        {copied === "api" ? "Copied!" : "Copy"}
+                      </Button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Required Headers
+                    </label>
+                    <pre className="bg-muted p-3 rounded text-xs font-mono">
+                      Content-Type: application/json
+                    </pre>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Request Body
+                    </label>
+                    <pre className="bg-muted p-3 rounded text-xs font-mono">
+                      {JSON.stringify({
+                        message: "Hello",
+                        embedCode: embedCode || "your-embed-code",
+                        sessionId: "unique-session-id"
+                      }, null, 2)}
+                    </pre>
                   </div>
                 </CardContent>
               </Card>
@@ -935,32 +675,27 @@ export default function ExportPage() {
           {/* Platform Integrations */}
           <div className="mt-12">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-2">
+              <h2 className="text-2xl font-bold text-foreground mb-4">
                 Platform Integrations
               </h2>
               <p className="text-muted-foreground">
-                Step-by-step instructions for embedding your chatbot on popular
-                platforms
+                Get step-by-step instructions for popular platforms
               </p>
             </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {platformIntegrations.map((platform, index) => (
-                <Card
-                  key={index}
-                  className="hover:border-primary transition-colors cursor-pointer"
-                >
-                  <CardContent className="p-4 text-center">
-                    <div className="w-12 h-12 bg-muted rounded-lg mx-auto mb-3 flex items-center justify-center">
-                      <Globe className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-medium text-foreground text-sm mb-1">
-                      {platform.name}
-                    </h3>
-                    <p className="text-xs text-muted-foreground">
-                      {platform.description}
-                    </p>
-                  </CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { name: "WordPress", icon: "🌐" },
+                { name: "Shopify", icon: "🛍️" },
+                { name: "Webflow", icon: "🎨" },
+                { name: "React", icon: "⚛️" },
+                { name: "Next.js", icon: "🚀" },
+                { name: "Vue.js", icon: "💚" },
+                { name: "Angular", icon: "🅰️" },
+                { name: "HTML", icon: "📄" },
+              ].map((platform) => (
+                <Card key={platform.name} className="text-center p-4 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="text-2xl mb-2">{platform.icon}</div>
+                  <h3 className="font-medium text-foreground">{platform.name}</h3>
                 </Card>
               ))}
             </div>

@@ -4,16 +4,28 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { embedCode } = req.query;
+    const { embedCode, config } = req.query;
     console.log("📦 Serving embed file for:", embedCode);
+    console.log("📦 With config:", config);
 
     // Set proper headers for JavaScript files
     res.setHeader("Content-Type", "application/javascript");
     res.setHeader("Cache-Control", "public, max-age=3600"); // Cache for 1 hour
     res.setHeader("Access-Control-Allow-Origin", "*");
 
-    // Generate a simple embed script that will work immediately
-    const scriptContent = generateEmbedScript(embedCode);
+    // Parse the configuration from query params
+    let chatbotConfig = null;
+    if (config) {
+      try {
+        chatbotConfig = JSON.parse(decodeURIComponent(config));
+        console.log("✅ Using provided chatbot config:", chatbotConfig);
+      } catch (error) {
+        console.log("❌ Error parsing config:", error);
+      }
+    }
+
+    // Generate the embed script with the provided configuration
+    const scriptContent = generateEmbedScript(embedCode, chatbotConfig);
 
     res.status(200).send(scriptContent);
   } catch (error) {
@@ -22,30 +34,29 @@ export default async function handler(req, res) {
   }
 }
 
-function generateEmbedScript(embedCode) {
+function generateEmbedScript(embedCode, chatbotConfig) {
   const productionUrl = "https://lux-llm-prod.vercel.app";
   const isProduction = process.env.NODE_ENV === "production";
   const apiBaseUrl = isProduction ? productionUrl : "http://localhost:3000";
 
-  // For now, use a default configuration that can be customized
-  // This will be replaced with dynamic configuration later
+  // Use the provided chatbot configuration or fallback to defaults
   const config = {
     embedCode: embedCode,
-    chatbotName: 'Portfolio Bot',
-    systemPrompt: 'You are a helpful AI assistant.',
-    primaryColor: '#3b82f6',
-    backgroundColor: '#ffffff',
-    textColor: '#1f2937',
-    accentColor: '#e5e7eb',
-    chatBgColor: '#ffffff',
-    chatBorderColor: '#e5e7eb',
-    borderRadius: 12,
-    fontSize: 14,
-    fontFamily: 'Inter',
+    chatbotName: chatbotConfig?.name || 'AI Assistant',
+    systemPrompt: chatbotConfig?.systemPrompt || 'You are a helpful AI assistant.',
+    primaryColor: chatbotConfig?.userMsgColor || '#3b82f6',
+    backgroundColor: chatbotConfig?.chatBgColor || '#ffffff',
+    textColor: chatbotConfig?.botMsgColor || '#1f2937',
+    accentColor: chatbotConfig?.chatBorderColor || '#e5e7eb',
+    chatBgColor: chatbotConfig?.chatBgColor || '#ffffff',
+    chatBorderColor: chatbotConfig?.chatBorderColor || '#e5e7eb',
+    borderRadius: chatbotConfig?.borderRadius || 12,
+    fontSize: chatbotConfig?.fontSize || 14,
+    fontFamily: chatbotConfig?.fontFamily || 'Inter',
     position: 'bottom-right',
-    welcomeMessage: 'Hello! How can I help you today?',
-    placeholder: 'Type your message...',
-    avatarUrl: '',
+    welcomeMessage: chatbotConfig?.welcomeMessage || 'Hello! How can I help you today?',
+    placeholder: chatbotConfig?.placeholder || 'Type your message...',
+    avatarUrl: chatbotConfig?.avatar || '',
     showTypingIndicator: true,
     enableSounds: false,
     animationSpeed: 'normal',
@@ -59,11 +70,11 @@ function generateEmbedScript(embedCode) {
 (function() {
   'use strict';
   
-  // Configuration
+  // Configuration with EXACT customizations from editor
   const config = {
     embedCode: '${config.embedCode}',
-    chatbotName: '${config.chatbotName}',
-    systemPrompt: '${config.systemPrompt}',
+    chatbotName: '${config.chatbotName.replace(/'/g, "\\'")}',
+    systemPrompt: '${config.systemPrompt.replace(/'/g, "\\'")}',
     primaryColor: '${config.primaryColor}',
     backgroundColor: '${config.backgroundColor}',
     textColor: '${config.textColor}',
@@ -74,8 +85,8 @@ function generateEmbedScript(embedCode) {
     fontSize: ${config.fontSize},
     fontFamily: '${config.fontFamily}',
     position: '${config.position}',
-    welcomeMessage: '${config.welcomeMessage}',
-    placeholder: '${config.placeholder}',
+    welcomeMessage: '${config.welcomeMessage.replace(/'/g, "\\'")}',
+    placeholder: '${config.placeholder.replace(/'/g, "\\'")}',
     avatarUrl: '${config.avatarUrl}',
     showTypingIndicator: ${config.showTypingIndicator},
     enableSounds: ${config.enableSounds},
@@ -83,7 +94,9 @@ function generateEmbedScript(embedCode) {
     apiBaseUrl: '${config.apiBaseUrl}'
   };
 
-  // Chatbot HTML
+  console.log('LuxLLM Chatbot loaded with config:', config);
+
+  // Chatbot HTML with EXACT customizations
   const chatbotHTML = \`
     <div id="luxllm-chatbot-\${config.embedCode}" style="
       position: fixed;
