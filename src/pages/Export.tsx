@@ -229,16 +229,38 @@ export default function ExportPage() {
       theme: chatbotConfig.theme || "modern"
     }));
 
+    console.log("🔧 Generating embed script with config:", {
+      embedCode: embedCode || "default",
+      config: JSON.parse(decodeURIComponent(configParam))
+    });
+
     return `<script src="https://lux-llm-prod.vercel.app/api/embed-script/${embedCode || "default"}?config=${configParam}" async></script>`;
   };
 
   const generateIframeEmbed = () => {
     if (!chatbotConfig) return "";
 
+    // Pass configuration to the embed preview via URL parameters
+    const configParam = encodeURIComponent(JSON.stringify({
+      name: chatbotConfig.name,
+      systemPrompt: chatbotConfig.systemPrompt,
+      avatar: chatbotConfig.avatar || "",
+      chatBgColor: chatbotConfig.chatBgColor,
+      chatBorderColor: chatbotConfig.chatBorderColor,
+      userMsgColor: chatbotConfig.userMsgColor,
+      botMsgColor: chatbotConfig.botMsgColor,
+      welcomeMessage: chatbotConfig.welcomeMessage,
+      placeholder: chatbotConfig.placeholder,
+      borderRadius: chatbotConfig.borderRadius || 12,
+      fontSize: chatbotConfig.fontSize || 14,
+      fontFamily: chatbotConfig.fontFamily || "Inter",
+      theme: chatbotConfig.theme || "modern"
+    }));
+
     return `<iframe 
       src="https://lux-llm-prod.vercel.app/api/embed-preview/${
         embedCode || "default"
-      }"
+      }?config=${configParam}"
       width="400" 
       height="600" 
       frameborder="0" 
@@ -607,7 +629,28 @@ export default function ExportPage() {
                         Click the button below to open a preview page where you can test your chatbot.
                       </p>
                       <Button
-                        onClick={() => window.open(`/api/embed-preview/${embedCode}`, '_blank')}
+                        onClick={() => {
+                          if (chatbotConfig) {
+                            const configParam = encodeURIComponent(JSON.stringify({
+                              name: chatbotConfig.name,
+                              systemPrompt: chatbotConfig.systemPrompt,
+                              avatar: chatbotConfig.avatar || "",
+                              chatBgColor: chatbotConfig.chatBgColor,
+                              chatBorderColor: chatbotConfig.chatBorderColor,
+                              userMsgColor: chatbotConfig.userMsgColor,
+                              botMsgColor: chatbotConfig.botMsgColor,
+                              welcomeMessage: chatbotConfig.welcomeMessage,
+                              placeholder: chatbotConfig.placeholder,
+                              borderRadius: chatbotConfig.borderRadius || 12,
+                              fontSize: chatbotConfig.fontSize || 14,
+                              fontFamily: chatbotConfig.fontFamily || "Inter",
+                              theme: chatbotConfig.theme || "modern"
+                            }));
+                            window.open(`/api/embed-preview/${embedCode}?config=${configParam}`, '_blank');
+                          } else {
+                            window.open(`/api/embed-preview/${embedCode}`, '_blank');
+                          }
+                        }}
                         className="w-full"
                         variant="outline"
                       >
