@@ -52,20 +52,38 @@ export default function ExportPage() {
   );
   const [embedCode, setEmbedCode] = useState("");
 
+  // Chat functionality for the test chatbot
+  const [messages, setMessages] = useState<Array<{id: string, role: 'user' | 'assistant', content: string, timestamp: Date}>>([]);
+  const [inputMessage, setInputMessage] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+
+  // Initialize with welcome message when chatbot config loads
+  useEffect(() => {
+    if (chatbotConfig && messages.length === 0) {
+      setMessages([{
+        id: 'welcome',
+        role: 'assistant',
+        content: chatbotConfig.welcomeMessage,
+        timestamp: new Date()
+      }]);
+    }
+  }, [chatbotConfig, messages.length]);
+
   useEffect(() => {
     // Load chatbot customizations from database first, then localStorage
     const loadChatbotConfig = async () => {
       try {
         // First try to load from database (most up-to-date)
         const { data: dbSettings, error } = await getChatbotSettings();
-        
+
         if (dbSettings && !error) {
           console.log("Loaded configuration from database:", dbSettings);
-          
+
           const config: ChatbotConfig = {
             name: dbSettings.name || "Portfolio Bot",
             description: "AI chatbot for my website",
-            systemPrompt: dbSettings.system_prompt || "You are a helpful AI assistant.",
+            systemPrompt:
+              dbSettings.system_prompt || "You are a helpful AI assistant.",
             avatar: dbSettings.avatar_url || "",
             chatBgColor: dbSettings.chat_bg || "#ffffff",
             chatBorderColor: dbSettings.border_color || "#e5e7eb",
@@ -74,7 +92,7 @@ export default function ExportPage() {
             welcomeMessage: "Hello! How can I help you today?",
             placeholder: "Type your message...",
           };
-          
+
           setChatbotConfig(config);
           setEmbedName(dbSettings.name || "Portfolio Bot");
           setDescription("AI chatbot for my website");
@@ -96,8 +114,11 @@ export default function ExportPage() {
       if (exportConfig) {
         try {
           const exportData = JSON.parse(exportConfig);
-          console.log("Loaded export configuration from localStorage:", exportData);
-          
+          console.log(
+            "Loaded export configuration from localStorage:",
+            exportData
+          );
+
           config = {
             name: exportData.name || "Portfolio Bot",
             description: exportData.description || "AI chatbot for my website",
@@ -112,10 +133,10 @@ export default function ExportPage() {
               exportData.welcome_message || "Hello! How can I help you today?",
             placeholder: exportData.placeholder || "Type your message...",
           };
-          
+
           setEmbedName(exportData.name || "Portfolio Bot");
           setDescription(exportData.description || "AI chatbot for my website");
-          
+
           console.log("Using export configuration from localStorage:", config);
         } catch (e) {
           console.log("Error parsing export config:", e);
@@ -489,11 +510,12 @@ export default function ExportPage() {
       const { data: dbSettings, error } = await getChatbotSettings();
       if (dbSettings && !error) {
         console.log("Refreshed configuration from database:", dbSettings);
-        
+
         const config: ChatbotConfig = {
           name: dbSettings.name || "Portfolio Bot",
           description: "AI chatbot for my website",
-          systemPrompt: dbSettings.system_prompt || "You are a helpful AI assistant.",
+          systemPrompt:
+            dbSettings.system_prompt || "You are a helpful AI assistant.",
           avatar: dbSettings.avatar_url || "",
           chatBgColor: dbSettings.chat_bg || "#ffffff",
           chatBorderColor: dbSettings.border_color || "#e5e7eb",
@@ -502,7 +524,7 @@ export default function ExportPage() {
           welcomeMessage: "Hello! How can I help you today?",
           placeholder: "Type your message...",
         };
-        
+
         setChatbotConfig(config);
         setEmbedName(dbSettings.name || "Portfolio Bot");
         setDescription("AI chatbot for my website");
@@ -510,6 +532,61 @@ export default function ExportPage() {
       }
     } catch (error) {
       console.error("Failed to refresh configuration:", error);
+    }
+  };
+
+  // Send message function for the test chatbot
+  const sendMessage = async () => {
+    if (!inputMessage.trim() || !chatbotConfig) return;
+
+    const userMessage = {
+      id: Date.now().toString(),
+      role: 'user' as const,
+      content: inputMessage,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputMessage("");
+    setIsTyping(true);
+
+    try {
+      // Call the public chat API
+      const response = await fetch('https://lux-llm-prod.vercel.app/api/public-chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: inputMessage,
+          system_prompt: chatbotConfig.systemPrompt,
+          agent_id: 'export-test-chatbot'
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const botMessage = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant' as const,
+          content: data.message,
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, botMessage]);
+      } else {
+        throw new Error('Failed to get response');
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      const errorMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant' as const,
+        content: "Sorry, I'm experiencing technical difficulties. Please try again.",
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsTyping(false);
     }
   };
 
@@ -660,7 +737,7 @@ export default function ExportPage() {
                     <Globe className="w-6 h-6 text-green-400" />
                     <CardTitle>Chatbot Preview</CardTitle>
                   </div>
-                  <Button 
+                  <Button
                     onClick={refreshConfig}
                     size="sm"
                     className="bg-blue-600 hover:bg-blue-700 text-white"
@@ -1058,15 +1135,27 @@ export default function ExportPage() {
 
                     {/* Messages */}
                     <div className="flex-1 p-3 overflow-y-auto">
-                      <div
-                        className="inline-block p-2 rounded-lg text-sm max-w-[80%]"
-                        style={{
-                          backgroundColor: chatbotConfig.chatBorderColor,
-                          color: chatbotConfig.botMsgColor,
-                        }}
-                      >
-                        {chatbotConfig.welcomeMessage}
-                      </div>
+                                             {messages.map(msg => (
+                         <div
+                           key={msg.id}
+                           className={`inline-block p-2 rounded-lg text-sm max-w-[80%] mb-2 ${
+                             msg.role === 'user' ? 'ml-auto' : ''
+                           }`}
+                           style={{
+                             backgroundColor: msg.role === 'user' 
+                               ? chatbotConfig.userMsgColor 
+                               : chatbotConfig.chatBorderColor,
+                             color: msg.role === 'user' 
+                               ? 'white' 
+                               : chatbotConfig.botMsgColor,
+                           }}
+                         >
+                           {msg.content}
+                           {isTyping && msg.role === 'assistant' && (
+                             <span className="ml-1 text-xs opacity-70">typing...</span>
+                           )}
+                         </div>
+                       ))}
                     </div>
 
                     {/* Input */}
@@ -1081,12 +1170,20 @@ export default function ExportPage() {
                             backgroundColor: chatbotConfig.chatBgColor,
                             color: chatbotConfig.botMsgColor,
                           }}
+                          value={inputMessage}
+                          onChange={e => setInputMessage(e.target.value)}
+                          onKeyPress={e => {
+                            if (e.key === 'Enter') {
+                              sendMessage();
+                            }
+                          }}
                         />
                         <button
                           className="w-8 h-8 rounded-full flex items-center justify-center"
                           style={{
                             backgroundColor: chatbotConfig.userMsgColor,
                           }}
+                          onClick={sendMessage}
                         >
                           <span className="text-white text-xs">→</span>
                         </button>
