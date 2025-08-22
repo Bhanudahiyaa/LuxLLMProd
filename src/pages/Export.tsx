@@ -53,19 +53,28 @@ export default function ExportPage() {
   const [embedCode, setEmbedCode] = useState("");
 
   // Chat functionality for the test chatbot
-  const [messages, setMessages] = useState<Array<{id: string, role: 'user' | 'assistant', content: string, timestamp: Date}>>([]);
+  const [messages, setMessages] = useState<
+    Array<{
+      id: string;
+      role: "user" | "assistant";
+      content: string;
+      timestamp: Date;
+    }>
+  >([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
   // Initialize with welcome message when chatbot config loads
   useEffect(() => {
     if (chatbotConfig && messages.length === 0) {
-      setMessages([{
-        id: 'welcome',
-        role: 'assistant',
-        content: chatbotConfig.welcomeMessage,
-        timestamp: new Date()
-      }]);
+      setMessages([
+        {
+          id: "welcome",
+          role: "assistant",
+          content: chatbotConfig.welcomeMessage,
+          timestamp: new Date(),
+        },
+      ]);
     }
   }, [chatbotConfig, messages.length]);
 
@@ -541,9 +550,9 @@ export default function ExportPage() {
 
     const userMessage = {
       id: Date.now().toString(),
-      role: 'user' as const,
+      role: "user" as const,
       content: inputMessage,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -552,37 +561,41 @@ export default function ExportPage() {
 
     try {
       // Call the public chat API
-      const response = await fetch('https://lux-llm-prod.vercel.app/api/public-chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: inputMessage,
-          system_prompt: chatbotConfig.systemPrompt,
-          agent_id: 'export-test-chatbot'
-        })
-      });
+             const response = await fetch(
+         "https://lux-llm-prod.vercel.app/api/public-chat",
+         {
+           method: "POST",
+           headers: {
+             "Content-Type": "application/json",
+           },
+           body: JSON.stringify({
+             message: inputMessage,
+             embedCode: "export-test-chatbot",
+             sessionId: "export-test-session",
+           }),
+         }
+       );
 
       if (response.ok) {
         const data = await response.json();
         const botMessage = {
           id: (Date.now() + 1).toString(),
-          role: 'assistant' as const,
+          role: "assistant" as const,
           content: data.message,
-          timestamp: new Date()
+          timestamp: new Date(),
         };
         setMessages(prev => [...prev, botMessage]);
       } else {
-        throw new Error('Failed to get response');
+        throw new Error("Failed to get response");
       }
     } catch (error) {
       console.error("Error sending message:", error);
       const errorMessage = {
         id: (Date.now() + 1).toString(),
-        role: 'assistant' as const,
-        content: "Sorry, I'm experiencing technical difficulties. Please try again.",
-        timestamp: new Date()
+        role: "assistant" as const,
+        content:
+          "Sorry, I'm experiencing technical difficulties. Please try again.",
+        timestamp: new Date(),
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -1135,27 +1148,31 @@ export default function ExportPage() {
 
                     {/* Messages */}
                     <div className="flex-1 p-3 overflow-y-auto">
-                                             {messages.map(msg => (
-                         <div
-                           key={msg.id}
-                           className={`inline-block p-2 rounded-lg text-sm max-w-[80%] mb-2 ${
-                             msg.role === 'user' ? 'ml-auto' : ''
-                           }`}
-                           style={{
-                             backgroundColor: msg.role === 'user' 
-                               ? chatbotConfig.userMsgColor 
-                               : chatbotConfig.chatBorderColor,
-                             color: msg.role === 'user' 
-                               ? 'white' 
-                               : chatbotConfig.botMsgColor,
-                           }}
-                         >
-                           {msg.content}
-                           {isTyping && msg.role === 'assistant' && (
-                             <span className="ml-1 text-xs opacity-70">typing...</span>
-                           )}
-                         </div>
-                       ))}
+                      {messages.map(msg => (
+                        <div
+                          key={msg.id}
+                          className={`inline-block p-2 rounded-lg text-sm max-w-[80%] mb-2 ${
+                            msg.role === "user" ? "ml-auto" : ""
+                          }`}
+                          style={{
+                            backgroundColor:
+                              msg.role === "user"
+                                ? chatbotConfig.userMsgColor
+                                : chatbotConfig.chatBorderColor,
+                            color:
+                              msg.role === "user"
+                                ? "white"
+                                : chatbotConfig.botMsgColor,
+                          }}
+                        >
+                          {msg.content}
+                          {isTyping && msg.role === "assistant" && (
+                            <span className="ml-1 text-xs opacity-70">
+                              typing...
+                            </span>
+                          )}
+                        </div>
+                      ))}
                     </div>
 
                     {/* Input */}
@@ -1173,7 +1190,7 @@ export default function ExportPage() {
                           value={inputMessage}
                           onChange={e => setInputMessage(e.target.value)}
                           onKeyPress={e => {
-                            if (e.key === 'Enter') {
+                            if (e.key === "Enter") {
                               sendMessage();
                             }
                           }}
