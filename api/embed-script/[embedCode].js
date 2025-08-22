@@ -23,18 +23,37 @@ export default async function handler(req, res) {
 
     // Try to get embed configuration from database
     let embedConfig = null;
+    let chatbotSettings = null;
+    
     try {
-      const { data: embed, error } = await supabase
+      // First try to get the embed record
+      const { data: embed, error: embedError } = await supabase
         .from("embeds")
         .select("*")
         .eq("embed_code", embedCode)
         .eq("is_active", true)
         .single();
 
-      if (!error && embed) {
+      if (!embedError && embed) {
         embedConfig = embed;
         console.log("✅ Found embed configuration:", embed.id);
-        console.log("✅ Agent config:", embed.agent_config);
+        
+        // If embed has agent_config, use it
+        if (embed.agent_config) {
+          console.log("✅ Using agent_config from embed:", embed.agent_config);
+        } else {
+          // Try to get chatbot settings for this user
+          const { data: settings, error: settingsError } = await supabase
+            .from("chatbot_settings")
+            .select("*")
+            .eq("user_id", embed.user_id)
+            .single();
+            
+          if (!settingsError && settings) {
+            chatbotSettings = settings;
+            console.log("✅ Found chatbot settings:", settings);
+          }
+        }
       } else {
         console.log("⚠️ Using default configuration for:", embedCode);
       }
@@ -43,7 +62,7 @@ export default async function handler(req, res) {
     }
 
     // Generate the embed script content
-    const scriptContent = generateEmbedScript(embedCode, embedConfig);
+    const scriptContent = generateEmbedScript(embedCode, embedConfig, chatbotSettings);
 
     res.status(200).send(scriptContent);
   } catch (error) {
@@ -52,7 +71,7 @@ export default async function handler(req, res) {
   }
 }
 
-function generateEmbedScript(embedCode, embedConfig) {
+function generateEmbedScript(embedCode, embedConfig, chatbotSettings) {
   const productionUrl = "https://lux-llm-prod.vercel.app";
   const isProduction = process.env.NODE_ENV === "production";
   const apiBaseUrl = isProduction ? productionUrl : "http://localhost:3000";
@@ -60,26 +79,29 @@ function generateEmbedScript(embedCode, embedConfig) {
   // Get agent configuration with fallbacks
   const agentConfig = embedConfig?.agent_config || {};
   
-  // Escape any single quotes in the config values to prevent syntax errors
-  const escapedName = (agentConfig.name || "AI Assistant").replace(/'/g, "\\'");
-  const escapedPrompt = (agentConfig.system_prompt || "You are a helpful AI assistant that can answer questions about technology, programming, and general knowledge.").replace(/'/g, "\\'");
+  // Use chatbot settings if available, otherwise fall back to agent config or defaults
+  const settings = chatbotSettings || {};
   
-  // Use actual agent customizations with fallbacks
-  const primaryColor = agentConfig.user_msg_color || '#3b82f6';
-  const backgroundColor = agentConfig.chat_bg_color || '#ffffff';
-  const textColor = agentConfig.bot_msg_color || '#1f2937';
-  const accentColor = agentConfig.chat_border_color || '#e5e7eb';
-  const chatBgColor = agentConfig.chat_bg_color || '#ffffff';
-  const chatBorderColor = agentConfig.chat_border_color || '#e5e7eb';
+  // Escape any single quotes in the config values to prevent syntax errors
+  const escapedName = (settings.name || agentConfig.name || "AI Assistant").replace(/'/g, "\\'");
+  const escapedPrompt = (settings.system_prompt || agentConfig.system_prompt || "You are a helpful AI assistant that can answer questions about technology, programming, and general knowledge.").replace(/'/g, "\\'");
+  
+  // Use actual customizations with fallbacks (priority: chatbot_settings > agent_config > defaults)
+  const primaryColor = settings.user_msg_color || agentConfig.user_msg_color || '#3b82f6';
+  const backgroundColor = settings.chat_bg || agentConfig.chat_bg_color || '#ffffff';
+  const textColor = settings.bot_msg_color || agentConfig.bot_msg_color || '#1f2937';
+  const accentColor = settings.border_color || agentConfig.chat_border_color || '#e5e7eb';
+  const chatBgColor = settings.chat_bg || agentConfig.chat_bg_color || '#ffffff';
+  const chatBorderColor = settings.border_color || agentConfig.chat_border_color || '#e5e7eb';
   
   // UI settings with fallbacks
-  const borderRadius = agentConfig.borderRadius || 12;
-  const fontSize = agentConfig.fontSize || 14;
-  const fontFamily = agentConfig.fontFamily || 'Inter';
+  const borderRadius = 12; // Default
+  const fontSize = 14; // Default
+  const fontFamily = 'Inter'; // Default
   const position = 'bottom-right'; // Default
-  const welcomeMessage = agentConfig.welcome_message || `Hello! I'm ${agentConfig.name || "your AI assistant"}. How can I help you today?`;
-  const placeholder = agentConfig.placeholder || "Type your message...";
-  const avatarUrl = agentConfig.avatar_url || '';
+  const welcomeMessage = `Hello! I'm ${escapedName}. How can I help you today?`;
+  const placeholder = "Type your message...";
+  const avatarUrl = settings.avatar_url || agentConfig.avatar_url || '';
   
   // Features
   const showTypingIndicator = true;

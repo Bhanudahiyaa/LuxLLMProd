@@ -530,16 +530,18 @@ export default function ExportPage() {
       console.log("Created embed with configuration:", data);
 
       // Also save to localStorage as backup
-      localStorage.setItem(`embed-${newEmbedCode}`, JSON.stringify({
-        embedCode: newEmbedCode,
-        chatbotConfig: chatbotConfig,
-        createdAt: new Date().toISOString(),
-        name: embedName,
-        description: description,
-        maxRequestsPerHour: parseInt(maxRequestsPerHour),
-        maxRequestsPerDay: parseInt(maxRequestsPerDay),
-      }));
-
+      localStorage.setItem(
+        `embed-${newEmbedCode}`,
+        JSON.stringify({
+          embedCode: newEmbedCode,
+          chatbotConfig: chatbotConfig,
+          createdAt: new Date().toISOString(),
+          name: embedName,
+          description: description,
+          maxRequestsPerHour: parseInt(maxRequestsPerHour),
+          maxRequestsPerDay: parseInt(maxRequestsPerDay),
+        })
+      );
     } catch (error) {
       console.error("Error creating embed:", error);
       alert("Failed to create embed. Please try again.");
@@ -785,14 +787,14 @@ export default function ExportPage() {
                       />
                     </div>
                   </div>
-                                  <Button
-                  onClick={handleCreateEmbed}
-                  className="w-full"
-                  disabled={!chatbotConfig || isCreating}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  {isCreating ? "Creating..." : "Create Embed"}
-                </Button>
+                  <Button
+                    onClick={handleCreateEmbed}
+                    className="w-full"
+                    disabled={!chatbotConfig || isCreating}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {isCreating ? "Creating..." : "Create Embed"}
+                  </Button>
                   {!chatbotConfig && (
                     <p className="text-sm text-yellow-600 text-center">
                       ⚠️ Please customize your chatbot in the /editor page first
