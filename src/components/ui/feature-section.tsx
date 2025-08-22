@@ -68,7 +68,7 @@ export function FeatureSteps({
               </motion.div>
 
               <div className="flex-1">
-                <p className="text-sm md:text-lg text-muted-foreground text-left">
+                <p className="text-sm md:text-lg text-muted-foreground font-thin text-left">
                   {index === activeIndex && feature.highlight
                     ? feature.content
                         .split(new RegExp(`(${feature.highlight})`, "gi"))

@@ -4,37 +4,37 @@ import { motion } from "motion/react";
 
 const testimonials = [
   {
-    text: "LuxLLM gave us a zero-code way to spin up multimodal agents with full frontend integration. Total game changer.",
+    text: "LuxLLM gave us a zero code way to spin up multimodal agents with full frontend integration. Total game changer.",
     image: "https://randomuser.me/api/portraits/men/10.jpg",
     name: "Ankit Verma",
     role: "Founding Engineer at SynapseAI",
   },
   {
-    text: "We went from prompt to fully deployable agent logic in under 5 minutes. LuxLLM makes agent workflows effortless.",
+    text: "We went from prompt to fully deployable Chatbot logic in under 5 minutes. LuxLLM makes Chatbot workflows effortless.",
     image: "https://randomuser.me/api/portraits/women/11.jpg",
     name: "Priya Narayan",
     role: "CTO at NeuraTech",
   },
   {
-    text: "Auto model-switching and mobile-responsiveness make LuxLLM perfect for dynamic enterprise-grade apps.",
+    text: "Auto model-switching and mobile-responsiveness make LuxLLM perfect for dynamic enterprise grade apps.",
     image: "https://randomuser.me/api/portraits/men/12.jpg",
     name: "Karan Malhotra",
     role: "Product Architect at AlgoPulse",
   },
   {
-    text: "LuxLLM handles secure data fetching and generates optimized agent logic that’s plug-and-play ready.",
+    text: "LuxLLM handles secure data fetching and generates optimized Chatbot logic that’s plug-and-play ready.",
     image: "https://randomuser.me/api/portraits/women/12.jpg",
     name: "Sneha Iyer",
     role: "Lead AI Engineer, CognitiveCore",
   },
   {
-    text: "From .env to logic to frontend, LuxLLM’s structured output saved us weeks of manual integration.",
+    text: "From custom prompts to logic to frontend, LuxLLM’s structured output saved us weeks of manual integration.",
     image: "https://randomuser.me/api/portraits/men/13.jpg",
     name: "Aditya Rao",
     role: "Founder, Autogen Tools",
   },
   {
-    text: "The platform lets our team ship LLM features 5x faster with secure, reliable and composable agent logic.",
+    text: "The platform lets our team ship Chatbot features 5x faster with secure, reliable and composable Chatbot logic.",
     image: "https://randomuser.me/api/portraits/women/13.jpg",
     name: "Rhea Kapoor",
     role: "VP of Engineering at DeepStack",
@@ -46,13 +46,13 @@ const testimonials = [
     role: "LLM DevOps Lead at Nexa Systems",
   },
   {
-    text: "No-code agent deployment with full code control. LuxLLM hit the sweet spot for our engineering team.",
+    text: "No-code Chatbot deployment with full code control. LuxLLM hit the sweet spot for our engineering team.",
     image: "https://randomuser.me/api/portraits/women/14.jpg",
     name: "Meera Joshi",
     role: "Technical PM, NovaAI",
   },
   {
-    text: "Best enterprise-grade agent generation tool we've used—reliable, extensible, and incredibly well-designed.",
+    text: "Best enterprise grade agent generation tool we've used reliable, extensible, and incredibly well-designed.",
     image: "https://randomuser.me/api/portraits/men/15.jpg",
     name: "Rahul Chatterjee",
     role: "AI Solutions Director, Brainnova",
@@ -131,21 +131,17 @@ const Testimonials = () => {
           viewport={{ once: true }}
           className="flex flex-col items-center justify-center max-w-[540px] mx-auto"
         >
-          <div className="flex justify-center">
-            <div className="border border-border/20 py-1 px-4 rounded-lg text-foreground/60 text-sm">
-              Testimonials
-            </div>
-          </div>
+          <div className="flex justify-center"></div>
 
           <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-light tracking-tighter mt-5 text-center">
             Trusted by <span className="text-primary">Innovators</span>
           </h2>
-          <p className="text-center mt-5 opacity-75 text-foreground/70 font-light">
-            See what leading developers and researchers are saying about LuxLLM
+          <p className="text-center text-lg mt-5 opacity-75 text-foreground/70 font-light">
+            See what developers and researchers are saying about LuxLLM
           </p>
         </motion.div>
 
-        <div className="flex justify-center gap-6 mt-12 [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)] max-h-[740px] overflow-hidden">
+        <div className="flex justify-center gap-6 mt-12 [mask-image:linear-gradient(to_bottom,transparent,black_30%,black_75%,transparent)] max-h-[740px] overflow-hidden">
           <TestimonialsColumn testimonials={firstColumn} duration={15} />
           <TestimonialsColumn
             testimonials={secondColumn}

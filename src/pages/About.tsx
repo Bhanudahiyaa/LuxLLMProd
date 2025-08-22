@@ -61,7 +61,7 @@ const About = () => {
             <h1 className="text-5xl md:text-7xl font-light tracking-tighter mb-6">
               About <span className="text-primary">LuxLLM</span>
             </h1>
-            <p className="text-xl md:text-2xl text-foreground/70 font-thin leading-relaxed">
+            <p className="text-lg md:text-lg text-foreground/70 font-thin leading-relaxed">
               Lux LLM is powering the evolution of AI chatbots faster, smarter,
               limitless.
             </p>
@@ -83,7 +83,7 @@ const About = () => {
               <h2 className="text-3xl md:text-4xl font-light tracking-tighter mb-8 text-center">
                 Our Story
               </h2>
-              <div className="space-y-6 text-lg text-foreground/80 font-light leading-relaxed">
+              <div className="space-y-6 text-lg text-foreground/80 font-thin leading-relaxed">
                 <p>
                   Lux LLM was built to remove the complexity of AI chatbot
                   deployment. Instead of juggling fragmented tools and heavy
@@ -121,7 +121,7 @@ const About = () => {
             <h2 className="text-4xl md:text-5xl font-light tracking-tighter mb-6">
               Our Values
             </h2>
-            <p className="text-xl text-foreground/70 font-light max-w-2xl mx-auto">
+            <p className="text-lg text-foreground/70 font-light max-w-2xl mx-auto">
               The principles that guide everything we do
             </p>
           </motion.div>
@@ -164,7 +164,7 @@ const About = () => {
             <h2 className="text-4xl md:text-5xl font-light tracking-tighter mb-6">
               Meet the Team
             </h2>
-            <p className="text-xl text-foreground/70 font-light max-w-2xl mx-auto">
+            <p className="text-lg text-foreground/70 font-thin max-w-2xl mx-auto">
               The brilliant mind behind LuxLLM
             </p>
           </motion.div>

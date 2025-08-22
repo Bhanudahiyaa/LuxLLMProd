@@ -9,28 +9,28 @@ const FAQSection = () => {
     {
       question: "What AI models does LuxLLM support?",
       answer:
-        "LuxLLM unifies access to top-performing AI models including GPT-4, Claude, Gemini, LLaMA, Mistral, and more. We continuously integrate the latest models as they are released, so your agents stay ahead of the curve.",
+        "LuxLLM unifies access to top-performing AI models including GPT-4, Claude, Gemini, LLaMA, Mistral, and more. We continuously integrate the latest models as they are released, so your Chatbots stay ahead of the curve.",
     },
     {
       question: "How does LuxLLM pricing work?",
       answer:
-        "Our pricing is based on active AI agent usage and the number of queries per month. All plans include access to multiple models, no-code agent building, and core integrations. You can scale up or down anytime as your needs change.",
+        "Our pricing is based on active AI Chatbot usage and the number of queries per month. All plans include access to multiple models, no code Chatbot building, and core integrations. You can scale up or down anytime as your needs change.",
     },
     {
       question: "How does LuxLLM handle my data?",
       answer:
-        "We use end-to-end encryption for all data in transit and at rest. Your inputs and outputs remain private, are never used for model training without explicit consent, and can be instantly deleted from our systems at your request.",
+        "We use end to end encryption for all data in transit and at rest. Your inputs and outputs remain private, are never used for model training without explicit consent, and can be instantly deleted from our systems at your request.",
     },
 
     {
       question: "Does LuxLLM offer enterprise features?",
       answer:
-        "We offer enterprise-ready solutions including role-based access control, SSO/SAML authentication, private deployments, and priority support. Our infrastructure is designed to meet the compliance needs of regulated industries.",
+        "We offer enterprise ready solutions including role based access control, SSO/SAML authentication, private deployments, and priority support. Our infrastructure is designed to meet the compliance needs of regulated industries.",
     },
     {
-      question: "How fast will my AI agents respond?",
+      question: "How fast will my AI Chatbot respond?",
       answer:
-        "Most LuxLLM agents respond in under 2 seconds. Pro and Enterprise plans include priority infrastructure to ensure low latency even during peak traffic.",
+        "Most LuxLLM Chatbots respond in under 2 seconds. Pro and Enterprise plans include priority infrastructure to ensure low latency even during peak traffic.",
     },
   ];
 
@@ -39,7 +39,7 @@ const FAQSection = () => {
   };
 
   return (
-    <section id="faq" className="py-10 relative">
+    <section id="faq" className="py-12 relative">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -48,10 +48,10 @@ const FAQSection = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-6xl font-light tracking-tighter mb-6">
+          <h2 className="text-4xl md:text-6xl font-light tracking-tighter mb-8">
             Frequently Asked <span className="text-primary">Questions</span>
           </h2>
-          <p className="text-xl text-foreground/70 font-light max-w-2xl mx-auto">
+          <p className="text-lg text-foreground/70 font-light max-w-2xl mx-auto">
             Everything you need to know about LuxLLM
           </p>
         </motion.div>

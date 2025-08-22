@@ -69,7 +69,7 @@ const PricingSection = () => {
           <h2 className="text-4xl md:text-6xl font-light tracking-tighter mb-6">
             Simple <span className="text-primary">Pricing</span>
           </h2>
-          <p className="text-xl text-foreground/70 font-light max-w-2xl mx-auto">
+          <p className="text-lg text-foreground/70 font-thin max-w-2xl mx-auto">
             Choose the perfect plan for your AI journey. Upgrade or downgrade at
             any time.
           </p>

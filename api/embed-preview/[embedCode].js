@@ -197,6 +197,16 @@ export default async function handler(req, res) {
           }
 
           function createBeautifulChatbot(config) {
+            console.log('Creating beautiful chatbot with config:', config);
+            
+            // Load fonts from editor settings
+            if (config.fontFamily && config.fontFamily !== 'Inter') {
+              const fontLink = document.createElement('link');
+              fontLink.href = \`https://fonts.googleapis.com/css2?family=\${config.fontFamily.replace(/\s+/g, '+')}:wght@100;300;400;500;600;700&display=swap\`;
+              fontLink.rel = 'stylesheet';
+              document.head.appendChild(fontLink);
+            }
+
             // Create the main chatbot container
             const chatbotContainer = document.createElement('div');
             chatbotContainer.id = 'luxllm-beautiful-chatbot';
@@ -207,6 +217,17 @@ export default async function handler(req, res) {
               z-index: 10000;
               font-family: \${config.fontFamily || 'Inter'}, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             \`;
+
+            // Chat state
+            let messages = [
+              {
+                id: '1',
+                text: config.welcomeMessage || 'Hello! How can I help you today?',
+                isBot: true,
+                timestamp: new Date()
+              }
+            ];
+            let isTyping = false;
 
             // Create the beautiful chat window
             const chatWindow = document.createElement('div');
@@ -252,24 +273,6 @@ export default async function handler(req, res) {
               opacity: 0.3;
             \`;
 
-            // Add keyframes for animation
-            const style = document.createElement('style');
-            style.textContent = \`
-              @keyframes movePattern {
-                0% { background-position: 0 0; }
-                100% { background-position: 40px 40px; }
-              }
-              @keyframes float {
-                0%, 100% { transform: translateY(0px); }
-                50% { transform: translateY(-10px); }
-              }
-              @keyframes pulse {
-                0%, 100% { opacity: 1; }
-                50% { opacity: 0.7; }
-              }
-            \`;
-            document.head.appendChild(style);
-
             // Create avatar
             const avatar = document.createElement('div');
             avatar.style.cssText = \`
@@ -295,6 +298,29 @@ export default async function handler(req, res) {
               </div>
             \`;
 
+            // Create minimize button (like editor)
+            const minimizeBtn = document.createElement('button');
+            minimizeBtn.innerHTML = '−';
+            minimizeBtn.style.cssText = \`
+              background: rgba(255,255,255,0.1);
+              border: none;
+              color: white;
+              width: 24px;
+              height: 24px;
+              border-radius: 50%;
+              cursor: pointer;
+              font-size: 18px;
+              margin-left: auto;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            \`;
+            minimizeBtn.onclick = () => {
+              chatWindow.style.display = 'none';
+              chatButton.style.display = 'flex';
+            };
+
             // Create close button
             const closeBtn = document.createElement('button');
             closeBtn.innerHTML = '×';
@@ -307,8 +333,11 @@ export default async function handler(req, res) {
               border-radius: 50%;
               cursor: pointer;
               font-size: 18px;
-              margin-left: auto;
+              margin-left: 8px;
               transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              justify-content: center;
             \`;
             closeBtn.onclick = () => {
               chatWindow.style.display = 'none';
@@ -319,6 +348,7 @@ export default async function handler(req, res) {
             header.appendChild(headerPattern);
             header.appendChild(avatar);
             header.appendChild(botInfo);
+            header.appendChild(minimizeBtn);
             header.appendChild(closeBtn);
 
             // Create messages area
@@ -334,21 +364,188 @@ export default async function handler(req, res) {
               gap: 12px;
             \`;
 
-            // Add welcome message
-            const welcomeMsg = document.createElement('div');
-            welcomeMsg.style.cssText = \`
-              padding: 12px 16px;
-              background: \${config.accentColor || '#f3f4f6'};
-              border-radius: 8px;
-              color: \${config.textColor || '#1f2937'};
-              font-size: 14px;
-              line-height: 1.4;
-              max-width: 80%;
-              align-self: flex-start;
-              box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            \`;
-            welcomeMsg.textContent = config.welcomeMessage || 'Hello! How can I help you today?';
-            messagesArea.appendChild(welcomeMsg);
+            // Function to render messages
+            function renderMessages() {
+              messagesArea.innerHTML = '';
+              messages.forEach((message, index) => {
+                const messageDiv = document.createElement('div');
+                messageDiv.style.cssText = \`
+                  display: flex;
+                  justify-content: \${message.isBot ? 'flex-start' : 'flex-end'};
+                  animation: fadeInUp 0.3s ease-out \${index * 0.1}s both;
+                \`;
+                
+                const messageBubble = document.createElement('div');
+                messageBubble.style.cssText = \`
+                  max-width: 80%;
+                  padding: 12px 16px;
+                  border-radius: \${(config.borderRadius || 12) * 0.8}px;
+                  font-size: \${config.fontSize || 14}px;
+                  line-height: 1.4;
+                  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                  color: \${message.isBot ? config.textColor : 'white'};
+                  background: \${message.isBot ? 'rgba(255,255,255,0.2)' : config.primaryColor};
+                  backdrop-filter: blur(5px);
+                \`;
+                messageBubble.textContent = message.text;
+                
+                messageDiv.appendChild(messageBubble);
+                messagesArea.appendChild(messageDiv);
+              });
+            }
+
+            // Function to add typing indicator
+            function showTypingIndicator() {
+              const typingDiv = document.createElement('div');
+              typingDiv.id = 'typing-indicator';
+              typingDiv.style.cssText = \`
+                display: flex;
+                justify-content: flex-start;
+                animation: fadeInUp 0.3s ease-out;
+              \`;
+              
+              const typingBubble = document.createElement('div');
+              typingBubble.style.cssText = \`
+                padding: 12px 16px;
+                border-radius: \${(config.borderRadius || 12) * 0.8}px;
+                background: rgba(255,255,255,0.2);
+                backdrop-filter: blur(5px);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+              \`;
+              
+              const dots = document.createElement('div');
+              dots.style.cssText = \`
+                display: flex;
+                gap: 4px;
+                align-items: center;
+              \`;
+              
+              for (let i = 0; i < 3; i++) {
+                const dot = document.createElement('div');
+                dot.style.cssText = \`
+                  width: 8px;
+                  height: 8px;
+                  background: \${config.textColor};
+                  border-radius: 50%;
+                  animation: typingDot 1.4s infinite \${i * 0.2}s;
+                \`;
+                dots.appendChild(dot);
+              }
+              
+              typingBubble.appendChild(dots);
+              typingDiv.appendChild(typingBubble);
+              messagesArea.appendChild(typingDiv);
+              messagesArea.scrollTop = messagesArea.scrollHeight;
+            }
+
+            // Function to hide typing indicator
+            function hideTypingIndicator() {
+              const typingIndicator = document.getElementById('typing-indicator');
+              if (typingIndicator) {
+                typingIndicator.remove();
+              }
+            }
+
+            // Function to send message
+            async function sendMessage() {
+              const userMessage = input.value.trim();
+              if (!userMessage) return;
+
+              // Add user message
+              const newUserMessage = {
+                id: Date.now().toString(),
+                text: userMessage,
+                isBot: false,
+                timestamp: new Date()
+              };
+              messages.push(newUserMessage);
+              input.value = '';
+              renderMessages();
+              messagesArea.scrollTop = messagesArea.scrollHeight;
+
+              // Show typing indicator
+              isTyping = true;
+              showTypingIndicator();
+
+              try {
+                // Call the chat API
+                const response = await fetch('/api/public-chat', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    message: userMessage,
+                    system_prompt: config.systemPrompt || 'You are a helpful AI assistant.',
+                    agentId: getAgentIdFromConfig(config)
+                  })
+                });
+
+                if (!response.ok) {
+                  throw new Error(\`HTTP error! status: \${response.status}\`);
+                }
+
+                const data = await response.json();
+                
+                // Hide typing indicator
+                hideTypingIndicator();
+                isTyping = false;
+
+                // Add bot response
+                const botMessage = {
+                  id: (Date.now() + 1).toString(),
+                  text: data.message,
+                  isBot: true,
+                  timestamp: new Date()
+                };
+                messages.push(botMessage);
+                renderMessages();
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+
+              } catch (error) {
+                console.error('Chat API error:', error);
+                hideTypingIndicator();
+                isTyping = false;
+                
+                // Add error message
+                const errorMessage = {
+                  id: (Date.now() + 1).toString(),
+                  text: 'I apologize, but I\'m having trouble connecting to the chat service. Please try again in a moment.',
+                  isBot: true,
+                  timestamp: new Date()
+                };
+                messages.push(errorMessage);
+                renderMessages();
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+              }
+            }
+
+            // Function to get agent ID from config (like editor)
+            function getAgentIdFromConfig(config) {
+              const systemPrompt = config.systemPrompt || "";
+              const lowerPrompt = systemPrompt.toLowerCase();
+
+              if (lowerPrompt.includes("faq") || lowerPrompt.includes("question") || lowerPrompt.includes("assistant")) {
+                return "faq-bot";
+              } else if (lowerPrompt.includes("customer support") || lowerPrompt.includes("support")) {
+                return "customer-support-bot";
+              } else if (lowerPrompt.includes("portfolio") || lowerPrompt.includes("resume")) {
+                return "portfolio-bot";
+              } else if (lowerPrompt.includes("feedback") || lowerPrompt.includes("review")) {
+                return "feedback-bot";
+              } else if (lowerPrompt.includes("sales") || lowerPrompt.includes("product")) {
+                return "sales-bot";
+              } else if (lowerPrompt.includes("meeting") || lowerPrompt.includes("prep")) {
+                return "meeting-prep-bot";
+              } else if (lowerPrompt.includes("document") || lowerPrompt.includes("generator")) {
+                return "document-generator-bot";
+              } else {
+                return "general-assistant-bot";
+              }
+            }
+
+            // Render initial messages
+            renderMessages();
 
             // Create input area
             const inputArea = document.createElement('div');
@@ -368,12 +565,13 @@ export default async function handler(req, res) {
               flex: 1;
               padding: 12px;
               border: 1px solid \${config.accentColor || '#e5e7eb'};
-              border-radius: 6px;
-              font-size: 14px;
+              border-radius: \${(config.borderRadius || 12) * 0.6}px;
+              font-size: \${config.fontSize || 14}px;
               outline: none;
               background: \${config.backgroundColor};
               color: \${config.textColor || '#1f2937'};
               transition: all 0.2s;
+              font-family: \${config.fontFamily || 'Inter'}, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             \`;
             input.onfocus = () => {
               input.style.borderColor = config.primaryColor;
@@ -392,12 +590,15 @@ export default async function handler(req, res) {
               background: \${config.primaryColor};
               color: white;
               border: none;
-              border-radius: 6px;
+              border-radius: \${(config.borderRadius || 12) * 0.6}px;
               cursor: pointer;
-              font-size: 14px;
+              font-size: \${config.fontSize || 14}px;
               font-weight: 500;
               transition: all 0.2s;
               box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+              display: flex;
+              align-items: center;
+              justify-content: center;
             \`;
             sendBtn.onmouseenter = () => {
               sendBtn.style.transform = 'scale(1.05)';
@@ -407,6 +608,7 @@ export default async function handler(req, res) {
               sendBtn.style.transform = 'scale(1)';
               sendBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
             };
+            sendBtn.onclick = sendMessage;
 
             // Assemble input area
             inputArea.appendChild(input);
@@ -451,11 +653,45 @@ export default async function handler(req, res) {
             // Add enter key support
             input.addEventListener('keypress', (e) => {
               if (e.key === 'Enter') {
-                // Handle send message
-                console.log('Send message:', input.value);
-                input.value = '';
+                sendMessage();
               }
             });
+
+            // Add enhanced keyframes for animations
+            const enhancedStyle = document.createElement('style');
+            enhancedStyle.textContent = \`
+              @keyframes movePattern {
+                0% { background-position: 0 0; }
+                100% { background-position: 40px 40px; }
+              }
+              @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+              }
+              @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.7; }
+              }
+              @keyframes fadeInUp {
+                from {
+                  opacity: 0;
+                  transform: translateY(10px);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+              }
+              @keyframes typingDot {
+                0%, 60%, 100% {
+                  transform: translateY(0);
+                }
+                30% {
+                  transform: translateY(-10px);
+                }
+              }
+            \`;
+            document.head.appendChild(enhancedStyle);
 
             console.log('Beautiful chatbot created with config:', config);
           }

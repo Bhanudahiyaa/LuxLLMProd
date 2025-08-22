@@ -48,7 +48,7 @@ const HeroSection = () => {
             linear-gradient(to right, rgba(0,0,0,0.12) 1px, transparent 1px),
             linear-gradient(to bottom, rgba(0,0,0,0.12) 1px, transparent 1px)
           `,
-          backgroundSize: "100% 100%, 44px 44px, 44px 44px",
+          backgroundSize: "100% 100%, 48px 48px, 48px 48px",
           backgroundPosition: "0 0, 0 0, 0 0",
         }}
       />
@@ -58,11 +58,11 @@ const HeroSection = () => {
         className="absolute inset-0 z-0 hidden dark:block pointer-events-none"
         style={{
           backgroundImage: `
-            radial-gradient(ellipse at center, hsl(var(--background)) 0%, hsl(var(--background)) 35%, rgba(0,0,0,0) 80%),
-            linear-gradient(to right, rgba(255,255,255,0.18) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.18) 1px, transparent 1px)
+            radial-gradient(ellipse at center, hsl(var(--background)) 0%, hsl(var(--background)) 35%, rgba(0,0,0,0) 85%),
+            linear-gradient(to right, rgba(255,255,255,0.14) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.14) 1px, transparent 1px)
           `,
-          backgroundSize: "100% 100%, 44px 44px, 44px 44px",
+          backgroundSize: "100% 100%, 48px 48px, 48px 48px",
           backgroundPosition: "0 0, 0 0, 0 0",
         }}
       />
@@ -77,7 +77,7 @@ const HeroSection = () => {
           <div className="relative inline-block">
             <Badge
               variant="outline"
-              className="absolute top-4 sm:-top-6 left-1/2 -translate-x-1/2 mt-32 sm:mt-44 
+              className="absolute top-4 sm:-top-6 left-1/2 -translate-x-1/2 mt-44 sm:mt-44 
               text-[10px] sm:text-sm font-medium px-4 sm:px-5 py-1 rounded-full shadow
               flex items-center gap-1.5 sm:gap-2 max-w-[95%] sm:max-w-fit whitespace-nowrap"
             >
@@ -104,7 +104,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-8xl md:text-[8rem] font-thin tracking-tighter mt-48 mb-3 bg-gradient-to-r from-foreground via-foreground/90 to-foreground/40 bg-clip-text text-transparent"
+              className="text-8xl md:text-[9rem] font-thin tracking-tighter mt-48 mb-3 bg-gradient-to-r from-foreground via-foreground/90 to-foreground/40 bg-clip-text text-transparent"
             >
               <span>
                 <Typewriter

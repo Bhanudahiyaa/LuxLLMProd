@@ -73,7 +73,7 @@ const Contact = () => {
             <h1 className="text-5xl md:text-7xl font-light tracking-tighter mb-6">
               Get in <span className="text-primary">Touch</span>
             </h1>
-            <p className="text-xl md:text-2xl text-foreground/70 font-light leading-relaxed">
+            <p className="text-lg md:text-lg text-foreground/70 font-light leading-relaxed">
               Have questions? We'd love to hear from you. Send us a message and
               we'll respond as soon as possible.
             </p>

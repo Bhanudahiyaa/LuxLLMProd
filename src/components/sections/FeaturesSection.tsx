@@ -19,7 +19,7 @@ const FeaturesSection = () => {
           <h2 className="text-4xl md:text-6xl font-light tracking-tighter mb-6">
             Powerful <span className="text-primary">Features</span>
           </h2>
-          <p className="text-xl text-foreground/70 font-light max-w-2xl mx-auto">
+          <p className="text-lg text-foreground/70 font-thin max-w-2xl mx-auto">
             Everything you need to harness the power of multiple AI models
           </p>
         </motion.div>

@@ -78,7 +78,7 @@ const MissionSection: React.FC = () => {
           <h2 className="text-4xl md:text-6xl font-light tracking-tighter">
             Our <span className="text-primary">Mission</span>
           </h2>
-          <p className="mt-6 text-foreground/70 max-w-xl mx-auto">
+          <p className="mt-6 text-lg text-thin text-foreground/70 max-w-xl mx-auto">
             Empower everyone to build AI agents in minutes - code free,
             scalable, and production ready.
           </p>

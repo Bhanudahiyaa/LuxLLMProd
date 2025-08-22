@@ -66,8 +66,8 @@ const HowItWorksSection = () => {
           <h2 className="text-4xl md:text-6xl font-light tracking-tighter mb-4">
             How it <span className="text-primary">Works</span>
           </h2>
-          <p className="text-xl text-foreground/70 font-light max-w-2xl mx-auto">
-            Build, preview, and deploy AI agents in seconds.
+          <p className="text-lg text-foreground/70 font-thin max-w-2xl mx-auto">
+            Build, preview, and deploy AI Chatbots in minutes.
           </p>
         </div>
 
