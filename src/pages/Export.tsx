@@ -20,6 +20,7 @@ import {
   Users,
   Palette,
   Download,
+  Lock,
 } from "lucide-react";
 import { useAuth } from "@clerk/clerk-react";
 import { useChatbotSettingsService } from "@/hooks/chatbotSettingsService";
@@ -51,9 +52,7 @@ export default function ExportPage() {
   const { createEmbed } = useEmbedService();
   const [copied, setCopied] = useState<string | null>(null);
   const [embedName, setEmbedName] = useState("Portfolio Bot");
-  const [description, setDescription] = useState(
-    "Customer support chatbot for my website"
-  );
+  const [description, setDescription] = useState("");
   const [maxRequestsPerHour, setMaxRequestsPerHour] = useState("100");
   const [maxRequestsPerDay, setMaxRequestsPerDay] = useState("1000");
   const [chatbotConfig, setChatbotConfig] = useState<ChatbotConfig | null>(
@@ -468,15 +467,20 @@ export default function ExportPage() {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground">
+                    <label className="text-sm font-medium text-foreground flex items-center gap-2">
                       Description
+                      <Lock className="w-4 h-4 text-muted-foreground" />
                     </label>
                     <Textarea
                       value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Describe your chatbot's purpose"
+                      disabled
+                      placeholder="Description loaded from editor settings"
                       rows={3}
+                      className="bg-muted cursor-not-allowed"
                     />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Description is automatically set from your editor configuration and cannot be changed here.
+                    </p>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>

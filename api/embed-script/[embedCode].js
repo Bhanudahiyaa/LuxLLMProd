@@ -42,25 +42,27 @@ function generateEmbedScript(embedCode, chatbotConfig) {
   // Use the provided chatbot configuration or fallback to defaults
   const config = {
     embedCode: embedCode,
-    chatbotName: chatbotConfig?.name || 'AI Assistant',
-    systemPrompt: chatbotConfig?.systemPrompt || 'You are a helpful AI assistant.',
-    primaryColor: chatbotConfig?.userMsgColor || '#3b82f6',
-    backgroundColor: chatbotConfig?.chatBgColor || '#ffffff',
-    textColor: chatbotConfig?.botMsgColor || '#1f2937',
-    accentColor: chatbotConfig?.chatBorderColor || '#e5e7eb',
-    chatBgColor: chatbotConfig?.chatBgColor || '#ffffff',
-    chatBorderColor: chatbotConfig?.chatBorderColor || '#e5e7eb',
+    chatbotName: chatbotConfig?.name || "AI Assistant",
+    systemPrompt:
+      chatbotConfig?.systemPrompt || "You are a helpful AI assistant.",
+    primaryColor: chatbotConfig?.userMsgColor || "#3b82f6",
+    backgroundColor: chatbotConfig?.chatBgColor || "#ffffff",
+    textColor: chatbotConfig?.botMsgColor || "#1f2937",
+    accentColor: chatbotConfig?.chatBorderColor || "#e5e7eb",
+    chatBgColor: chatbotConfig?.chatBgColor || "#ffffff",
+    chatBorderColor: chatbotConfig?.chatBorderColor || "#e5e7eb",
     borderRadius: chatbotConfig?.borderRadius || 12,
     fontSize: chatbotConfig?.fontSize || 14,
-    fontFamily: chatbotConfig?.fontFamily || 'Inter',
-    position: 'bottom-right',
-    welcomeMessage: chatbotConfig?.welcomeMessage || 'Hello! How can I help you today?',
-    placeholder: chatbotConfig?.placeholder || 'Type your message...',
-    avatarUrl: chatbotConfig?.avatar || '',
+    fontFamily: chatbotConfig?.fontFamily || "Inter",
+    position: "bottom-right",
+    welcomeMessage:
+      chatbotConfig?.welcomeMessage || "Hello! How can I help you today?",
+    placeholder: chatbotConfig?.placeholder || "Type your message...",
+    avatarUrl: chatbotConfig?.avatar || "",
     showTypingIndicator: true,
     enableSounds: false,
-    animationSpeed: 'normal',
-    apiBaseUrl: apiBaseUrl
+    animationSpeed: "normal",
+    apiBaseUrl: apiBaseUrl,
   };
 
   return `// LuxLLM Chatbot Embed Script
