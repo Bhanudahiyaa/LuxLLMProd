@@ -166,13 +166,7 @@ export default async function handler(req, res) {
             // Create the main chatbot container
             const chatbotContainer = document.createElement('div');
             chatbotContainer.id = 'luxllm-beautiful-chatbot';
-            chatbotContainer.style.cssText = \`
-              position: fixed;
-              bottom: 20px;
-              right: 20px;
-              z-index: 10000;
-              font-family: \${config.fontFamily || 'Inter'}, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            \`;
+            chatbotContainer.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 10000; font-family: ' + (config.fontFamily || 'Inter') + ', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;';
 
             // Chat state
             let messages = [
@@ -444,24 +438,8 @@ export default async function handler(req, res) {
             // Create floating chat button
             const chatButton = document.createElement('div');
             chatButton.id = 'luxllm-chat-button';
-            chatButton.style.cssText = \`
-              width: 60px;
-              height: 60px;
-              background: linear-gradient(135deg, \${config.primaryColor} 0%, \${config.primaryColor}dd 100%);
-              border-radius: 50%;
-              display: none;
-              align-items: center;
-              justify-content: center;
-              cursor: pointer;
-              box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-              transition: all 0.3s ease;
-              animation: float 3s ease-in-out infinite;
-            \`;
-            chatButton.innerHTML = \`
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-              </svg>
-            \`;
+            chatButton.style.cssText = 'width: 60px; height: 60px; background: linear-gradient(135deg, ' + config.primaryColor + ' 0%, ' + config.primaryColor + 'dd 100%); border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 32px rgba(0,0,0,0.3); transition: all 0.3s ease; animation: float 3s ease-in-out infinite;';
+            chatButton.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
             chatButton.onclick = () => {
               chatWindow.style.display = 'flex';
               chatButton.style.display = 'none';
