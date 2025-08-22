@@ -151,51 +151,7 @@ export default async function handler(req, res) {
         </div>
         
         <script>
-          function loadChatbot() {
-            // Get configuration from URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            const configParam = urlParams.get('config');
-            
-            if (configParam) {
-              try {
-                const config = JSON.parse(decodeURIComponent(configParam));
-                console.log('Loading chatbot with config:', config);
-                
-                // Create a beautiful chatbot that matches the editor preview
-                createBeautifulChatbot(config);
-                
-                // Update button
-                const button = document.querySelector('.test-button');
-                button.textContent = 'Chatbot Loaded!';
-                button.style.background = '#10b981';
-                button.disabled = true;
-                
-                // Show success message
-                setTimeout(() => {
-                  const successMsg = document.createElement('div');
-                  successMsg.style.cssText = 'text-align: center; margin-top: 20px; color: #10b981; font-weight: 500;';
-                  successMsg.textContent = '✅ Chatbot loaded successfully! Look for the floating chat button.';
-                  document.querySelector('.test-section').appendChild(successMsg);
-                }, 1000);
-              } catch (error) {
-                console.error('Error parsing config:', error);
-                alert('Error loading chatbot configuration');
-              }
-            } else {
-              // Fallback without config
-              const script = document.createElement('script');
-              script.src = \`/api/embed-script/${embedCode}.js\`;
-              script.async = true;
-              document.body.appendChild(script);
-              
-              // Update button
-              const button = document.querySelector('.test-button');
-              button.textContent = 'Chatbot Loaded!';
-              button.style.background = '#10b981';
-              button.disabled = true;
-            }
-          }
-
+          // Define createBeautifulChatbot function first (global scope)
           function createBeautifulChatbot(config) {
             console.log('Creating beautiful chatbot with config:', config);
             
@@ -694,6 +650,52 @@ export default async function handler(req, res) {
             document.head.appendChild(enhancedStyle);
 
             console.log('Beautiful chatbot created with config:', config);
+          }
+
+          // Define loadChatbot function (global scope)
+          function loadChatbot() {
+            // Get configuration from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const configParam = urlParams.get('config');
+            
+            if (configParam) {
+              try {
+                const config = JSON.parse(decodeURIComponent(configParam));
+                console.log('Loading chatbot with config:', config);
+                
+                // Create a beautiful chatbot that matches the editor preview
+                createBeautifulChatbot(config);
+                
+                // Update button
+                const button = document.querySelector('.test-button');
+                button.textContent = 'Chatbot Loaded!';
+                button.style.background = '#10b981';
+                button.disabled = true;
+                
+                // Show success message
+                setTimeout(() => {
+                  const successMsg = document.createElement('div');
+                  successMsg.style.cssText = 'text-align: center; margin-top: 20px; color: #10b981; font-weight: 500;';
+                  successMsg.textContent = '✅ Chatbot loaded successfully! Look for the floating chat button.';
+                  document.querySelector('.test-section').appendChild(successMsg);
+                }, 1000);
+              } catch (error) {
+                console.error('Error parsing config:', error);
+                alert('Error loading chatbot configuration');
+              }
+            } else {
+              // Fallback without config
+              const script = document.createElement('script');
+              script.src = \`/api/embed-script/${embedCode}.js\`;
+              script.async = true;
+              document.body.appendChild(script);
+              
+              // Update button
+              const button = document.querySelector('.test-button');
+              button.textContent = 'Chatbot Loaded!';
+              button.style.background = '#10b981';
+              button.disabled = true;
+            }
           }
         </script>
       </body>
