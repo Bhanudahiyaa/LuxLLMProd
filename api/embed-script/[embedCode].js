@@ -46,12 +46,12 @@ function generateEmbedScript(embedCode, chatbotConfig) {
     systemPrompt:
       chatbotConfig?.systemPrompt || "You are a helpful AI assistant.",
     // Map from ChatbotPreview interface
-    primaryColor: chatbotConfig?.primaryColor || "#3b82f6",        // primaryColor → primaryColor
-    backgroundColor: chatbotConfig?.backgroundColor || "#ffffff",   // backgroundColor → backgroundColor
-    textColor: chatbotConfig?.textColor || "#1f2937",             // textColor → textColor
-    accentColor: chatbotConfig?.accentColor || "#e5e7eb",         // accentColor → accentColor
-    chatBgColor: chatbotConfig?.backgroundColor || "#ffffff",      // backgroundColor → chatBgColor
-    chatBorderColor: chatbotConfig?.accentColor || "#e5e7eb",     // accentColor → chatBorderColor
+    primaryColor: chatbotConfig?.primaryColor || "#3b82f6", // primaryColor → primaryColor
+    backgroundColor: chatbotConfig?.backgroundColor || "#ffffff", // backgroundColor → backgroundColor
+    textColor: chatbotConfig?.textColor || "#1f2937", // textColor → textColor
+    accentColor: chatbotConfig?.accentColor || "#e5e7eb", // accentColor → accentColor
+    chatBgColor: chatbotConfig?.backgroundColor || "#ffffff", // backgroundColor → chatBgColor
+    chatBorderColor: chatbotConfig?.accentColor || "#e5e7eb", // accentColor → chatBorderColor
     borderRadius: chatbotConfig?.borderRadius || 12,
     fontSize: chatbotConfig?.fontSize || 14,
     fontFamily: chatbotConfig?.fontFamily || "Inter",

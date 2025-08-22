@@ -161,13 +161,8 @@ export default async function handler(req, res) {
                 const config = JSON.parse(decodeURIComponent(configParam));
                 console.log('Loading chatbot with config:', config);
                 
-                // Create script element with configuration passed via URL
-                const script = document.createElement('script');
-                script.src = \`/api/embed-script/${embedCode}.js?config=\${encodeURIComponent(configParam)}\`;
-                script.async = true;
-                
-                // Add to page
-                document.body.appendChild(script);
+                // Create a beautiful chatbot that matches the editor preview
+                createBeautifulChatbot(config);
                 
                 // Update button
                 const button = document.querySelector('.test-button');
@@ -199,6 +194,270 @@ export default async function handler(req, res) {
               button.style.background = '#10b981';
               button.disabled = true;
             }
+          }
+
+          function createBeautifulChatbot(config) {
+            // Create the main chatbot container
+            const chatbotContainer = document.createElement('div');
+            chatbotContainer.id = 'luxllm-beautiful-chatbot';
+            chatbotContainer.style.cssText = \`
+              position: fixed;
+              bottom: 20px;
+              right: 20px;
+              z-index: 10000;
+              font-family: \${config.fontFamily || 'Inter'}, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            \`;
+
+            // Create the beautiful chat window
+            const chatWindow = document.createElement('div');
+            chatWindow.id = 'luxllm-chat-window';
+            chatWindow.style.cssText = \`
+              width: 350px;
+              height: 500px;
+              background: linear-gradient(135deg, \${config.backgroundColor} 0%, \${config.backgroundColor}dd 100%);
+              border-radius: \${config.borderRadius || 12}px;
+              box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.2);
+              display: flex;
+              flex-direction: column;
+              overflow: hidden;
+              border: 1px solid \${config.accentColor || '#e5e7eb'};
+              backdrop-filter: blur(10px);
+            \`;
+
+            // Create header with gradient
+            const header = document.createElement('div');
+            header.style.cssText = \`
+              background: linear-gradient(135deg, \${config.primaryColor} 0%, \${config.primaryColor}dd 100%);
+              color: white;
+              padding: 16px;
+              font-weight: 600;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              position: relative;
+              overflow: hidden;
+            \`;
+
+            // Add animated background pattern to header
+            const headerPattern = document.createElement('div');
+            headerPattern.style.cssText = \`
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background-image: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.1) 75%, rgba(255,255,255,0.1));
+              background-size: 20px 20px;
+              animation: movePattern 20s linear infinite;
+              opacity: 0.3;
+            \`;
+
+            // Add keyframes for animation
+            const style = document.createElement('style');
+            style.textContent = \`
+              @keyframes movePattern {
+                0% { background-position: 0 0; }
+                100% { background-position: 40px 40px; }
+              }
+              @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+              }
+              @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.7; }
+              }
+            \`;
+            document.head.appendChild(style);
+
+            // Create avatar
+            const avatar = document.createElement('div');
+            avatar.style.cssText = \`
+              width: 32px;
+              height: 32px;
+              background: rgba(255,255,255,0.2);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 16px;
+              backdrop-filter: blur(5px);
+            \`;
+            avatar.innerHTML = '🤖';
+
+            // Create bot name and status
+            const botInfo = document.createElement('div');
+            botInfo.innerHTML = \`
+              <div style="font-size: 16px; font-weight: 600;">\${config.name || 'AI Assistant'}</div>
+              <div style="font-size: 12px; opacity: 0.8; display: flex; align-items: center; gap: 4px;">
+                <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite;"></div>
+                Online
+              </div>
+            \`;
+
+            // Create close button
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '×';
+            closeBtn.style.cssText = \`
+              background: rgba(255,255,255,0.1);
+              border: none;
+              color: white;
+              width: 24px;
+              height: 24px;
+              border-radius: 50%;
+              cursor: pointer;
+              font-size: 18px;
+              margin-left: auto;
+              transition: all 0.2s;
+            \`;
+            closeBtn.onclick = () => {
+              chatWindow.style.display = 'none';
+              chatButton.style.display = 'flex';
+            };
+
+            // Assemble header
+            header.appendChild(headerPattern);
+            header.appendChild(avatar);
+            header.appendChild(botInfo);
+            header.appendChild(closeBtn);
+
+            // Create messages area
+            const messagesArea = document.createElement('div');
+            messagesArea.id = 'luxllm-messages';
+            messagesArea.style.cssText = \`
+              flex: 1;
+              padding: 16px;
+              overflow-y: auto;
+              background: \${config.backgroundColor};
+              display: flex;
+              flex-direction: column;
+              gap: 12px;
+            \`;
+
+            // Add welcome message
+            const welcomeMsg = document.createElement('div');
+            welcomeMsg.style.cssText = \`
+              padding: 12px 16px;
+              background: \${config.accentColor || '#f3f4f6'};
+              border-radius: 8px;
+              color: \${config.textColor || '#1f2937'};
+              font-size: 14px;
+              line-height: 1.4;
+              max-width: 80%;
+              align-self: flex-start;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            \`;
+            welcomeMsg.textContent = config.welcomeMessage || 'Hello! How can I help you today?';
+            messagesArea.appendChild(welcomeMsg);
+
+            // Create input area
+            const inputArea = document.createElement('div');
+            inputArea.style.cssText = \`
+              padding: 16px;
+              border-top: 1px solid \${config.accentColor || '#e5e7eb'};
+              background: \${config.backgroundColor};
+              display: flex;
+              gap: 8px;
+            \`;
+
+            // Create input field
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = config.placeholder || 'Type your message...';
+            input.style.cssText = \`
+              flex: 1;
+              padding: 12px;
+              border: 1px solid \${config.accentColor || '#e5e7eb'};
+              border-radius: 6px;
+              font-size: 14px;
+              outline: none;
+              background: \${config.backgroundColor};
+              color: \${config.textColor || '#1f2937'};
+              transition: all 0.2s;
+            \`;
+            input.onfocus = () => {
+              input.style.borderColor = config.primaryColor;
+              input.style.boxShadow = \`0 0 0 3px \${config.primaryColor}20\`;
+            };
+            input.onblur = () => {
+              input.style.borderColor = config.accentColor || '#e5e7eb';
+              input.style.boxShadow = 'none';
+            };
+
+            // Create send button
+            const sendBtn = document.createElement('button');
+            sendBtn.innerHTML = '➤';
+            sendBtn.style.cssText = \`
+              padding: 12px 16px;
+              background: \${config.primaryColor};
+              color: white;
+              border: none;
+              border-radius: 6px;
+              cursor: pointer;
+              font-size: 14px;
+              font-weight: 500;
+              transition: all 0.2s;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            \`;
+            sendBtn.onmouseenter = () => {
+              sendBtn.style.transform = 'scale(1.05)';
+              sendBtn.style.boxShadow = \`0 4px 16px \${config.primaryColor}40\`;
+            };
+            sendBtn.onmouseleave = () => {
+              sendBtn.style.transform = 'scale(1)';
+              sendBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+            };
+
+            // Assemble input area
+            inputArea.appendChild(input);
+            inputArea.appendChild(sendBtn);
+
+            // Assemble chat window
+            chatWindow.appendChild(header);
+            chatWindow.appendChild(messagesArea);
+            chatWindow.appendChild(inputArea);
+
+            // Create floating chat button
+            const chatButton = document.createElement('div');
+            chatButton.id = 'luxllm-chat-button';
+            chatButton.style.cssText = \`
+              width: 60px;
+              height: 60px;
+              background: linear-gradient(135deg, \${config.primaryColor} 0%, \${config.primaryColor}dd 100%);
+              border-radius: 50%;
+              display: none;
+              align-items: center;
+              justify-content: center;
+              cursor: pointer;
+              box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+              transition: all 0.3s ease;
+              animation: float 3s ease-in-out infinite;
+            \`;
+            chatButton.innerHTML = \`
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            \`;
+            chatButton.onclick = () => {
+              chatWindow.style.display = 'flex';
+              chatButton.style.display = 'none';
+            };
+
+            // Add everything to the page
+            chatbotContainer.appendChild(chatWindow);
+            chatbotContainer.appendChild(chatButton);
+            document.body.appendChild(chatbotContainer);
+
+            // Add enter key support
+            input.addEventListener('keypress', (e) => {
+              if (e.key === 'Enter') {
+                // Handle send message
+                console.log('Send message:', input.value);
+                input.value = '';
+              }
+            });
+
+            console.log('Beautiful chatbot created with config:', config);
           }
         </script>
       </body>
