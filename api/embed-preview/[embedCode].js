@@ -22,17 +22,8 @@ export default async function handler(req, res) {
     let embedConfig = null;
     try {
       const { data: embed, error } = await supabase
-        .from("public_embeds")
-        .select(
-          `
-          *,
-          agents (
-            name,
-            system_prompt,
-            theme_config
-          )
-        `
-        )
+        .from("embeds")
+        .select("*")
         .eq("embed_code", embedCode)
         .eq("is_active", true)
         .single();

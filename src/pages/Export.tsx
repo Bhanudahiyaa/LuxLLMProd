@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@clerk/clerk-react";
 import { useChatbotSettingsService } from "@/hooks/chatbotSettingsService";
+import { useEmbedService } from "@/hooks/embedService";
 import { getThemeById, themePresets } from "@/lib/themes";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import Navigation from "@/components/Navigation";
@@ -47,6 +48,7 @@ interface ChatbotConfig {
 export default function ExportPage() {
   const { isSignedIn, isLoaded } = useAuth();
   const { getChatbotSettings } = useChatbotSettingsService();
+  const { createEmbed } = useEmbedService();
   const [copied, setCopied] = useState<string | null>(null);
   const [embedName, setEmbedName] = useState("Portfolio Bot");
   const [description, setDescription] = useState(
@@ -58,6 +60,7 @@ export default function ExportPage() {
     null
   );
   const [embedCode, setEmbedCode] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
 
   // Chat functionality for the test chatbot
 
@@ -219,7 +222,8 @@ export default function ExportPage() {
     borderRadius: '${chatbotConfig.borderRadius || 12}px',
     fontSize: '${chatbotConfig.fontSize || 14}px',
     fontFamily: '${chatbotConfig.fontFamily || "Inter"}, sans-serif',
-    theme: '${chatbotConfig.theme || "modern"}'
+    theme: '${chatbotConfig.theme || "modern"}',
+    embedCode: '${embedCode || "default"}'
   };
 
   console.log("Loading chatbot with EXACT config:", config);
@@ -280,7 +284,7 @@ export default function ExportPage() {
           \${config.avatarUrl ? \`<img src="\${config.avatarUrl}" style="width: 32px; height: 32px; border-radius: 50%;">\` : '<div style="width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;"><span style="font-size: 16px;">🤖</span></div>'}
           <div>
             <div style="font-weight: 600; font-size: 16px;">\${config.name}</div>
-            <div style="font-size: 12px; opacity: 0.8;">AI Assistant</div>
+            <div style="font-size: 12px; opacity: 0.8;">\${config.name} Bot</div>
           </div>
         </div>
 
@@ -375,8 +379,8 @@ export default function ExportPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: message,
-          systemPrompt: config.systemPrompt,
-          embedCode: config.embedCode
+          embedCode: config.embedCode,
+          sessionId: 'session-' + Date.now()
         })
       });
 
@@ -479,25 +483,69 @@ export default function ExportPage() {
       return;
     }
 
-    // Generate a unique embed code
-    const newEmbedCode = `embed-${Date.now()}-${Math.random()
-      .toString(36)
-      .substr(2, 9)}`;
-    setEmbedCode(newEmbedCode);
+    setIsCreating(true);
 
-    // Save the embed configuration to localStorage for persistence
-    const embedConfig = {
-      embedCode: newEmbedCode,
-      chatbotConfig: chatbotConfig,
-      createdAt: new Date().toISOString(),
-      name: embedName,
-      description: description,
-      maxRequestsPerHour: parseInt(maxRequestsPerHour),
-      maxRequestsPerDay: parseInt(maxRequestsPerDay),
-    };
+    try {
+      // Generate a unique embed code
+      const newEmbedCode = `embed-${Date.now()}-${Math.random()
+        .toString(36)
+        .substr(2, 9)}`;
 
-    localStorage.setItem(`embed-${newEmbedCode}`, JSON.stringify(embedConfig));
-    console.log("Created embed with configuration:", embedConfig);
+      // Create embed configuration for database
+      const embedConfig = {
+        embed_code: newEmbedCode,
+        name: embedName,
+        description: description,
+        agent_config: {
+          name: chatbotConfig.name,
+          system_prompt: chatbotConfig.systemPrompt,
+          avatar_url: chatbotConfig.avatar,
+          chat_bg_color: chatbotConfig.chatBgColor,
+          chat_border_color: chatbotConfig.chatBorderColor,
+          user_msg_color: chatbotConfig.userMsgColor,
+          bot_msg_color: chatbotConfig.botMsgColor,
+          welcome_message: chatbotConfig.welcomeMessage,
+          placeholder: chatbotConfig.placeholder,
+          theme: chatbotConfig.theme,
+          borderRadius: chatbotConfig.borderRadius,
+          fontSize: chatbotConfig.fontSize,
+          fontFamily: chatbotConfig.fontFamily,
+        },
+        max_requests_per_hour: parseInt(maxRequestsPerHour),
+        max_requests_per_day: parseInt(maxRequestsPerDay),
+        is_active: true,
+      };
+
+      // Save to database
+      const { data, error } = await createEmbed(embedConfig);
+
+      if (error) {
+        console.error("Failed to create embed:", error);
+        alert("Failed to create embed. Please try again.");
+        return;
+      }
+
+      // Set the embed code for the UI
+      setEmbedCode(newEmbedCode);
+      console.log("Created embed with configuration:", data);
+
+      // Also save to localStorage as backup
+      localStorage.setItem(`embed-${newEmbedCode}`, JSON.stringify({
+        embedCode: newEmbedCode,
+        chatbotConfig: chatbotConfig,
+        createdAt: new Date().toISOString(),
+        name: embedName,
+        description: description,
+        maxRequestsPerHour: parseInt(maxRequestsPerHour),
+        maxRequestsPerDay: parseInt(maxRequestsPerDay),
+      }));
+
+    } catch (error) {
+      console.error("Error creating embed:", error);
+      alert("Failed to create embed. Please try again.");
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   // Function to refresh configuration from database
@@ -631,291 +679,290 @@ export default function ExportPage() {
             </p>
           </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Column */}
-          <div className="space-y-8">
-            {/* Chatbot Preview */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Globe className="w-6 h-6 text-primary" />
-                    <CardTitle>Chatbot Preview</CardTitle>
-                  </div>
-                  <Button
-                    onClick={refreshConfig}
-                    size="sm"
-                    variant="outline"
-                  >
-                    🔄 Refresh
-                  </Button>
-                </div>
-                <CardDescription>
-                  Your customized '{embedName}' chatbot will appear seamlessly
-                  on any website where you embed the code below.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {chatbotConfig ? (
-                  <div className="w-full h-80 bg-muted rounded-lg border-2 border-dashed border-border flex items-center justify-center relative overflow-hidden">
-                    {/* Working Chatbot Preview - Exact replica of editor */}
-
-                    {/* Color Info - Show exact values */}
-                    <div className="absolute top-2 left-2 text-xs text-muted-foreground bg-background/80 p-2 rounded">
-                      <div className="font-medium mb-1">Current Settings:</div>
-                      <div>Name: {chatbotConfig.name}</div>
-                      <div>Primary: {chatbotConfig.userMsgColor}</div>
-                      <div>Background: {chatbotConfig.chatBgColor}</div>
-                      <div>Text: {chatbotConfig.botMsgColor}</div>
-                      <div>Border: {chatbotConfig.chatBorderColor}</div>
-                      <div className="mt-1 text-yellow-600">
-                        System: {chatbotConfig.systemPrompt.substring(0, 50)}...
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="w-full h-80 bg-muted rounded-lg border-2 border-dashed border-border flex items-center justify-center">
-                    <div className="text-center text-muted-foreground">
-                      <Globe className="w-12 h-12 mx-auto mb-2" />
-                      <p>No chatbot configuration found</p>
-                      <p className="text-sm">
-                        Go to /editor to customize your chatbot first
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Create Embed */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <Plus className="w-6 h-6 text-primary" />
-                  <CardTitle>Create Embed</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Embed Name
-                  </label>
-                  <Input
-                    value={embedName}
-                    onChange={e => setEmbedName(e.target.value)}
-                    placeholder="Enter embed name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Description (Optional)
-                  </label>
-                  <Textarea
-                    value={description}
-                    onChange={e => setDescription(e.target.value)}
-                    placeholder="Enter description"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Max Requests per Hour
-                    </label>
-                    <Input
-                      value={maxRequestsPerHour}
-                      onChange={e => setMaxRequestsPerHour(e.target.value)}
-                      type="number"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Max Requests per Day
-                    </label>
-                    <Input
-                      value={maxRequestsPerDay}
-                      onChange={e => setMaxRequestsPerDay(e.target.value)}
-                      type="number"
-                    />
-                  </div>
-                </div>
-                <Button
-                  onClick={handleCreateEmbed}
-                  className="w-full"
-                  disabled={!chatbotConfig}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Embed
-                </Button>
-                {!chatbotConfig && (
-                  <p className="text-sm text-yellow-600 text-center">
-                    ⚠️ Please customize your chatbot in the /editor page first
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right Column */}
-          <div className="space-y-8">
-            {/* Script Embed */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <Code className="w-6 h-6 text-primary" />
-                  <CardTitle>Script Embed</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="relative">
-                  <textarea
-                    value={generateEmbedScript()}
-                    readOnly
-                    className="w-full h-32 bg-muted border border-border rounded-lg p-3 text-sm font-mono resize-none"
-                    placeholder="Create an embed first to generate the script..."
-                  />
-                  <Button
-                    onClick={() =>
-                      copyToClipboard(generateEmbedScript(), "script")
-                    }
-                    className="absolute top-2 right-2"
-                    size="sm"
-                    disabled={!embedCode}
-                  >
-                    {copied === "script" ? (
-                      "Copied!"
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Iframe Embed */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <Globe className="w-6 h-6 text-primary" />
-                  <CardTitle>Iframe Embed</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="relative">
-                  <textarea
-                    value={generateIframeEmbed()}
-                    readOnly
-                    className="w-full h-20 bg-muted border border-border rounded-lg p-3 text-sm font-mono resize-none"
-                    placeholder="Create an embed first to generate the iframe..."
-                  />
-                  <Button
-                    onClick={() =>
-                      copyToClipboard(generateIframeEmbed(), "iframe")
-                    }
-                    className="absolute top-2 right-2"
-                    size="sm"
-                    disabled={!embedCode}
-                  >
-                    {copied === "iframe" ? (
-                      "Copied!"
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Test Your Embed */}
-            {embedCode && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Left Column */}
+            <div className="space-y-8">
+              {/* Chatbot Preview */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Test Your Embed</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Globe className="w-6 h-6 text-primary" />
+                      <CardTitle>Chatbot Preview</CardTitle>
+                    </div>
+                    <Button onClick={refreshConfig} size="sm" variant="outline">
+                      🔄 Refresh
+                    </Button>
+                  </div>
+                  <CardDescription>
+                    Your customized '{embedName}' chatbot will appear seamlessly
+                    on any website where you embed the code below.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {chatbotConfig ? (
+                    <div className="w-full h-80 bg-muted rounded-lg border-2 border-dashed border-border flex items-center justify-center relative overflow-hidden">
+                      {/* Working Chatbot Preview - Exact replica of editor */}
+
+                      {/* Color Info - Show exact values */}
+                      <div className="absolute top-2 left-2 text-xs text-muted-foreground bg-background/80 p-2 rounded">
+                        <div className="font-medium mb-1">
+                          Current Settings:
+                        </div>
+                        <div>Name: {chatbotConfig.name}</div>
+                        <div>Primary: {chatbotConfig.userMsgColor}</div>
+                        <div>Background: {chatbotConfig.chatBgColor}</div>
+                        <div>Text: {chatbotConfig.botMsgColor}</div>
+                        <div>Border: {chatbotConfig.chatBorderColor}</div>
+                        <div className="mt-1 text-yellow-600">
+                          System: {chatbotConfig.systemPrompt.substring(0, 50)}
+                          ...
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full h-80 bg-muted rounded-lg border-2 border-dashed border-border flex items-center justify-center">
+                      <div className="text-center text-muted-foreground">
+                        <Globe className="w-12 h-12 mx-auto mb-2" />
+                        <p>No chatbot configuration found</p>
+                        <p className="text-sm">
+                          Go to /editor to customize your chatbot first
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Create Embed */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <Plus className="w-6 h-6 text-primary" />
+                    <CardTitle>Create Embed</CardTitle>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="bg-muted border border-border rounded-lg p-3">
-                    <p className="text-sm text-foreground">
-                      Your embed code: {embedCode}
-                    </p>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      Embed Name
+                    </label>
+                    <Input
+                      value={embedName}
+                      onChange={e => setEmbedName(e.target.value)}
+                      placeholder="Enter embed name"
+                    />
                   </div>
-                  <div className="flex gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      Description (Optional)
+                    </label>
+                    <Textarea
+                      value={description}
+                      onChange={e => setDescription(e.target.value)}
+                      placeholder="Enter description"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Max Requests per Hour
+                      </label>
+                      <Input
+                        value={maxRequestsPerHour}
+                        onChange={e => setMaxRequestsPerHour(e.target.value)}
+                        type="number"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Max Requests per Day
+                      </label>
+                      <Input
+                        value={maxRequestsPerDay}
+                        onChange={e => setMaxRequestsPerDay(e.target.value)}
+                        type="number"
+                      />
+                    </div>
+                  </div>
+                                  <Button
+                  onClick={handleCreateEmbed}
+                  className="w-full"
+                  disabled={!chatbotConfig || isCreating}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  {isCreating ? "Creating..." : "Create Embed"}
+                </Button>
+                  {!chatbotConfig && (
+                    <p className="text-sm text-yellow-600 text-center">
+                      ⚠️ Please customize your chatbot in the /editor page first
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-8">
+              {/* Script Embed */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <Code className="w-6 h-6 text-primary" />
+                    <CardTitle>Script Embed</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="relative">
+                    <textarea
+                      value={generateEmbedScript()}
+                      readOnly
+                      className="w-full h-32 bg-muted border border-border rounded-lg p-3 text-sm font-mono resize-none"
+                      placeholder="Create an embed first to generate the script..."
+                    />
                     <Button
                       onClick={() =>
-                        window.open(
-                          `https://lux-llm-prod.vercel.app/api/embed-preview/${embedCode}`,
-                          "_blank"
-                        )
+                        copyToClipboard(generateEmbedScript(), "script")
                       }
+                      className="absolute top-2 right-2"
+                      size="sm"
+                      disabled={!embedCode}
                     >
-                      <Eye className="w-4 h-4 mr-2" />
-                      Preview Embed
-                    </Button>
-                    <Button
-                      onClick={() => copyToClipboard(embedCode, "embedCode")}
-                      variant="outline"
-                    >
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copy Embed Code
+                      {copied === "script" ? (
+                        "Copied!"
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
                     </Button>
                   </div>
                 </CardContent>
               </Card>
-            )}
 
-            {/* API Configuration */}
-            <Card>
-              <CardHeader>
-                <CardTitle>API Configuration</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-muted border border-primary rounded-lg p-4">
-                  <p className="text-sm text-foreground">
-                    <strong className="text-primary">Important:</strong> The
-                    embed code calls an API endpoint (
-                    <code className="text-primary">
-                      https://lux-llm-prod.vercel.app/api/public-chat
-                    </code>
-                    ) for handling chat requests, tracking usage, and storing
-                    conversations.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Platform Integrations */}
-        <div className="mt-12">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-foreground mb-2">
-              Platform Integrations
-            </h2>
-            <p className="text-muted-foreground">
-              Step-by-step instructions for embedding your chatbot on popular
-              platforms
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {platformIntegrations.map((platform, index) => (
-              <Card
-                key={index}
-                className="hover:border-primary transition-colors cursor-pointer"
-              >
-                <CardContent className="p-4 text-center">
-                  <div className="w-12 h-12 bg-muted rounded-lg mx-auto mb-3 flex items-center justify-center">
+              {/* Iframe Embed */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-3">
                     <Globe className="w-6 h-6 text-primary" />
+                    <CardTitle>Iframe Embed</CardTitle>
                   </div>
-                  <h3 className="font-medium text-foreground text-sm mb-1">
-                    {platform.name}
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    {platform.description}
-                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="relative">
+                    <textarea
+                      value={generateIframeEmbed()}
+                      readOnly
+                      className="w-full h-20 bg-muted border border-border rounded-lg p-3 text-sm font-mono resize-none"
+                      placeholder="Create an embed first to generate the iframe..."
+                    />
+                    <Button
+                      onClick={() =>
+                        copyToClipboard(generateIframeEmbed(), "iframe")
+                      }
+                      className="absolute top-2 right-2"
+                      size="sm"
+                      disabled={!embedCode}
+                    >
+                      {copied === "iframe" ? (
+                        "Copied!"
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
-            ))}
+
+              {/* Test Your Embed */}
+              {embedCode && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Test Your Embed</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="bg-muted border border-border rounded-lg p-3">
+                      <p className="text-sm text-foreground">
+                        Your embed code: {embedCode}
+                      </p>
+                    </div>
+                    <div className="flex gap-3">
+                      <Button
+                        onClick={() =>
+                          window.open(
+                            `https://lux-llm-prod.vercel.app/api/embed-preview/${embedCode}`,
+                            "_blank"
+                          )
+                        }
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        Preview Embed
+                      </Button>
+                      <Button
+                        onClick={() => copyToClipboard(embedCode, "embedCode")}
+                        variant="outline"
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copy Embed Code
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* API Configuration */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>API Configuration</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-muted border border-primary rounded-lg p-4">
+                    <p className="text-sm text-foreground">
+                      <strong className="text-primary">Important:</strong> The
+                      embed code calls an API endpoint (
+                      <code className="text-primary">
+                        https://lux-llm-prod.vercel.app/api/public-chat
+                      </code>
+                      ) for handling chat requests, tracking usage, and storing
+                      conversations.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-        </div>
+
+          {/* Platform Integrations */}
+          <div className="mt-12">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-foreground mb-2">
+                Platform Integrations
+              </h2>
+              <p className="text-muted-foreground">
+                Step-by-step instructions for embedding your chatbot on popular
+                platforms
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {platformIntegrations.map((platform, index) => (
+                <Card
+                  key={index}
+                  className="hover:border-primary transition-colors cursor-pointer"
+                >
+                  <CardContent className="p-4 text-center">
+                    <div className="w-12 h-12 bg-muted rounded-lg mx-auto mb-3 flex items-center justify-center">
+                      <Globe className="w-6 h-6 text-primary" />
+                    </div>
+                    <h3 className="font-medium text-foreground text-sm mb-1">
+                      {platform.name}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      {platform.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         </main>
       </div>
     </div>

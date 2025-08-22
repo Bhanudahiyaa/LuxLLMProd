@@ -25,25 +25,8 @@ export default async function handler(req, res) {
     let embedConfig = null;
     try {
       const { data: embed, error } = await supabase
-        .from("public_embeds")
-        .select(
-          `
-          *,
-          agents (
-            id,
-            name,
-            system_prompt,
-            avatar_url,
-            chat_bg_color,
-            chat_border_color,
-            user_msg_color,
-            bot_msg_color,
-            chat_name,
-            heading,
-            subheading
-          )
-        `
-        )
+        .from("embeds")
+        .select("*")
         .eq("embed_code", embedCode)
         .eq("is_active", true)
         .single();
@@ -51,7 +34,7 @@ export default async function handler(req, res) {
       if (!error && embed) {
         embedConfig = embed;
         console.log("✅ Found embed configuration:", embed.id);
-        console.log("✅ Agent data:", embed.agents);
+        console.log("✅ Agent config:", embed.agent_config);
       } else {
         console.log("⚠️ Using default configuration for:", embedCode);
       }
@@ -75,28 +58,28 @@ function generateEmbedScript(embedCode, embedConfig) {
   const apiBaseUrl = isProduction ? productionUrl : "http://localhost:3000";
 
   // Get agent configuration with fallbacks
-  const agent = embedConfig?.agents || {};
+  const agentConfig = embedConfig?.agent_config || {};
   
   // Escape any single quotes in the config values to prevent syntax errors
-  const escapedName = (agent.name || embedConfig?.name || "AI Assistant").replace(/'/g, "\\'");
-  const escapedPrompt = (agent.system_prompt || "You are a helpful AI assistant that can answer questions about technology, programming, and general knowledge.").replace(/'/g, "\\'");
+  const escapedName = (agentConfig.name || "AI Assistant").replace(/'/g, "\\'");
+  const escapedPrompt = (agentConfig.system_prompt || "You are a helpful AI assistant that can answer questions about technology, programming, and general knowledge.").replace(/'/g, "\\'");
   
   // Use actual agent customizations with fallbacks
-  const primaryColor = agent.user_msg_color || '#3b82f6';
-  const backgroundColor = agent.chat_bg_color || '#ffffff';
-  const textColor = agent.bot_msg_color || '#1f2937';
-  const accentColor = agent.chat_border_color || '#e5e7eb';
-  const chatBgColor = agent.chat_bg_color || '#ffffff';
-  const chatBorderColor = agent.chat_border_color || '#e5e7eb';
+  const primaryColor = agentConfig.user_msg_color || '#3b82f6';
+  const backgroundColor = agentConfig.chat_bg_color || '#ffffff';
+  const textColor = agentConfig.bot_msg_color || '#1f2937';
+  const accentColor = agentConfig.chat_border_color || '#e5e7eb';
+  const chatBgColor = agentConfig.chat_bg_color || '#ffffff';
+  const chatBorderColor = agentConfig.chat_border_color || '#e5e7eb';
   
   // UI settings with fallbacks
-  const borderRadius = 12; // Default
-  const fontSize = 14; // Default
-  const fontFamily = 'Inter'; // Default
+  const borderRadius = agentConfig.borderRadius || 12;
+  const fontSize = agentConfig.fontSize || 14;
+  const fontFamily = agentConfig.fontFamily || 'Inter';
   const position = 'bottom-right'; // Default
-  const welcomeMessage = `Hello! I'm ${agent.name || "your AI assistant"}. How can I help you today?`;
-  const placeholder = "Type your message...";
-  const avatarUrl = agent.avatar_url || '';
+  const welcomeMessage = agentConfig.welcome_message || `Hello! I'm ${agentConfig.name || "your AI assistant"}. How can I help you today?`;
+  const placeholder = agentConfig.placeholder || "Type your message...";
+  const avatarUrl = agentConfig.avatar_url || '';
   
   // Features
   const showTypingIndicator = true;
