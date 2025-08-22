@@ -24,6 +24,8 @@ import {
 import { useAuth } from "@clerk/clerk-react";
 import { useChatbotSettingsService } from "@/hooks/chatbotSettingsService";
 import { getThemeById, themePresets } from "@/lib/themes";
+import { AppSidebar } from "@/components/layout/AppSidebar";
+import Navigation from "@/components/Navigation";
 
 interface ChatbotConfig {
   name: string;
@@ -58,7 +60,6 @@ export default function ExportPage() {
   const [embedCode, setEmbedCode] = useState("");
 
   // Chat functionality for the test chatbot
-
 
   useEffect(() => {
     // Load chatbot customizations from database first, then localStorage
@@ -550,8 +551,6 @@ export default function ExportPage() {
     }
   };
 
-
-
   const platformIntegrations = [
     { name: "WordPress", description: "Add to header.php or use plugin" },
     { name: "Shopify", description: "Edit theme.liquid file" },
@@ -601,139 +600,82 @@ export default function ExportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex">
-      {/* Left Sidebar */}
-      <div className="w-64 bg-gray-800 border-r border-gray-700 p-6">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-green-400">LuxLLM</h1>
-        </div>
-
-        <nav className="space-y-6">
-          <div>
-            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-              BUILD
-            </h3>
-            <ul className="space-y-2">
-              <li className="text-gray-300 hover:text-white cursor-pointer">
-                Templates
-              </li>
-              <li className="text-gray-300 hover:text-white cursor-pointer">
-                Premium
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-              MANAGE
-            </h3>
-            <ul className="space-y-2">
-              <li className="text-gray-300 hover:text-white cursor-pointer">
-                My Agents
-              </li>
-              <li className="text-gray-300 hover:text-white cursor-pointer">
-                Customize
-              </li>
-              <li className="text-green-400 flex items-center gap-2">
-                <Code className="w-4 h-4" />
-                Export
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-              HELP
-            </h3>
-            <ul className="space-y-2">
-              <li className="text-gray-300 hover:text-white cursor-pointer">
-                How it Works
-              </li>
-              <li className="text-gray-300 hover:text-white cursor-pointer">
-                Quick Start
-              </li>
-              <li className="text-gray-300 hover:text-white cursor-pointer">
-                Pricing
-              </li>
-              <li className="text-gray-300 hover:text-white cursor-pointer">
-                Blog
-              </li>
-              <li className="text-gray-300 hover:text-white cursor-pointer">
-                Team
-              </li>
-              <li className="text-gray-300 hover:text-white cursor-pointer">
-                Support
-              </li>
-              <li className="text-gray-300 hover:text-white cursor-pointer">
-                About
-              </li>
-            </ul>
-          </div>
-        </nav>
-      </div>
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      <AppSidebar />
 
       {/* Main Content */}
-      <div className="flex-1 p-8">
+      <div className="md:ml-48">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <Code className="w-8 h-8 text-green-400" />
-            <h1 className="text-3xl font-bold text-green-400">
-              Export Chatbot
-            </h1>
+        <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="flex h-16 items-center justify-between px-6">
+            <div className="md:hidden">
+              {/* Mobile menu trigger is handled by AppSidebar */}
+            </div>
           </div>
-          <p className="text-gray-400 text-lg">
-            Seamlessly integrate your AI chatbot into any website with our
-            elegant embed solutions.
-          </p>
-        </div>
+        </header>
+
+        {/* Page Content */}
+        <main className="flex-1 p-6">
+          {/* Page Header */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Code className="w-8 h-8 text-primary" />
+              <h1 className="text-3xl font-bold text-foreground">
+                Export Chatbot
+              </h1>
+            </div>
+            <p className="text-muted-foreground text-lg">
+              Seamlessly integrate your AI chatbot into any website with our
+              elegant embed solutions.
+            </p>
+          </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column */}
           <div className="space-y-8">
             {/* Chatbot Preview */}
-            <Card className="bg-gray-800 border-gray-700">
+            <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Globe className="w-6 h-6 text-green-400" />
+                    <Globe className="w-6 h-6 text-primary" />
                     <CardTitle>Chatbot Preview</CardTitle>
                   </div>
                   <Button
                     onClick={refreshConfig}
                     size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    variant="outline"
                   >
                     🔄 Refresh
                   </Button>
                 </div>
-                <CardDescription className="text-gray-400">
+                <CardDescription>
                   Your customized '{embedName}' chatbot will appear seamlessly
                   on any website where you embed the code below.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {chatbotConfig ? (
-                  <div className="w-full h-80 bg-gray-700 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center relative overflow-hidden">
+                  <div className="w-full h-80 bg-muted rounded-lg border-2 border-dashed border-border flex items-center justify-center relative overflow-hidden">
                     {/* Working Chatbot Preview - Exact replica of editor */}
 
-
                     {/* Color Info - Show exact values */}
-                    <div className="absolute top-2 left-2 text-xs text-gray-400 bg-gray-800/80 p-2 rounded">
+                    <div className="absolute top-2 left-2 text-xs text-muted-foreground bg-background/80 p-2 rounded">
                       <div className="font-medium mb-1">Current Settings:</div>
                       <div>Name: {chatbotConfig.name}</div>
                       <div>Primary: {chatbotConfig.userMsgColor}</div>
                       <div>Background: {chatbotConfig.chatBgColor}</div>
                       <div>Text: {chatbotConfig.botMsgColor}</div>
                       <div>Border: {chatbotConfig.chatBorderColor}</div>
-                      <div className="mt-1 text-yellow-400">
+                      <div className="mt-1 text-yellow-600">
                         System: {chatbotConfig.systemPrompt.substring(0, 50)}...
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="w-full h-80 bg-gray-700 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
-                    <div className="text-center text-gray-400">
+                  <div className="w-full h-80 bg-muted rounded-lg border-2 border-dashed border-border flex items-center justify-center">
+                    <div className="text-center text-muted-foreground">
                       <Globe className="w-12 h-12 mx-auto mb-2" />
                       <p>No chatbot configuration found</p>
                       <p className="text-sm">
@@ -746,70 +688,66 @@ export default function ExportPage() {
             </Card>
 
             {/* Create Embed */}
-            <Card className="bg-gray-800 border-gray-700">
+            <Card>
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <Plus className="w-6 h-6 text-green-400" />
+                  <Plus className="w-6 h-6 text-primary" />
                   <CardTitle>Create Embed</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Embed Name
                   </label>
                   <Input
                     value={embedName}
                     onChange={e => setEmbedName(e.target.value)}
-                    className="bg-gray-700 border-gray-600 text-white"
                     placeholder="Enter embed name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Description (Optional)
                   </label>
                   <Textarea
                     value={description}
                     onChange={e => setDescription(e.target.value)}
-                    className="bg-gray-700 border-gray-600 text-white"
                     placeholder="Enter description"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Max Requests per Hour
                     </label>
                     <Input
                       value={maxRequestsPerHour}
                       onChange={e => setMaxRequestsPerHour(e.target.value)}
-                      className="bg-gray-700 border-gray-600 text-white"
                       type="number"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Max Requests per Day
                     </label>
                     <Input
                       value={maxRequestsPerDay}
                       onChange={e => setMaxRequestsPerDay(e.target.value)}
-                      className="bg-gray-700 border-gray-600 text-white"
                       type="number"
                     />
                   </div>
                 </div>
                 <Button
                   onClick={handleCreateEmbed}
-                  className="w-full bg-green-500 hover:bg-green-600 text-white"
+                  className="w-full"
                   disabled={!chatbotConfig}
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Create Embed
                 </Button>
                 {!chatbotConfig && (
-                  <p className="text-sm text-yellow-400 text-center">
+                  <p className="text-sm text-yellow-600 text-center">
                     ⚠️ Please customize your chatbot in the /editor page first
                   </p>
                 )}
@@ -820,10 +758,10 @@ export default function ExportPage() {
           {/* Right Column */}
           <div className="space-y-8">
             {/* Script Embed */}
-            <Card className="bg-gray-800 border-gray-700">
+            <Card>
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <Code className="w-6 h-6 text-green-400" />
+                  <Code className="w-6 h-6 text-primary" />
                   <CardTitle>Script Embed</CardTitle>
                 </div>
               </CardHeader>
@@ -832,14 +770,14 @@ export default function ExportPage() {
                   <textarea
                     value={generateEmbedScript()}
                     readOnly
-                    className="w-full h-32 bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm font-mono text-white resize-none"
+                    className="w-full h-32 bg-muted border border-border rounded-lg p-3 text-sm font-mono resize-none"
                     placeholder="Create an embed first to generate the script..."
                   />
                   <Button
                     onClick={() =>
                       copyToClipboard(generateEmbedScript(), "script")
                     }
-                    className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white"
+                    className="absolute top-2 right-2"
                     size="sm"
                     disabled={!embedCode}
                   >
@@ -854,10 +792,10 @@ export default function ExportPage() {
             </Card>
 
             {/* Iframe Embed */}
-            <Card className="bg-gray-800 border-gray-700">
+            <Card>
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <Globe className="w-6 h-6 text-green-400" />
+                  <Globe className="w-6 h-6 text-primary" />
                   <CardTitle>Iframe Embed</CardTitle>
                 </div>
               </CardHeader>
@@ -866,14 +804,14 @@ export default function ExportPage() {
                   <textarea
                     value={generateIframeEmbed()}
                     readOnly
-                    className="w-full h-20 bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm font-mono text-white resize-none"
+                    className="w-full h-20 bg-muted border border-border rounded-lg p-3 text-sm font-mono resize-none"
                     placeholder="Create an embed first to generate the iframe..."
                   />
                   <Button
                     onClick={() =>
                       copyToClipboard(generateIframeEmbed(), "iframe")
                     }
-                    className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white"
+                    className="absolute top-2 right-2"
                     size="sm"
                     disabled={!embedCode}
                   >
@@ -889,13 +827,13 @@ export default function ExportPage() {
 
             {/* Test Your Embed */}
             {embedCode && (
-              <Card className="bg-gray-800 border-gray-700">
+              <Card>
                 <CardHeader>
                   <CardTitle>Test Your Embed</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="bg-gray-700 border border-gray-600 rounded-lg p-3">
-                    <p className="text-sm text-gray-300">
+                  <div className="bg-muted border border-border rounded-lg p-3">
+                    <p className="text-sm text-foreground">
                       Your embed code: {embedCode}
                     </p>
                   </div>
@@ -907,14 +845,13 @@ export default function ExportPage() {
                           "_blank"
                         )
                       }
-                      className="bg-green-500 hover:bg-green-600 text-white"
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       Preview Embed
                     </Button>
                     <Button
                       onClick={() => copyToClipboard(embedCode, "embedCode")}
-                      className="bg-green-500 hover:bg-green-600 text-white"
+                      variant="outline"
                     >
                       <Copy className="w-4 h-4 mr-2" />
                       Copy Embed Code
@@ -925,16 +862,16 @@ export default function ExportPage() {
             )}
 
             {/* API Configuration */}
-            <Card className="bg-gray-800 border-gray-700">
+            <Card>
               <CardHeader>
                 <CardTitle>API Configuration</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="bg-gray-700 border border-green-500 rounded-lg p-4">
-                  <p className="text-sm text-gray-300">
-                    <strong className="text-green-400">Important:</strong> The
+                <div className="bg-muted border border-primary rounded-lg p-4">
+                  <p className="text-sm text-foreground">
+                    <strong className="text-primary">Important:</strong> The
                     embed code calls an API endpoint (
-                    <code className="text-green-400">
+                    <code className="text-primary">
                       https://lux-llm-prod.vercel.app/api/public-chat
                     </code>
                     ) for handling chat requests, tracking usage, and storing
@@ -946,15 +883,13 @@ export default function ExportPage() {
           </div>
         </div>
 
-
-
         {/* Platform Integrations */}
         <div className="mt-12">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-white mb-2">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
               Platform Integrations
             </h2>
-            <p className="text-gray-400">
+            <p className="text-muted-foreground">
               Step-by-step instructions for embedding your chatbot on popular
               platforms
             </p>
@@ -964,16 +899,16 @@ export default function ExportPage() {
             {platformIntegrations.map((platform, index) => (
               <Card
                 key={index}
-                className="bg-gray-800 border-gray-700 hover:border-green-500 transition-colors cursor-pointer"
+                className="hover:border-primary transition-colors cursor-pointer"
               >
                 <CardContent className="p-4 text-center">
-                  <div className="w-12 h-12 bg-gray-700 rounded-lg mx-auto mb-3 flex items-center justify-center">
-                    <Globe className="w-6 h-6 text-green-400" />
+                  <div className="w-12 h-12 bg-muted rounded-lg mx-auto mb-3 flex items-center justify-center">
+                    <Globe className="w-6 h-6 text-primary" />
                   </div>
-                  <h3 className="font-medium text-white text-sm mb-1">
+                  <h3 className="font-medium text-foreground text-sm mb-1">
                     {platform.name}
                   </h3>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-muted-foreground">
                     {platform.description}
                   </p>
                 </CardContent>
@@ -981,6 +916,7 @@ export default function ExportPage() {
             ))}
           </div>
         </div>
+        </main>
       </div>
     </div>
   );
