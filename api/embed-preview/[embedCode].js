@@ -18,26 +18,7 @@ export default async function handler(req, res) {
     const isProduction = process.env.NODE_ENV === "production";
     const baseUrl = isProduction ? productionUrl : "http://localhost:3000";
 
-    // Try to get embed configuration from database
-    let embedConfig = null;
-    try {
-      const { data: embed, error } = await supabase
-        .from("embeds")
-        .select("*")
-        .eq("embed_code", embedCode)
-        .eq("is_active", true)
-        .single();
-
-      if (!error && embed) {
-        embedConfig = embed;
-        console.log("✅ Found embed configuration:", embed.id);
-      } else {
-        console.log("⚠️ Using default configuration for:", embedCode);
-      }
-    } catch (error) {
-      console.log("⚠️ Could not fetch embed config, using defaults");
-    }
-
+    // Simple HTML page that will load the chatbot configuration from URL params
     const html = `
       <!DOCTYPE html>
       <html lang="en">
@@ -127,10 +108,6 @@ export default async function handler(req, res) {
             background: #dcfce7;
             color: #166534;
           }
-          .status-testing {
-            background: #fef3c7;
-            color: #92400e;
-          }
           .production-info {
             background: #dbeafe;
             border: 1px solid #3b82f6;
@@ -161,15 +138,9 @@ export default async function handler(req, res) {
           <div class="embed-info">
             <h3>Embed Information</h3>
             <p><strong>Embed Code:</strong> <code>${embedCode}</code></p>
-            <p><strong>Script URL:</strong> <code>${baseUrl}/api/embed/${embedCode}.js</code></p>
             <p><strong>Status:</strong> <span class="status-badge ${
               isProduction ? "status-active" : "status-testing"
             }">${isProduction ? "✅ Production" : "🔄 Development"}</span></p>
-            ${
-              isProduction
-                ? ""
-                : "<p><strong>Note:</strong> This is running in development mode</p>"
-            }
           </div>
           
           <div class="test-section">
@@ -181,9 +152,9 @@ export default async function handler(req, res) {
         
         <script>
           function loadChatbot() {
-            // Create script element
+            // Create script element with configuration passed via URL
             const script = document.createElement('script');
-            script.src = '/api/embed-script/${embedCode}.js'; // Corrected path
+            script.src = '/api/embed-script/${embedCode}.js';
             script.async = true;
             
             // Add to page
