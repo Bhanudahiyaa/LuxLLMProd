@@ -63,6 +63,13 @@ interface Agent {
   subheading?: string;
   avatar_url?: string;
   system_prompt?: string;
+  description?: string;
+  created_at?: string;
+  updated_at?: string;
+  chat_bg_color?: string;
+  chat_border_color?: string;
+  user_msg_color?: string;
+  bot_msg_color?: string;
 }
 
 interface ChatMessage {
@@ -653,6 +660,40 @@ export default function ChatbotEditor() {
       localStorage.setItem("selectedAgent", JSON.stringify(agentDataToUpdate));
     }
   }, [agent, watch, loading]);
+
+  // Save complete chatbot configuration for export page
+  useEffect(() => {
+    const completeConfig = {
+      name: watch("name"),
+      avatar_url: watch("avatar_url"),
+      chat_bg: watch("chat_bg"),
+      border_color: watch("border_color"),
+      user_msg_color: watch("user_msg_color"),
+      bot_msg_color: watch("bot_msg_color"),
+      system_prompt: watch("system_prompt"),
+      welcome_message: welcomeMessageState,
+      placeholder: placeholderState,
+      description: agent?.description || "AI chatbot for my website",
+      created_at: agent?.created_at || new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    // Save to localStorage for export page
+    localStorage.setItem("exportChatbotConfig", JSON.stringify(completeConfig));
+    console.log("Saved export configuration:", completeConfig);
+  }, [
+    watch("name"),
+    watch("avatar_url"),
+    watch("chat_bg"),
+    watch("border_color"),
+    watch("user_msg_color"),
+    watch("bot_msg_color"),
+    watch("system_prompt"),
+    welcomeMessageState,
+    placeholderState,
+    agent?.description,
+    agent?.created_at,
+  ]);
 
   // Send message function
   const sendMessage = async () => {

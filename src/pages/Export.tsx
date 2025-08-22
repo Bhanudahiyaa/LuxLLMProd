@@ -54,10 +54,39 @@ export default function ExportPage() {
     // Load chatbot customizations from localStorage
     const customizations = localStorage.getItem("chatbotCustomizations");
     const selectedAgent = localStorage.getItem("selectedAgent");
+    const exportConfig = localStorage.getItem("exportChatbotConfig");
 
     let config: ChatbotConfig | null = null;
 
-    if (selectedAgent) {
+    // Priority: exportChatbotConfig (from editor) > selectedAgent > customizations
+    if (exportConfig) {
+      try {
+        const exportData = JSON.parse(exportConfig);
+        console.log("Loaded export configuration:", exportData);
+        
+        config = {
+          name: exportData.name || "Portfolio Bot",
+          description: exportData.description || "AI chatbot for my website",
+          systemPrompt: exportData.system_prompt || "You are a helpful AI assistant.",
+          avatar: exportData.avatar_url || "",
+          chatBgColor: exportData.chat_bg || "#ffffff",
+          chatBorderColor: exportData.border_color || "#e5e7eb",
+          userMsgColor: exportData.user_msg_color || "#3b82f6",
+          botMsgColor: exportData.bot_msg_color || "#1f2937",
+          welcomeMessage: exportData.welcome_message || "Hello! How can I help you today?",
+          placeholder: exportData.placeholder || "Type your message...",
+        };
+        
+        setEmbedName(exportData.name || "Portfolio Bot");
+        setDescription(exportData.description || "AI chatbot for my website");
+        
+        console.log("Using export configuration:", config);
+      } catch (e) {
+        console.log("Error parsing export config:", e);
+      }
+    }
+
+    if (!config && selectedAgent) {
       try {
         const agent = JSON.parse(selectedAgent);
         config = {
@@ -84,7 +113,7 @@ export default function ExportPage() {
       }
     }
 
-    if (customizations && !config) {
+    if (!config && customizations) {
       try {
         const colors = JSON.parse(customizations);
         config = {
@@ -100,20 +129,22 @@ export default function ExportPage() {
           placeholder: "Type your message...",
         };
       } catch (e) {
-        console.log("Error parsing chatbot customizations:", e);
+        console.log("Error parsing customizations:", e);
       }
     }
 
     if (config) {
       setChatbotConfig(config);
-      console.log("Loaded chatbot config:", config);
+      console.log("Final chatbot config loaded:", config);
+    } else {
+      console.log("No chatbot configuration found");
     }
   }, []);
 
   const generateEmbedScript = () => {
-    if (!chatbotConfig || !embedCode) return "";
+    if (!chatbotConfig) return "";
 
-    // Generate a complete working embed script with all customizations
+    // Generate a complete working embed script with EXACT customizations from editor
     const scriptId = `lux-llm-chatbot-${Date.now()}`;
 
     return `<!-- LuxLLM Customized Chatbot Embed Script -->
@@ -121,7 +152,7 @@ export default function ExportPage() {
 (function() {
   'use strict';
   
-  // Configuration with all your customizations
+  // Configuration with EXACT customizations from editor
   const config = {
     name: '${chatbotConfig.name.replace(/'/g, "\\'")}',
     systemPrompt: '${chatbotConfig.systemPrompt.replace(/'/g, "\\'")}',
@@ -133,10 +164,11 @@ export default function ExportPage() {
     welcomeMessage: '${chatbotConfig.welcomeMessage.replace(/'/g, "\\'")}',
     placeholder: '${chatbotConfig.placeholder.replace(/'/g, "\\'")}',
     apiUrl: 'https://lux-llm-prod.vercel.app/api/public-chat',
-    embedCode: '${embedCode}',
     borderRadius: '12px',
     fontFamily: 'Inter, sans-serif'
   };
+
+  console.log("Loading chatbot with EXACT config:", config);
 
   // Create chatbot HTML with customizations
   const chatbotHTML = \`
@@ -365,9 +397,16 @@ export default function ExportPage() {
   };
 
   const generateIframeEmbed = () => {
-    if (!embedCode) return "";
+    if (!chatbotConfig) return "";
 
-    return `<iframe src="https://lux-llm-prod.vercel.app/api/embed-preview/${embedCode}" width="400" height="600" frameborder="0" style="border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);"></iframe>`;
+    return `<iframe 
+      src="https://lux-llm-prod.vercel.app/api/embed-preview/${embedCode || 'default'}"
+      width="400" 
+      height="600" 
+      frameborder="0" 
+      style="border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);"
+      title="${chatbotConfig.name} Chatbot"
+    ></iframe>`;
   };
 
   const copyToClipboard = async (text: string, type: string) => {
@@ -377,11 +416,30 @@ export default function ExportPage() {
   };
 
   const handleCreateEmbed = async () => {
+    if (!chatbotConfig) {
+      console.error("No chatbot configuration available");
+      return;
+    }
+
     // Generate a unique embed code
     const newEmbedCode = `embed-${Date.now()}-${Math.random()
       .toString(36)
       .substr(2, 9)}`;
     setEmbedCode(newEmbedCode);
+
+    // Save the embed configuration to localStorage for persistence
+    const embedConfig = {
+      embedCode: newEmbedCode,
+      chatbotConfig: chatbotConfig,
+      createdAt: new Date().toISOString(),
+      name: embedName,
+      description: description,
+      maxRequestsPerHour: parseInt(maxRequestsPerHour),
+      maxRequestsPerDay: parseInt(maxRequestsPerDay)
+    };
+
+    localStorage.setItem(`embed-${newEmbedCode}`, JSON.stringify(embedConfig));
+    console.log("Created embed with configuration:", embedConfig);
   };
 
   const platformIntegrations = [
@@ -539,37 +597,42 @@ export default function ExportPage() {
                 {chatbotConfig ? (
                   <div className="w-full h-80 bg-gray-700 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center relative overflow-hidden">
                     {/* Working Chatbot Preview - Exact replica of editor */}
-                    <div 
+                    <div
                       className="absolute bottom-4 right-4 w-80 h-64 bg-white rounded-xl shadow-2xl border-2 flex flex-col"
                       style={{
                         backgroundColor: chatbotConfig.chatBgColor,
                         borderColor: chatbotConfig.chatBorderColor,
-                        borderRadius: '12px',
-                        fontFamily: 'Inter, sans-serif'
+                        borderRadius: "12px",
+                        fontFamily: "Inter, sans-serif",
                       }}
                     >
                       {/* Header */}
-                      <div 
+                      <div
                         className="p-3 rounded-t-xl flex items-center justify-between"
                         style={{ backgroundColor: chatbotConfig.userMsgColor }}
                       >
                         <div className="flex items-center gap-2">
                           {chatbotConfig.avatar ? (
-                            <img 
-                              src={chatbotConfig.avatar} 
-                              alt="Avatar" 
+                            <img
+                              src={chatbotConfig.avatar}
+                              alt="Avatar"
                               className="w-6 h-6 rounded-full"
-                                                          onError={(e) => {
-                              const target = e.currentTarget as HTMLImageElement;
-                              target.style.display = 'none';
-                              const nextElement = target.nextElementSibling as HTMLElement;
-                              if (nextElement) nextElement.style.display = 'flex';
-                            }}
+                              onError={e => {
+                                const target =
+                                  e.currentTarget as HTMLImageElement;
+                                target.style.display = "none";
+                                const nextElement =
+                                  target.nextElementSibling as HTMLElement;
+                                if (nextElement)
+                                  nextElement.style.display = "flex";
+                              }}
                             />
                           ) : null}
-                          <div 
+                          <div
                             className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center"
-                            style={{ display: chatbotConfig.avatar ? 'none' : 'flex' }}
+                            style={{
+                              display: chatbotConfig.avatar ? "none" : "flex",
+                            }}
                           >
                             <span className="text-white text-xs">🤖</span>
                           </div>
@@ -582,20 +645,20 @@ export default function ExportPage() {
                           <span className="text-white/80 text-xs">Online</span>
                         </div>
                       </div>
-                      
+
                       {/* Messages */}
                       <div className="flex-1 p-3 overflow-hidden">
-                        <div 
+                        <div
                           className="inline-block p-2 rounded-lg text-sm max-w-[80%]"
                           style={{
                             backgroundColor: chatbotConfig.chatBorderColor,
-                            color: chatbotConfig.botMsgColor
+                            color: chatbotConfig.botMsgColor,
                           }}
                         >
                           {chatbotConfig.welcomeMessage}
                         </div>
                       </div>
-                      
+
                       {/* Input */}
                       <div className="p-3 border-t border-gray-200">
                         <div className="flex gap-2">
@@ -606,19 +669,21 @@ export default function ExportPage() {
                             style={{
                               borderColor: chatbotConfig.chatBorderColor,
                               backgroundColor: chatbotConfig.chatBgColor,
-                              color: chatbotConfig.botMsgColor
+                              color: chatbotConfig.botMsgColor,
                             }}
                           />
-                          <button 
+                          <button
                             className="w-8 h-8 rounded-full flex items-center justify-center"
-                            style={{ backgroundColor: chatbotConfig.userMsgColor }}
+                            style={{
+                              backgroundColor: chatbotConfig.userMsgColor,
+                            }}
                           >
                             <span className="text-white text-xs">→</span>
                           </button>
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Color Info - Show exact values */}
                     <div className="absolute top-2 left-2 text-xs text-gray-400 bg-gray-800/80 p-2 rounded">
                       <div className="font-medium mb-1">Current Settings:</div>
@@ -801,14 +866,19 @@ export default function ExportPage() {
                     </p>
                   </div>
                   <div className="flex gap-3">
-                    <Button 
-                      onClick={() => window.open(`https://lux-llm-prod.vercel.app/api/embed-preview/${embedCode}`, '_blank')}
+                    <Button
+                      onClick={() =>
+                        window.open(
+                          `https://lux-llm-prod.vercel.app/api/embed-preview/${embedCode}`,
+                          "_blank"
+                        )
+                      }
                       className="bg-green-500 hover:bg-green-600 text-white"
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       Preview Embed
                     </Button>
-                    <Button 
+                    <Button
                       onClick={() => copyToClipboard(embedCode, "embedCode")}
                       className="bg-green-500 hover:bg-green-600 text-white"
                     >
@@ -853,41 +923,46 @@ export default function ExportPage() {
                 Try out your customized chatbot right here before embedding it
               </p>
             </div>
-            
+
             <div className="max-w-md mx-auto">
               <Card className="bg-gray-800 border-gray-700">
                 <CardContent className="p-0">
-                  <div 
+                  <div
                     className="w-full h-96 rounded-xl flex flex-col"
                     style={{
                       backgroundColor: chatbotConfig.chatBgColor,
                       borderColor: chatbotConfig.chatBorderColor,
-                      borderRadius: '12px',
-                      fontFamily: 'Inter, sans-serif'
+                      borderRadius: "12px",
+                      fontFamily: "Inter, sans-serif",
                     }}
                   >
                     {/* Header */}
-                    <div 
+                    <div
                       className="p-3 rounded-t-xl flex items-center justify-between"
                       style={{ backgroundColor: chatbotConfig.userMsgColor }}
                     >
                       <div className="flex items-center gap-2">
                         {chatbotConfig.avatar ? (
-                          <img 
-                            src={chatbotConfig.avatar} 
-                            alt="Avatar" 
+                          <img
+                            src={chatbotConfig.avatar}
+                            alt="Avatar"
                             className="w-6 h-6 rounded-full"
-                            onError={(e) => {
-                              const target = e.currentTarget as HTMLImageElement;
-                              target.style.display = 'none';
-                              const nextElement = target.nextElementSibling as HTMLElement;
-                              if (nextElement) nextElement.style.display = 'flex';
+                            onError={e => {
+                              const target =
+                                e.currentTarget as HTMLImageElement;
+                              target.style.display = "none";
+                              const nextElement =
+                                target.nextElementSibling as HTMLElement;
+                              if (nextElement)
+                                nextElement.style.display = "flex";
                             }}
                           />
                         ) : null}
-                        <div 
+                        <div
                           className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center"
-                          style={{ display: chatbotConfig.avatar ? 'none' : 'flex' }}
+                          style={{
+                            display: chatbotConfig.avatar ? "none" : "flex",
+                          }}
                         >
                           <span className="text-white text-xs">🤖</span>
                         </div>
@@ -900,20 +975,20 @@ export default function ExportPage() {
                         <span className="text-white/80 text-xs">Online</span>
                       </div>
                     </div>
-                    
+
                     {/* Messages */}
                     <div className="flex-1 p-3 overflow-y-auto">
-                      <div 
+                      <div
                         className="inline-block p-2 rounded-lg text-sm max-w-[80%]"
                         style={{
                           backgroundColor: chatbotConfig.chatBorderColor,
-                          color: chatbotConfig.botMsgColor
+                          color: chatbotConfig.botMsgColor,
                         }}
                       >
                         {chatbotConfig.welcomeMessage}
                       </div>
                     </div>
-                    
+
                     {/* Input */}
                     <div className="p-3 border-t border-gray-200">
                       <div className="flex gap-2">
@@ -924,12 +999,14 @@ export default function ExportPage() {
                           style={{
                             borderColor: chatbotConfig.chatBorderColor,
                             backgroundColor: chatbotConfig.chatBgColor,
-                            color: chatbotConfig.botMsgColor
+                            color: chatbotConfig.botMsgColor,
                           }}
                         />
-                        <button 
+                        <button
                           className="w-8 h-8 rounded-full flex items-center justify-center"
-                          style={{ backgroundColor: chatbotConfig.userMsgColor }}
+                          style={{
+                            backgroundColor: chatbotConfig.userMsgColor,
+                          }}
                         >
                           <span className="text-white text-xs">→</span>
                         </button>
