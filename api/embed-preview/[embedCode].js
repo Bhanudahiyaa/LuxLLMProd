@@ -188,90 +188,29 @@ export default async function handler(req, res) {
             // Create the beautiful chat window
             const chatWindow = document.createElement('div');
             chatWindow.id = 'luxllm-chat-window';
-            chatWindow.style.cssText = \`
-              width: 350px;
-              height: 500px;
-              background: linear-gradient(135deg, \${config.backgroundColor} 0%, \${config.backgroundColor}dd 100%);
-              border-radius: \${config.borderRadius || 12}px;
-              box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.2);
-              display: flex;
-              flex-direction: column;
-              overflow: hidden;
-              border: 1px solid \${config.accentColor || '#e5e7eb'};
-              backdrop-filter: blur(10px);
-            \`;
+            chatWindow.style.cssText = 'width: 350px; height: 500px; background: linear-gradient(135deg, ' + config.backgroundColor + ' 0%, ' + config.backgroundColor + 'dd 100%); border-radius: ' + (config.borderRadius || 12) + 'px; box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; border: 1px solid ' + (config.accentColor || '#e5e7eb') + '; backdrop-filter: blur(10px);';
 
             // Create header with gradient
             const header = document.createElement('div');
-            header.style.cssText = \`
-              background: linear-gradient(135deg, \${config.primaryColor} 0%, \${config.primaryColor}dd 100%);
-              color: white;
-              padding: 16px;
-              font-weight: 600;
-              display: flex;
-              align-items: center;
-              gap: 8px;
-              position: relative;
-              overflow: hidden;
-            \`;
+            header.style.cssText = 'background: linear-gradient(135deg, ' + config.primaryColor + ' 0%, ' + config.primaryColor + 'dd 100%); color: white; padding: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; position: relative; overflow: hidden;';
 
             // Add animated background pattern to header
             const headerPattern = document.createElement('div');
-            headerPattern.style.cssText = \`
-              position: absolute;
-              top: 0;
-              left: 0;
-              right: 0;
-              bottom: 0;
-              background-image: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.1) 75%, rgba(255,255,255,0.1));
-              background-size: 20px 20px;
-              animation: movePattern 20s linear infinite;
-              opacity: 0.3;
-            \`;
+            headerPattern.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.1) 75%, rgba(255,255,255,0.1)); background-size: 20px 20px; animation: movePattern 20s linear infinite; opacity: 0.3;';
 
             // Create avatar
             const avatar = document.createElement('div');
-            avatar.style.cssText = \`
-              width: 32px;
-              height: 32px;
-              background: rgba(255,255,255,0.2);
-              border-radius: 50%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-size: 16px;
-              backdrop-filter: blur(5px);
-            \`;
+            avatar.style.cssText = 'width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; backdrop-filter: blur(5px);';
             avatar.innerHTML = '🤖';
 
             // Create bot name and status
             const botInfo = document.createElement('div');
-            botInfo.innerHTML = \`
-              <div style="font-size: 16px; font-weight: 600;">\${config.name || 'AI Assistant'}</div>
-              <div style="font-size: 12px; opacity: 0.8; display: flex; align-items: center; gap: 4px;">
-                <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite;"></div>
-                Online
-              </div>
-            \`;
+            botInfo.innerHTML = '<div style="font-size: 16px; font-weight: 600;">' + (config.name || 'AI Assistant') + '</div><div style="font-size: 12px; opacity: 0.8; display: flex; align-items: center; gap: 4px;"><div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite;"></div>Online</div>';
 
             // Create minimize button (like editor)
             const minimizeBtn = document.createElement('button');
             minimizeBtn.innerHTML = '−';
-            minimizeBtn.style.cssText = \`
-              background: rgba(255,255,255,0.1);
-              border: none;
-              color: white;
-              width: 24px;
-              height: 24px;
-              border-radius: 50%;
-              cursor: pointer;
-              font-size: 18px;
-              margin-left: auto;
-              transition: all 0.2s;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            \`;
+            minimizeBtn.style.cssText = 'background: rgba(255,255,255,0.1); border: none; color: white; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 18px; margin-left: auto; transition: all 0.2s; display: flex; align-items: center; justify-content: center;';
             minimizeBtn.onclick = () => {
               chatWindow.style.display = 'none';
               chatButton.style.display = 'flex';
@@ -280,21 +219,7 @@ export default async function handler(req, res) {
             // Create close button
             const closeBtn = document.createElement('button');
             closeBtn.innerHTML = '×';
-            closeBtn.style.cssText = \`
-              background: rgba(255,255,255,0.1);
-              border: none;
-              color: white;
-              width: 24px;
-              height: 24px;
-              border-radius: 50%;
-              cursor: pointer;
-              font-size: 18px;
-              margin-left: 8px;
-              transition: all 0.2s;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            \`;
+            closeBtn.style.cssText = 'background: rgba(255,255,255,0.1); border: none; color: white; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 18px; margin-left: 8px; transition: all 0.2s; display: flex; align-items: center; justify-content: center;';
             closeBtn.onclick = () => {
               chatWindow.style.display = 'none';
               chatButton.style.display = 'flex';
@@ -310,39 +235,17 @@ export default async function handler(req, res) {
             // Create messages area
             const messagesArea = document.createElement('div');
             messagesArea.id = 'luxllm-messages';
-            messagesArea.style.cssText = \`
-              flex: 1;
-              padding: 16px;
-              overflow-y: auto;
-              background: \${config.backgroundColor};
-              display: flex;
-              flex-direction: column;
-              gap: 12px;
-            \`;
+            messagesArea.style.cssText = 'flex: 1; padding: 16px; overflow-y: auto; background: ' + config.backgroundColor + '; display: flex; flex-direction: column; gap: 12px;';
 
             // Function to render messages
             function renderMessages() {
               messagesArea.innerHTML = '';
               messages.forEach((message, index) => {
                 const messageDiv = document.createElement('div');
-                messageDiv.style.cssText = \`
-                  display: flex;
-                  justify-content: \${message.isBot ? 'flex-start' : 'flex-end'};
-                  animation: fadeInUp 0.3s ease-out \${index * 0.1}s both;
-                \`;
+                messageDiv.style.cssText = 'display: flex; justify-content: ' + (message.isBot ? 'flex-start' : 'flex-end') + '; animation: fadeInUp 0.3s ease-out ' + (index * 0.1) + 's both;';
                 
                 const messageBubble = document.createElement('div');
-                messageBubble.style.cssText = \`
-                  max-width: 80%;
-                  padding: 12px 16px;
-                  border-radius: \${(config.borderRadius || 12) * 0.8}px;
-                  font-size: \${config.fontSize || 14}px;
-                  line-height: 1.4;
-                  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                  color: \${message.isBot ? config.textColor : 'white'};
-                  background: \${message.isBot ? 'rgba(255,255,255,0.2)' : config.primaryColor};
-                  backdrop-filter: blur(5px);
-                \`;
+                messageBubble.style.cssText = 'max-width: 80%; padding: 12px 16px; border-radius: ' + ((config.borderRadius || 12) * 0.8) + 'px; font-size: ' + (config.fontSize || 14) + 'px; line-height: 1.4; box-shadow: 0 2px 8px rgba(0,0,0,0.1); color: ' + (message.isBot ? config.textColor : 'white') + '; background: ' + (message.isBot ? 'rgba(255,255,255,0.2)' : config.primaryColor) + '; backdrop-filter: blur(5px);';
                 messageBubble.textContent = message.text;
                 
                 messageDiv.appendChild(messageBubble);
@@ -354,37 +257,17 @@ export default async function handler(req, res) {
             function showTypingIndicator() {
               const typingDiv = document.createElement('div');
               typingDiv.id = 'typing-indicator';
-              typingDiv.style.cssText = \`
-                display: flex;
-                justify-content: flex-start;
-                animation: fadeInUp 0.3s ease-out;
-              \`;
+              typingDiv.style.cssText = 'display: flex; justify-content: flex-start; animation: fadeInUp 0.3s ease-out;';
               
               const typingBubble = document.createElement('div');
-              typingBubble.style.cssText = \`
-                padding: 12px 16px;
-                border-radius: \${(config.borderRadius || 12) * 0.8}px;
-                background: rgba(255,255,255,0.2);
-                backdrop-filter: blur(5px);
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-              \`;
+              typingBubble.style.cssText = 'padding: 12px 16px; border-radius: ' + ((config.borderRadius || 12) * 0.8) + 'px; background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
               
               const dots = document.createElement('div');
-              dots.style.cssText = \`
-                display: flex;
-                gap: 4px;
-                align-items: center;
-              \`;
+              dots.style.cssText = 'display: flex; gap: 4px; align-items: center;';
               
               for (let i = 0; i < 3; i++) {
                 const dot = document.createElement('div');
-                dot.style.cssText = \`
-                  width: 8px;
-                  height: 8px;
-                  background: \${config.textColor};
-                  border-radius: 50%;
-                  animation: typingDot 1.4s infinite \${i * 0.2}s;
-                \`;
+                dot.style.cssText = 'width: 8px; height: 8px; background: ' + config.textColor + '; border-radius: 50%; animation: typingDot 1.4s infinite ' + (i * 0.2) + 's;';
                 dots.appendChild(dot);
               }
               
@@ -505,33 +388,16 @@ export default async function handler(req, res) {
 
             // Create input area
             const inputArea = document.createElement('div');
-            inputArea.style.cssText = \`
-              padding: 16px;
-              border-top: 1px solid \${config.accentColor || '#e5e7eb'};
-              background: \${config.backgroundColor};
-              display: flex;
-              gap: 8px;
-            \`;
+            inputArea.style.cssText = 'padding: 16px; border-top: 1px solid ' + (config.accentColor || '#e5e7eb') + '; background: ' + config.backgroundColor + '; display: flex; gap: 8px;';
 
             // Create input field
             const input = document.createElement('input');
             input.type = 'text';
             input.placeholder = config.placeholder || 'Type your message...';
-            input.style.cssText = \`
-              flex: 1;
-              padding: 12px;
-              border: 1px solid \${config.accentColor || '#e5e7eb'};
-              border-radius: \${(config.borderRadius || 12) * 0.6}px;
-              font-size: \${config.fontSize || 14}px;
-              outline: none;
-              background: \${config.backgroundColor};
-              color: \${config.textColor || '#1f2937'};
-              transition: all 0.2s;
-              font-family: \${config.fontFamily || 'Inter'}, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            \`;
+            input.style.cssText = 'flex: 1; padding: 12px; border: 1px solid ' + (config.accentColor || '#e5e7eb') + '; border-radius: ' + ((config.borderRadius || 12) * 0.6) + 'px; font-size: ' + (config.fontSize || 14) + 'px; outline: none; background: ' + config.backgroundColor + '; color: ' + (config.textColor || '#1f2937') + '; transition: all 0.2s; font-family: ' + (config.fontFamily || 'Inter') + ', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;';
             input.onfocus = () => {
               input.style.borderColor = config.primaryColor;
-              input.style.boxShadow = \`0 0 0 3px \${config.primaryColor}20\`;
+              input.style.boxShadow = '0 0 0 3px ' + config.primaryColor + '20';
             };
             input.onblur = () => {
               input.style.borderColor = config.accentColor || '#e5e7eb';
@@ -615,38 +481,7 @@ export default async function handler(req, res) {
 
             // Add enhanced keyframes for animations
             const enhancedStyle = document.createElement('style');
-            enhancedStyle.textContent = \`
-              @keyframes movePattern {
-                0% { background-position: 0 0; }
-                100% { background-position: 40px 40px; }
-              }
-              @keyframes float {
-                0%, 100% { transform: translateY(0px); }
-                50% { transform: translateY(-10px); }
-              }
-              @keyframes pulse {
-                0%, 100% { opacity: 1; }
-                50% { opacity: 0.7; }
-              }
-              @keyframes fadeInUp {
-                from {
-                  opacity: 0;
-                  transform: translateY(10px);
-                }
-                to {
-                  opacity: 1;
-                  transform: translateY(0);
-                }
-              }
-              @keyframes typingDot {
-                0%, 60%, 100% {
-                  transform: translateY(0);
-                }
-                30% {
-                  transform: translateY(-10px);
-                }
-              }
-            \`;
+            enhancedStyle.textContent = '@keyframes movePattern { 0% { background-position: 0 0; } 100% { background-position: 40px 40px; } } @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } } @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } } @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } } @keyframes typingDot { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-10px); } }';
             document.head.appendChild(enhancedStyle);
 
             console.log('Beautiful chatbot created with config:', config);
@@ -686,7 +521,7 @@ export default async function handler(req, res) {
             } else {
               // Fallback without config
               const script = document.createElement('script');
-              script.src = \`/api/embed-script/${embedCode}.js\`;
+              script.src = '/api/embed-script/' + embedCode + '.js';
               script.async = true;
               document.body.appendChild(script);
               
