@@ -45,23 +45,24 @@ function generateEmbedScript(embedCode, chatbotConfig) {
     chatbotName: chatbotConfig?.name || "AI Assistant",
     systemPrompt:
       chatbotConfig?.systemPrompt || "You are a helpful AI assistant.",
-    primaryColor: chatbotConfig?.userMsgColor || "#3b82f6",
-    backgroundColor: chatbotConfig?.chatBgColor || "#ffffff",
-    textColor: chatbotConfig?.botMsgColor || "#1f2937",
-    accentColor: chatbotConfig?.chatBorderColor || "#e5e7eb",
-    chatBgColor: chatbotConfig?.chatBgColor || "#ffffff",
-    chatBorderColor: chatbotConfig?.chatBorderColor || "#e5e7eb",
+    // Map from ChatbotPreview interface
+    primaryColor: chatbotConfig?.primaryColor || "#3b82f6",        // primaryColor → primaryColor
+    backgroundColor: chatbotConfig?.backgroundColor || "#ffffff",   // backgroundColor → backgroundColor
+    textColor: chatbotConfig?.textColor || "#1f2937",             // textColor → textColor
+    accentColor: chatbotConfig?.accentColor || "#e5e7eb",         // accentColor → accentColor
+    chatBgColor: chatbotConfig?.backgroundColor || "#ffffff",      // backgroundColor → chatBgColor
+    chatBorderColor: chatbotConfig?.accentColor || "#e5e7eb",     // accentColor → chatBorderColor
     borderRadius: chatbotConfig?.borderRadius || 12,
     fontSize: chatbotConfig?.fontSize || 14,
     fontFamily: chatbotConfig?.fontFamily || "Inter",
-    position: "bottom-right",
+    position: chatbotConfig?.position || "bottom-right",
     welcomeMessage:
       chatbotConfig?.welcomeMessage || "Hello! How can I help you today?",
     placeholder: chatbotConfig?.placeholder || "Type your message...",
     avatarUrl: chatbotConfig?.avatar || "",
-    showTypingIndicator: true,
-    enableSounds: false,
-    animationSpeed: "normal",
+    showTypingIndicator: chatbotConfig?.showTypingIndicator !== false,
+    enableSounds: chatbotConfig?.enableSounds || false,
+    animationSpeed: chatbotConfig?.animationSpeed || "normal",
     apiBaseUrl: apiBaseUrl,
   };
 

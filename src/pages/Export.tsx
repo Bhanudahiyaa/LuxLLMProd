@@ -213,20 +213,28 @@ export default function ExportPage() {
     if (!chatbotConfig) return "";
 
     // Generate a simple script tag that loads the embed script with configuration
+    // Map to match the ChatbotPreview component structure
     const configParam = encodeURIComponent(JSON.stringify({
       name: chatbotConfig.name,
       systemPrompt: chatbotConfig.systemPrompt,
       avatar: chatbotConfig.avatar || "",
-      chatBgColor: chatbotConfig.chatBgColor,
-      chatBorderColor: chatbotConfig.chatBorderColor,
-      userMsgColor: chatbotConfig.userMsgColor,
-      botMsgColor: chatbotConfig.botMsgColor,
+      // Map colors to match ChatbotPreview interface
+      primaryColor: chatbotConfig.userMsgColor,        // userMsgColor → primaryColor
+      backgroundColor: chatbotConfig.chatBgColor,      // chatBgColor → backgroundColor  
+      accentColor: chatbotConfig.chatBorderColor,      // chatBorderColor → accentColor
+      textColor: chatbotConfig.botMsgColor,            // botMsgColor → textColor
+      // Keep other properties
       welcomeMessage: chatbotConfig.welcomeMessage,
       placeholder: chatbotConfig.placeholder,
       borderRadius: chatbotConfig.borderRadius || 12,
       fontSize: chatbotConfig.fontSize || 14,
       fontFamily: chatbotConfig.fontFamily || "Inter",
-      theme: chatbotConfig.theme || "modern"
+      theme: chatbotConfig.theme || "modern",
+      // Add missing properties that ChatbotPreview expects
+      position: "bottom-right",
+      showTypingIndicator: true,
+      enableSounds: false,
+      animationSpeed: "normal"
     }));
 
     console.log("🔧 Generating embed script with config:", {
@@ -241,20 +249,28 @@ export default function ExportPage() {
     if (!chatbotConfig) return "";
 
     // Pass configuration to the embed preview via URL parameters
+    // Map to match the ChatbotPreview component structure
     const configParam = encodeURIComponent(JSON.stringify({
       name: chatbotConfig.name,
       systemPrompt: chatbotConfig.systemPrompt,
       avatar: chatbotConfig.avatar || "",
-      chatBgColor: chatbotConfig.chatBgColor,
-      chatBorderColor: chatbotConfig.chatBorderColor,
-      userMsgColor: chatbotConfig.userMsgColor,
-      botMsgColor: chatbotConfig.botMsgColor,
+      // Map colors to match ChatbotPreview interface
+      primaryColor: chatbotConfig.userMsgColor,        // userMsgColor → primaryColor
+      backgroundColor: chatbotConfig.chatBgColor,      // chatBgColor → backgroundColor  
+      accentColor: chatbotConfig.chatBorderColor,      // chatBorderColor → accentColor
+      textColor: chatbotConfig.botMsgColor,            // botMsgColor → textColor
+      // Keep other properties
       welcomeMessage: chatbotConfig.welcomeMessage,
       placeholder: chatbotConfig.placeholder,
       borderRadius: chatbotConfig.borderRadius || 12,
       fontSize: chatbotConfig.fontSize || 14,
       fontFamily: chatbotConfig.fontFamily || "Inter",
-      theme: chatbotConfig.theme || "modern"
+      theme: chatbotConfig.theme || "modern",
+      // Add missing properties that ChatbotPreview expects
+      position: "bottom-right",
+      showTypingIndicator: true,
+      enableSounds: false,
+      animationSpeed: "normal"
     }));
 
     return `<iframe 
@@ -635,16 +651,23 @@ export default function ExportPage() {
                               name: chatbotConfig.name,
                               systemPrompt: chatbotConfig.systemPrompt,
                               avatar: chatbotConfig.avatar || "",
-                              chatBgColor: chatbotConfig.chatBgColor,
-                              chatBorderColor: chatbotConfig.chatBorderColor,
-                              userMsgColor: chatbotConfig.userMsgColor,
-                              botMsgColor: chatbotConfig.botMsgColor,
+                              // Map colors to match ChatbotPreview interface
+                              primaryColor: chatbotConfig.userMsgColor,        // userMsgColor → primaryColor
+                              backgroundColor: chatbotConfig.chatBgColor,      // chatBgColor → backgroundColor  
+                              accentColor: chatbotConfig.chatBorderColor,      // chatBorderColor → accentColor
+                              textColor: chatbotConfig.botMsgColor,            // botMsgColor → textColor
+                              // Keep other properties
                               welcomeMessage: chatbotConfig.welcomeMessage,
                               placeholder: chatbotConfig.placeholder,
                               borderRadius: chatbotConfig.borderRadius || 12,
                               fontSize: chatbotConfig.fontSize || 14,
                               fontFamily: chatbotConfig.fontFamily || "Inter",
-                              theme: chatbotConfig.theme || "modern"
+                              theme: chatbotConfig.theme || "modern",
+                              // Add missing properties that ChatbotPreview expects
+                              position: "bottom-right",
+                              showTypingIndicator: true,
+                              enableSounds: false,
+                              animationSpeed: "normal"
                             }));
                             window.open(`/api/embed-preview/${embedCode}?config=${configParam}`, '_blank');
                           } else {
