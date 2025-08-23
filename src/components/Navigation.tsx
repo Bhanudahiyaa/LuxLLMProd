@@ -192,14 +192,14 @@ const Navigation = () => {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex items-center gap-2"
+              className="flex items-center gap-1"
             >
               <img
                 src="/images/luxllm-logo.png"
                 alt="LuxLLM logo"
                 className="h-7 w-7 object-contain"
               />
-              <div className="font-bold text-2xl tracking-tighter">
+              <div className="font-medium text-2xl tracking-tighter">
                 <span className="text-primary">Lux</span>
                 <span className="text-foreground">LLM</span>
               </div>

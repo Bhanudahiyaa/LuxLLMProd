@@ -213,16 +213,16 @@ export default function ExportPage() {
     if (!chatbotConfig) return "";
 
     // Generate a simple script tag that loads the embed script with configuration
-    // Map to match the ChatbotPreview component structure
+    // Map to match the embed script interface (CORRECT mapping)
     const configParam = encodeURIComponent(JSON.stringify({
       name: chatbotConfig.name,
       systemPrompt: chatbotConfig.systemPrompt,
       avatar: chatbotConfig.avatar || "",
-      // Map colors to match ChatbotPreview interface
-      primaryColor: chatbotConfig.userMsgColor,        // userMsgColor → primaryColor
-      backgroundColor: chatbotConfig.chatBgColor,      // chatBgColor → backgroundColor  
-      accentColor: chatbotConfig.chatBorderColor,      // chatBorderColor → accentColor
-      textColor: chatbotConfig.botMsgColor,            // botMsgColor → textColor
+      // Map colors to match embed script interface (CORRECT mapping)
+      primaryColor: chatbotConfig.userMsgColor,        // userMsgColor → primaryColor (headers, buttons)
+      backgroundColor: chatbotConfig.chatBgColor,      // chatBgColor → backgroundColor (chat background)
+      accentColor: chatbotConfig.chatBorderColor,      // chatBorderColor → accentColor (borders, secondary)
+      textColor: chatbotConfig.botMsgColor,            // botMsgColor → textColor (text content)
       // Keep other properties
       welcomeMessage: chatbotConfig.welcomeMessage,
       placeholder: chatbotConfig.placeholder,
@@ -249,16 +249,16 @@ export default function ExportPage() {
     if (!chatbotConfig) return "";
 
     // Pass configuration to the embed preview via URL parameters
-    // Map to match the ChatbotPreview component structure
+    // Map to match the embed script interface (CORRECT mapping)
     const configParam = encodeURIComponent(JSON.stringify({
       name: chatbotConfig.name,
       systemPrompt: chatbotConfig.systemPrompt,
       avatar: chatbotConfig.avatar || "",
-      // Map colors to match ChatbotPreview interface
-      primaryColor: chatbotConfig.userMsgColor,        // userMsgColor → primaryColor
-      backgroundColor: chatbotConfig.chatBgColor,      // chatBgColor → backgroundColor  
-      accentColor: chatbotConfig.chatBorderColor,      // chatBorderColor → accentColor
-      textColor: chatbotConfig.botMsgColor,            // botMsgColor → textColor
+      // Map colors to match embed script interface (CORRECT mapping)
+      primaryColor: chatbotConfig.userMsgColor,        // userMsgColor → primaryColor (headers, buttons)
+      backgroundColor: chatbotConfig.chatBgColor,      // chatBgColor → backgroundColor (chat background)
+      accentColor: chatbotConfig.chatBorderColor,      // chatBorderColor → accentColor (borders, secondary)
+      textColor: chatbotConfig.botMsgColor,            // botMsgColor → textColor (text content)
       // Keep other properties
       welcomeMessage: chatbotConfig.welcomeMessage,
       placeholder: chatbotConfig.placeholder,
@@ -651,11 +651,11 @@ export default function ExportPage() {
                               name: chatbotConfig.name,
                               systemPrompt: chatbotConfig.systemPrompt,
                               avatar: chatbotConfig.avatar || "",
-                              // Map colors to match ChatbotPreview interface
-                              primaryColor: chatbotConfig.userMsgColor,        // userMsgColor → primaryColor
-                              backgroundColor: chatbotConfig.chatBgColor,      // chatBgColor → backgroundColor  
-                              accentColor: chatbotConfig.chatBorderColor,      // chatBorderColor → accentColor
-                              textColor: chatbotConfig.botMsgColor,            // botMsgColor → textColor
+                              // Map colors to match embed script interface (CORRECT mapping)
+                              primaryColor: chatbotConfig.userMsgColor,        // userMsgColor → primaryColor (headers, buttons)
+                              backgroundColor: chatbotConfig.chatBgColor,      // chatBgColor → backgroundColor (chat background)
+                              accentColor: chatbotConfig.chatBorderColor,      // chatBorderColor → accentColor (borders, secondary)
+                              textColor: chatbotConfig.botMsgColor,            // botMsgColor → textColor (text content)
                               // Keep other properties
                               welcomeMessage: chatbotConfig.welcomeMessage,
                               placeholder: chatbotConfig.placeholder,

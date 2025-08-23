@@ -220,11 +220,11 @@
                 name: chatbotConfig.name,
                 systemPrompt: chatbotConfig.systemPrompt,
                 avatar: chatbotConfig.avatar || "",
-                // Map colors to match ChatbotPreview interface (EXACT same as Export.tsx)
-                primaryColor: chatbotConfig.userMsgColor,        // userMsgColor → primaryColor
-                backgroundColor: chatbotConfig.chatBgColor,      // chatBgColor → backgroundColor  
-                accentColor: chatbotConfig.chatBorderColor,      // chatBorderColor → accentColor
-                textColor: chatbotConfig.botMsgColor,            // botMsgColor → textColor
+                // Map colors to match embed script interface (CORRECT mapping)
+                primaryColor: chatbotConfig.userMsgColor,        // userMsgColor → primaryColor (headers, buttons)
+                backgroundColor: chatbotConfig.chatBgColor,      // chatBgColor → backgroundColor (chat background)
+                accentColor: chatbotConfig.chatBorderColor,      // chatBorderColor → accentColor (borders, secondary)
+                textColor: chatbotConfig.botMsgColor,            // botMsgColor → textColor (text content)
                 // Keep other properties
                 welcomeMessage: chatbotConfig.welcomeMessage,
                 placeholder: chatbotConfig.placeholder,
