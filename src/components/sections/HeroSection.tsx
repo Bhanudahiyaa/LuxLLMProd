@@ -79,7 +79,7 @@ const HeroSection = () => {
               variant="outline"
               className="absolute top-4 sm:-top-8 left-1/2 -translate-x-1/2 mt-36 sm:mt-44 
               text-[10px] sm:text-sm font-medium px-4 sm:px-5 py-1 rounded-full shadow
-              flex items-center gap-1.5 sm:gap-2 max-w-[95%] sm:max-w-fit whitespace-nowrap"
+              flex items-center gap-1.5 sm:gap-2 max-w-[95%] sm:max-w-fit whitespace-nowrap z-30"
             >
               <span
                 className="animate-shimmer"
@@ -118,7 +118,7 @@ const HeroSection = () => {
               <br />
               <div className=" mt-7 tracking-tight text-primary text-4xl sm:text-5xl md:text-7xl font-light opacity-80 text-center">
                 𝘚𝘦𝘢𝘮𝘭𝘦𝘴𝘴 𝘕𝘰 𝘊𝘰𝘥𝘦 𝘈𝘐 𝘊𝘩𝘢𝘵𝘣𝘰𝘵 𝘧𝘰𝘳{" "}
-                <span className="text-white">𝘌𝘷𝘦𝘳𝘺 𝘞𝘦𝘣𝘴𝘪𝘵𝘦</span>
+                <span className="text-">𝘌𝘷𝘦𝘳𝘺 𝘞𝘦𝘣𝘴𝘪𝘵𝘦</span>
               </div>
             </motion.h1>
           </div>

@@ -139,6 +139,15 @@
         <p>Look for the floating chat button on this page. It contains your fully customized chatbot with all UI settings and AI functionality.</p>
     </div>
 
+    <!-- Configuration Debug Info -->
+    <div class="embed-section" id="config-debug" style="display: none;">
+        <h2>Configuration Debug</h2>
+        <p>This shows the exact configuration being used for your chatbot:</p>
+        <div class="embed-code" id="config-debug-code">
+            <!-- Configuration will be displayed here -->
+        </div>
+    </div>
+
     <!-- Script Embed Section -->
     <div class="embed-section">
         <h2>Script Embed (Currently Active)</h2>
@@ -206,8 +215,32 @@
                 };
             }
 
+            // Map configuration to match the embed script interface (EXACT same mapping as Export.tsx)
+            const embedConfig = {
+                name: chatbotConfig.name,
+                systemPrompt: chatbotConfig.systemPrompt,
+                avatar: chatbotConfig.avatar || "",
+                // Map colors to match ChatbotPreview interface (EXACT same as Export.tsx)
+                primaryColor: chatbotConfig.userMsgColor,        // userMsgColor → primaryColor
+                backgroundColor: chatbotConfig.chatBgColor,      // chatBgColor → backgroundColor  
+                accentColor: chatbotConfig.chatBorderColor,      // chatBorderColor → accentColor
+                textColor: chatbotConfig.botMsgColor,            // botMsgColor → textColor
+                // Keep other properties
+                welcomeMessage: chatbotConfig.welcomeMessage,
+                placeholder: chatbotConfig.placeholder,
+                borderRadius: chatbotConfig.borderRadius || 12,
+                fontSize: chatbotConfig.fontSize || 14,
+                fontFamily: chatbotConfig.fontFamily || "Inter",
+                theme: chatbotConfig.theme || "modern",
+                // Add missing properties that ChatbotPreview expects
+                position: "bottom-right",
+                showTypingIndicator: true,
+                enableSounds: false,
+                animationSpeed: "normal"
+            };
+
             // Encode configuration for URL
-            const configParam = encodeURIComponent(JSON.stringify(chatbotConfig));
+            const configParam = encodeURIComponent(JSON.stringify(embedConfig));
             
             // Generate embed code (use timestamp for demo)
             const embedCode = 'demo-' + Date.now();
@@ -223,7 +256,7 @@
   height="600" 
   frameborder="0" 
   style="border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);"
-  title="${chatbotConfig.name} Chatbot"
+  title="${embedConfig.name} Chatbot"
 ><\/iframe>`;
             document.getElementById('iframe-embed-code').textContent = iframeEmbedCode;
             
@@ -234,6 +267,15 @@
             document.body.appendChild(script);
             
             console.log('🎯 Demo chatbot loaded with config:', chatbotConfig);
+            console.log('🎯 Mapped embed config:', embedConfig);
+            
+            // Show configuration debug info
+            const configDebug = document.getElementById('config-debug');
+            const configDebugCode = document.getElementById('config-debug-code');
+            if (configDebug && configDebugCode) {
+                configDebug.style.display = 'block';
+                configDebugCode.textContent = JSON.stringify(embedConfig, null, 2);
+            }
         }
 
         // Copy functions
