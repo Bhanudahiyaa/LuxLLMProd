@@ -116,10 +116,9 @@ const HeroSection = () => {
                 />
               </span>
               <br />
-              <div className="font-italianno mt-7 tracking-tight text-primary text-4xl sm:text-5xl md:text-7xl font-light opacity-80 text-center">
-                𝘚𝘦𝘢𝘮𝘭𝘦𝘴𝘴 𝘕𝘰 𝘊𝘰𝘥𝘦 𝘈𝘐 𝘊𝘩𝘢𝘵𝘣𝘰𝘵 𝘧𝘰𝘳
-                <br />
-                𝘌𝘷𝘦𝘳𝘺 𝘞𝘦𝘣𝘴𝘪𝘵𝘦
+              <div className=" mt-7 tracking-tight text-primary text-4xl sm:text-5xl md:text-7xl font-light opacity-80 text-center">
+                𝘚𝘦𝘢𝘮𝘭𝘦𝘴𝘴 𝘕𝘰 𝘊𝘰𝘥𝘦 𝘈𝘐 𝘊𝘩𝘢𝘵𝘣𝘰𝘵 𝘧𝘰𝘳{" "}
+                <span className="text-white">𝘌𝘷𝘦𝘳𝘺 𝘞𝘦𝘣𝘴𝘪𝘵𝘦</span>
               </div>
             </motion.h1>
           </div>
