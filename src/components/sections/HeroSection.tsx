@@ -77,7 +77,7 @@ const HeroSection = () => {
           <div className="relative inline-block">
             <Badge
               variant="outline"
-              className="absolute top-4 sm:-top-6 left-1/2 -translate-x-1/2 mt-44 sm:mt-44 
+              className="absolute top-4 sm:-top-8 left-1/2 -translate-x-1/2 mt-36 sm:mt-44 
               text-[10px] sm:text-sm font-medium px-4 sm:px-5 py-1 rounded-full shadow
               flex items-center gap-1.5 sm:gap-2 max-w-[95%] sm:max-w-fit whitespace-nowrap"
             >
@@ -104,7 +104,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-8xl md:text-[9rem] font-thin tracking-tighter mt-48 mb-3 bg-gradient-to-r from-foreground via-foreground/90 to-foreground/40 bg-clip-text text-transparent"
+              className="text-8xl md:text-[10rem] font-thin tracking-tighter mt-48 mb-3 bg-gradient-to-r from-foreground via-foreground/90 to-foreground/40 bg-clip-text text-transparent"
             >
               <span>
                 <Typewriter

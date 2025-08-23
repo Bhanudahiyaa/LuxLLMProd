@@ -685,6 +685,43 @@ export default function ExportPage() {
                 </Card>
               )}
 
+              {/* See Live on Website */}
+              {embedCode && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Globe className="w-5 h-5 text-primary" />
+                      See Live on Website
+                    </CardTitle>
+                    <CardDescription>
+                      See your chatbot working on a real demo website
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <p className="text-sm text-muted-foreground">
+                        Experience your chatbot in a real website environment. This demo shows exactly how your chatbot will appear and function when embedded on any website.
+                      </p>
+                      <Button
+                        onClick={() => {
+                          // Save current config to localStorage for the demo website
+                          if (chatbotConfig) {
+                            localStorage.setItem('exportChatbotConfig', JSON.stringify(chatbotConfig));
+                          }
+                          // Open the demo website
+                          window.open('/demo-website.html', '_blank');
+                        }}
+                        className="w-full"
+                        variant="default"
+                      >
+                        <Globe className="w-4 h-4 mr-2" />
+                        See Live Demo
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* API Configuration */}
               <Card>
                 <CardHeader>
