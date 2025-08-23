@@ -88,7 +88,7 @@ const MissionSection: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto">
           <div className="md:col-span-2">
             <BentoCard
-              title="AI Agents Deployed"
+              title="AI Chatbots Deployed"
               value="22"
               subtitle="Built and launched by our community this year"
               colors={[
@@ -101,9 +101,9 @@ const MissionSection: React.FC = () => {
           </div>
 
           <BentoCard
-            title="Avg. Setup Time"
+            title="Avg Setup Time"
             value="2.5 min"
-            subtitle="From idea to a live AI agent"
+            subtitle="From idea to a live AI Chatbot"
             colors={[
               "rgba(6, 194, 16, 0.08)",
               "transparent",
