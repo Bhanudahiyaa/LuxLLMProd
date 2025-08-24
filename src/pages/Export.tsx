@@ -31,6 +31,25 @@ import { getThemeById, themePresets } from "@/lib/themes";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import Navigation from "@/components/Navigation";
 
+// Template descriptions mapping
+const TEMPLATE_DESCRIPTIONS: { [key: string]: string } = {
+  "Customer Support Bot":
+    "Handle customer queries instantly with a friendly AI assistant that provides 24/7 support.",
+  "Portfolio Bot":
+    "Introduce yourself and your work with an interactive portfolio chatbot that showcases your skills.",
+  "Request Handler Bot":
+    "Automate form submissions and handle structured requests with intelligent processing.",
+  "FAQ Assistant":
+    "Answer common questions about your product or service with instant, accurate responses.",
+  "Feedback Collector":
+    "Collect and organize user feedback conversationally to improve your products and services.",
+};
+
+// Helper function to get template description
+const getTemplateDescription = (agentName: string): string => {
+  return TEMPLATE_DESCRIPTIONS[agentName] || "AI chatbot for your website";
+};
+
 interface ChatbotConfig {
   name: string;
   description: string;
@@ -52,7 +71,7 @@ export default function ExportPage() {
   const { isSignedIn, isLoaded } = useAuth();
   const [searchParams] = useSearchParams();
   const agentId = searchParams.get("agentId");
-  
+
   const { getChatbotSettings } = useChatbotSettingsService();
   const { getAgentById } = useAgentService();
   const { createEmbed } = useEmbedService();
@@ -76,14 +95,16 @@ export default function ExportPage() {
         if (agentId) {
           console.log("Loading configuration for specific agent:", agentId);
           const { data: agent, error } = await getAgentById(agentId);
-          
+
           if (agent && !error) {
             console.log("Loaded agent configuration:", agent);
-            
+
             const config: ChatbotConfig = {
               name: agent.name || "Portfolio Bot",
-              description: agent.description || "AI chatbot for my website",
-              systemPrompt: agent.system_prompt || "You are a helpful AI assistant.",
+              description:
+                agent.description || getTemplateDescription(agent.name),
+              systemPrompt:
+                agent.system_prompt || "You are a helpful AI assistant.",
               avatar: agent.avatar_url || "",
               chatBgColor: agent.chat_bg_color || "#ffffff",
               chatBorderColor: agent.chat_border_color || "#e5e7eb",
@@ -99,11 +120,16 @@ export default function ExportPage() {
 
             setChatbotConfig(config);
             setEmbedName(agent.name || "Portfolio Bot");
-            setDescription(agent.description || "AI chatbot for my website");
+            setDescription(
+              agent.description || getTemplateDescription(agent.name)
+            );
             console.log("Using agent configuration:", config);
             return;
           } else {
-            console.log("Failed to load agent, falling back to default:", error);
+            console.log(
+              "Failed to load agent, falling back to default:",
+              error
+            );
           }
         }
 
@@ -117,7 +143,9 @@ export default function ExportPage() {
 
             const config: ChatbotConfig = {
               name: dbSettings.name || "Portfolio Bot",
-              description: "AI chatbot for my website",
+              description: getTemplateDescription(
+                dbSettings.name || "Portfolio Bot"
+              ),
               systemPrompt:
                 dbSettings.system_prompt || "You are a helpful AI assistant.",
               avatar: dbSettings.avatar_url || "",
@@ -135,7 +163,9 @@ export default function ExportPage() {
 
             setChatbotConfig(config);
             setEmbedName(dbSettings.name || "Portfolio Bot");
-            setDescription("AI chatbot for my website");
+            setDescription(
+              getTemplateDescription(dbSettings.name || "Portfolio Bot")
+            );
             console.log("Using database configuration:", config);
             return;
           }
@@ -161,7 +191,9 @@ export default function ExportPage() {
 
             config = {
               name: exportData.name || "Portfolio Bot",
-              description: exportData.description || "AI chatbot for my website",
+              description:
+                exportData.description ||
+                getTemplateDescription(exportData.name || "Portfolio Bot"),
               systemPrompt:
                 exportData.system_prompt || "You are a helpful AI assistant.",
               avatar: exportData.avatar_url || "",
@@ -170,7 +202,8 @@ export default function ExportPage() {
               userMsgColor: exportData.user_msg_color || "#3b82f6",
               botMsgColor: exportData.bot_msg_color || "#1f2937",
               welcomeMessage:
-                exportData.welcome_message || "Hello! How can I help you today?",
+                exportData.welcome_message ||
+                "Hello! How can I help you today?",
               placeholder: exportData.placeholder || "Type your message...",
               borderRadius: exportData.border_radius || 12,
               fontSize: exportData.font_size || 14,
@@ -179,9 +212,15 @@ export default function ExportPage() {
             };
 
             setEmbedName(exportData.name || "Portfolio Bot");
-            setDescription(exportData.description || "AI chatbot for my website");
+            setDescription(
+              exportData.description ||
+                getTemplateDescription(exportData.name || "Portfolio Bot")
+            );
 
-            console.log("Using export configuration from localStorage:", config);
+            console.log(
+              "Using export configuration from localStorage:",
+              config
+            );
           } catch (e) {
             console.log("Error parsing export config:", e);
           }
@@ -190,29 +229,29 @@ export default function ExportPage() {
         if (!config && selectedAgent) {
           try {
             const agent = JSON.parse(selectedAgent);
-            config = {
-              name: agent.name || "Portfolio Bot",
-              description:
-                agent.description || "Customer support chatbot for my website",
-              systemPrompt:
-                agent.system_prompt || "You are a helpful AI assistant.",
-              avatar: agent.avatar_url || "",
-              chatBgColor: agent.chat_bg || "#ffffff",
-              chatBorderColor: agent.border_color || "#e5e7eb",
-              userMsgColor: agent.user_msg_color || "#3b82f6",
-              botMsgColor: agent.bot_msg_color || "#1f2937",
-              welcomeMessage:
-                agent.welcome_message || "Hello! How can I help you today?",
-              placeholder: agent.placeholder || "Type your message...",
-              borderRadius: agent.border_radius || 12,
-              fontSize: agent.font_size || 14,
-              fontFamily: agent.font_family || "Inter",
-              theme: agent.theme || "modern",
-            };
-            setEmbedName(agent.name || "Portfolio Bot");
-            setDescription(
-              agent.description || "Customer support chatbot for my website"
-            );
+                      config = {
+            name: agent.name || "Portfolio Bot",
+            description:
+              agent.description || getTemplateDescription(agent.name || "Portfolio Bot"),
+            systemPrompt:
+              agent.system_prompt || "You are a helpful AI assistant.",
+            avatar: agent.avatar_url || "",
+            chatBgColor: agent.chat_bg || "#ffffff",
+            chatBorderColor: agent.border_color || "#e5e7eb",
+            userMsgColor: agent.user_msg_color || "#3b82f6",
+            botMsgColor: agent.bot_msg_color || "#1f2937",
+            welcomeMessage:
+              agent.welcome_message || "Hello! How can I help you today?",
+            placeholder: agent.placeholder || "Type your message...",
+            borderRadius: agent.border_radius || 12,
+            fontSize: agent.font_size || 14,
+            fontFamily: agent.font_family || "Inter",
+            theme: agent.theme || "modern",
+          };
+          setEmbedName(agent.name || "Portfolio Bot");
+          setDescription(
+            agent.description || getTemplateDescription(agent.name || "Portfolio Bot")
+          );
           } catch (e) {
             console.log("Error parsing selected agent:", e);
           }
@@ -221,22 +260,22 @@ export default function ExportPage() {
         if (!config && customizations) {
           try {
             const colors = JSON.parse(customizations);
-            config = {
-              name: "Portfolio Bot",
-              description: "Customer support chatbot for my website",
-              systemPrompt: "You are a helpful AI assistant.",
-              avatar: "",
-              chatBgColor: colors.chat_bg || "#ffffff",
-              chatBorderColor: colors.border_color || "#e5e7eb",
-              userMsgColor: colors.user_msg_color || "#3b82f6",
-              botMsgColor: colors.bot_msg_color || "#1f2937",
-              welcomeMessage: "Hello! How can I help you today?",
-              placeholder: "Type your message...",
-              borderRadius: 12,
-              fontSize: 14,
-              fontFamily: "Inter",
-              theme: "modern",
-            };
+                      config = {
+            name: "Portfolio Bot",
+            description: getTemplateDescription("Portfolio Bot"),
+            systemPrompt: "You are a helpful AI assistant.",
+            avatar: "",
+            chatBgColor: colors.chat_bg || "#ffffff",
+            chatBorderColor: colors.border_color || "#e5e7eb",
+            userMsgColor: colors.user_msg_color || "#3b82f6",
+            botMsgColor: colors.bot_msg_color || "#1f2937",
+            welcomeMessage: "Hello! How can I help you today?",
+            placeholder: "Type your message...",
+            borderRadius: 12,
+            fontSize: 14,
+            fontFamily: "Inter",
+            theme: "modern",
+          };
           } catch (e) {
             console.log("Error parsing customizations:", e);
           }
