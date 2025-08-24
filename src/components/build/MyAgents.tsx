@@ -33,11 +33,16 @@ import { useAuth } from "@clerk/clerk-react";
 
 // Template descriptions mapping
 const TEMPLATE_DESCRIPTIONS: { [key: string]: string } = {
-  "Customer Support Bot": "Handle customer queries instantly with a friendly AI assistant that provides 24/7 support.",
-  "Portfolio Bot": "Introduce yourself and your work with an interactive portfolio chatbot that showcases your skills.",
-  "Request Handler Bot": "Automate form submissions and handle structured requests with intelligent processing.",
-  "FAQ Assistant": "Answer common questions about your product or service with instant, accurate responses.",
-  "Feedback Collector": "Collect and organize user feedback conversationally to improve your products and services.",
+  "Customer Support Bot":
+    "Handle customer queries instantly with a friendly AI assistant that provides 24/7 support.",
+  "Portfolio Bot":
+    "Introduce yourself and your work with an interactive portfolio chatbot that showcases your skills.",
+  "Request Handler Bot":
+    "Automate form submissions and handle structured requests with intelligent processing.",
+  "FAQ Assistant":
+    "Answer common questions about your product or service with instant, accurate responses.",
+  "Feedback Collector":
+    "Collect and organize user feedback conversationally to improve your products and services.",
 };
 
 // Helper function to get template description

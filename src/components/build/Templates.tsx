@@ -44,7 +44,7 @@ interface Template {
   };
   created_at: string;
   date: string;
-  logo: string;
+  logo: string; // Icon name for Lucide React icons
 }
 
 // Hardcoded templates array
@@ -63,7 +63,7 @@ const TEMPLATES: Template[] = [
     system_prompt: "You are a helpful customer support assistant.",
     created_at: "March 15, 2025",
     date: "March 15, 2025",
-    logo: "👥",
+    logo: "support",
   },
   {
     id: "2",
@@ -79,7 +79,7 @@ const TEMPLATES: Template[] = [
     system_prompt: "You are a personal portfolio presenter AI.",
     created_at: "March 16, 2025",
     date: "March 16, 2025",
-    logo: "🤖",
+    logo: "portfolio",
   },
   {
     id: "3",
@@ -95,7 +95,7 @@ const TEMPLATES: Template[] = [
     system_prompt: "You manage structured requests and provide confirmations.",
     created_at: "March 17, 2025",
     date: "March 17, 2025",
-    logo: "⚡",
+    logo: "zap",
   },
   {
     id: "4",
@@ -118,7 +118,7 @@ const TEMPLATES: Template[] = [
     },
     created_at: "March 18, 2025",
     date: "March 18, 2025",
-    logo: "❓",
+    logo: "help-circle",
   },
   {
     id: "5",
@@ -134,7 +134,7 @@ const TEMPLATES: Template[] = [
     system_prompt: "You ask for feedback in a polite and structured way.",
     created_at: "March 19, 2025",
     date: "March 19, 2025",
-    logo: "💬",
+    logo: "message-square",
   },
 ];
 
@@ -148,6 +148,24 @@ export function Templates() {
   const [isCloning, setIsCloning] = useState(false);
 
   const { createAgent } = useAgentService();
+
+  // Function to render Lucide React icon based on logo string
+  const renderIcon = (iconName: string) => {
+    switch (iconName) {
+      case "support":
+        return <Users size={20} />;
+      case "portfolio":
+        return <Bot size={20} />;
+      case "zap":
+        return <Zap size={20} />;
+      case "help-circle":
+        return <HelpCircle size={20} />;
+      case "message-square":
+        return <MessageSquare size={20} />;
+      default:
+        return <Bot size={24} />;
+    }
+  };
 
   const categories = useMemo(() => {
     const all = TEMPLATES.map(t => t.category);
@@ -206,8 +224,18 @@ export function Templates() {
 
   return (
     <>
-      <section className="pb-24 bg-background min-h-screen">
+      <section className="pb-16 bg-background min-h-screen">
         <div className="container mx-auto px-4">
+          {/* Heading and Subheading */}
+          <div className="mb-10">
+            <h1 className="text-3xl font-thin text-foreground mb-3">
+              AI Chatbot Templates
+            </h1>
+            <p className="text-sm font-thin text-muted-foreground max-w-2xl">
+              Pre-configured AI chatbots for every use case.
+            </p>
+          </div>
+
           {/* Filters */}
           <div className="flex flex-wrap gap-2 mb-8">
             <Button
@@ -247,8 +275,8 @@ export function Templates() {
                   <span className="text-xs bg-muted/50 text-muted-foreground px-2 py-0.5 rounded-full">
                     {template.category}
                   </span>
-                  <div className="text-xl text-muted-foreground transition-colors duration-200 group-hover:text-green-500">
-                    {template.logo}
+                  <div className="text-muted-foreground transition-colors duration-200 group-hover:text-green-500">
+                    {renderIcon(template.logo)}
                   </div>
                 </div>
 

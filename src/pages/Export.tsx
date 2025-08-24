@@ -485,16 +485,12 @@ export default function ExportPage() {
         {/* Page Content */}
         <main className="flex-1 p-6">
           {/* Page Header */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <Code className="w-8 h-8 text-primary" />
-              <h1 className="text-3xl font-bold text-foreground">
-                Export Chatbot
-              </h1>
-            </div>
-            <p className="text-muted-foreground text-lg">
-              Seamlessly integrate your AI chatbot into any website with our
-              elegant embed solutions.
+          <div className="mb-10">
+            <h1 className="text-3xl font-thin text-foreground mb-3">
+              Export Chatbot
+            </h1>
+            <p className="text-sm font-thin text-muted-foreground max-w-2xl">
+              Seamlessly integrate your AI chatbot into any website.
             </p>
           </div>
 
@@ -923,11 +919,11 @@ export default function ExportPage() {
 
           {/* Platform Integrations */}
           <div className="mt-12">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4">
+            <div className="mb-8">
+              <h2 className="text-2xl font-thin text-foreground mb-3">
                 Platform Integrations
               </h2>
-              <p className="text-muted-foreground">
+              <p className="text-sm font-thin text-muted-foreground max-w-2xl">
                 Get step-by-step instructions for popular platforms
               </p>
             </div>
