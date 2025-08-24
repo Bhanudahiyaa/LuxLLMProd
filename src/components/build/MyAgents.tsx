@@ -338,7 +338,7 @@ export function MyAgents() {
                       variant="outline"
                       onClick={e => {
                         e.stopPropagation();
-                        navigate(`/export/${agent.id}`);
+                        navigate(`/export?agentId=${agent.id}`);
                       }}
                       className="border-border text-xs px-3 py-1 h-7"
                     >

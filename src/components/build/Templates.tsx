@@ -181,6 +181,7 @@ export function Templates() {
     try {
       const { data, error } = await createAgent({
         name: template.name,
+        description: template.description,
         avatar_url: template.avatar_url,
         heading: template.heading,
         subheading: template.subheading,

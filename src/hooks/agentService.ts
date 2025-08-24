@@ -7,6 +7,7 @@ export interface Agent {
   id: string;
   user_id: string;
   name: string;
+  description?: string;
   avatar_url?: string;
   heading?: string;
   subheading?: string;
@@ -30,6 +31,7 @@ export interface Conversation {
 
 export interface AgentData {
   name: string;
+  description?: string;
   avatar_url?: string;
   heading?: string;
   subheading?: string;
@@ -68,6 +70,7 @@ export function useAgentService() {
           {
             user_id: userId,
             name: agentData.name,
+            description: agentData.description || null,
             avatar_url: agentData.avatar_url || null,
             heading: agentData.heading || null,
             subheading: agentData.subheading || null,
@@ -99,6 +102,27 @@ export function useAgentService() {
     } catch (err) {
       console.error("Unexpected error fetching agents:", err);
       return { data: null, error: "Failed to fetch agents" };
+    }
+  }
+
+  // 2.5. Get agent by ID
+  async function getAgentById(
+    agentId: string
+  ): Promise<ServiceResponse<Agent>> {
+    if (!userId) return { data: null, error: "User not authenticated" };
+    try {
+      const client = await getAuthedClient();
+      const { data, error } = await client
+        .from("agents")
+        .select("*")
+        .eq("id", agentId)
+        .eq("user_id", userId)
+        .single();
+      if (error) return { data: null, error: error.message };
+      return { data, error: null };
+    } catch (err) {
+      console.error("Unexpected error fetching agent:", err);
+      return { data: null, error: "Failed to fetch agent" };
     }
   }
 
@@ -216,6 +240,7 @@ export function useAgentService() {
   return {
     createAgent,
     getAgentsByUser,
+    getAgentById,
     updateAgent,
     deleteAgent,
     saveConversation,
