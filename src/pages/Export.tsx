@@ -87,7 +87,7 @@ export default function ExportPage() {
             borderRadius: 12,
             fontSize: 14,
             fontFamily: "Inter",
-            theme: "modern"
+            theme: "modern",
           };
 
           setChatbotConfig(config);
@@ -132,7 +132,7 @@ export default function ExportPage() {
             borderRadius: exportData.border_radius || 12,
             fontSize: exportData.font_size || 14,
             fontFamily: exportData.font_family || "Inter",
-            theme: exportData.theme || "modern"
+            theme: exportData.theme || "modern",
           };
 
           setEmbedName(exportData.name || "Portfolio Bot");
@@ -164,7 +164,7 @@ export default function ExportPage() {
             borderRadius: agent.border_radius || 12,
             fontSize: agent.font_size || 14,
             fontFamily: agent.font_family || "Inter",
-            theme: agent.theme || "modern"
+            theme: agent.theme || "modern",
           };
           setEmbedName(agent.name || "Portfolio Bot");
           setDescription(
@@ -192,7 +192,7 @@ export default function ExportPage() {
             borderRadius: 12,
             fontSize: 14,
             fontFamily: "Inter",
-            theme: "modern"
+            theme: "modern",
           };
         } catch (e) {
           console.log("Error parsing customizations:", e);
@@ -215,35 +215,39 @@ export default function ExportPage() {
 
     // Generate a simple script tag that loads the embed script with configuration
     // Map to match the embed script interface (CORRECT mapping)
-    const configParam = encodeURIComponent(JSON.stringify({
-      name: chatbotConfig.name,
-      systemPrompt: chatbotConfig.systemPrompt,
-      avatar: chatbotConfig.avatar || "",
-      // Map colors to match embed script interface (CORRECT mapping)
-      primaryColor: chatbotConfig.userMsgColor,        // userMsgColor → primaryColor (headers, buttons)
-      backgroundColor: chatbotConfig.chatBgColor,      // chatBgColor → backgroundColor (chat background)
-      accentColor: chatbotConfig.chatBorderColor,      // chatBorderColor → accentColor (borders, secondary)
-      textColor: chatbotConfig.botMsgColor,            // botMsgColor → textColor (text content)
-      // Keep other properties
-      welcomeMessage: chatbotConfig.welcomeMessage,
-      placeholder: chatbotConfig.placeholder,
-      borderRadius: chatbotConfig.borderRadius || 12,
-      fontSize: chatbotConfig.fontSize || 14,
-      fontFamily: chatbotConfig.fontFamily || "Inter",
-      theme: chatbotConfig.theme || "modern",
-      // Add missing properties that ChatbotPreview expects
-      position: "bottom-right",
-      showTypingIndicator: true,
-      enableSounds: false,
-      animationSpeed: "normal"
-    }));
+    const configParam = encodeURIComponent(
+      JSON.stringify({
+        name: chatbotConfig.name,
+        systemPrompt: chatbotConfig.systemPrompt,
+        avatar: chatbotConfig.avatar || "",
+        // Map colors to match embed script interface (CORRECT mapping)
+        primaryColor: chatbotConfig.userMsgColor, // userMsgColor → primaryColor (headers, buttons)
+        backgroundColor: chatbotConfig.chatBgColor, // chatBgColor → backgroundColor (chat background)
+        accentColor: chatbotConfig.chatBorderColor, // chatBorderColor → accentColor (borders, secondary)
+        textColor: chatbotConfig.botMsgColor, // botMsgColor → textColor (text content)
+        // Keep other properties
+        welcomeMessage: chatbotConfig.welcomeMessage,
+        placeholder: chatbotConfig.placeholder,
+        borderRadius: chatbotConfig.borderRadius || 12,
+        fontSize: chatbotConfig.fontSize || 14,
+        fontFamily: chatbotConfig.fontFamily || "Inter",
+        theme: chatbotConfig.theme || "modern",
+        // Add missing properties that ChatbotPreview expects
+        position: "bottom-right",
+        showTypingIndicator: true,
+        enableSounds: false,
+        animationSpeed: "normal",
+      })
+    );
 
     console.log("🔧 Generating embed script with config:", {
       embedCode: embedCode || "default",
-      config: JSON.parse(decodeURIComponent(configParam))
+      config: JSON.parse(decodeURIComponent(configParam)),
     });
 
-    return `<script src="https://lux-llm-prod.vercel.app/api/embed-script/${embedCode || "default"}?config=${configParam}" async></script>`;
+    return `<script src="https://lux-llm-prod.vercel.app/api/embed-script/${
+      embedCode || "default"
+    }?config=${configParam}" async></script>`;
   };
 
   const generateIframeEmbed = () => {
@@ -251,28 +255,30 @@ export default function ExportPage() {
 
     // Pass configuration to the embed preview via URL parameters
     // Map to match the embed script interface (CORRECT mapping)
-    const configParam = encodeURIComponent(JSON.stringify({
-      name: chatbotConfig.name,
-      systemPrompt: chatbotConfig.systemPrompt,
-      avatar: chatbotConfig.avatar || "",
-      // Map colors to match embed script interface (CORRECT mapping)
-      primaryColor: chatbotConfig.userMsgColor,        // userMsgColor → primaryColor (headers, buttons)
-      backgroundColor: chatbotConfig.chatBgColor,      // chatBgColor → backgroundColor (chat background)
-      accentColor: chatbotConfig.chatBorderColor,      // chatBorderColor → accentColor (borders, secondary)
-      textColor: chatbotConfig.botMsgColor,            // botMsgColor → textColor (text content)
-      // Keep other properties
-      welcomeMessage: chatbotConfig.welcomeMessage,
-      placeholder: chatbotConfig.placeholder,
-      borderRadius: chatbotConfig.borderRadius || 12,
-      fontSize: chatbotConfig.fontSize || 14,
-      fontFamily: chatbotConfig.fontFamily || "Inter",
-      theme: chatbotConfig.theme || "modern",
-      // Add missing properties that ChatbotPreview expects
-      position: "bottom-right",
-      showTypingIndicator: true,
-      enableSounds: false,
-      animationSpeed: "normal"
-    }));
+    const configParam = encodeURIComponent(
+      JSON.stringify({
+        name: chatbotConfig.name,
+        systemPrompt: chatbotConfig.systemPrompt,
+        avatar: chatbotConfig.avatar || "",
+        // Map colors to match embed script interface (CORRECT mapping)
+        primaryColor: chatbotConfig.userMsgColor, // userMsgColor → primaryColor (headers, buttons)
+        backgroundColor: chatbotConfig.chatBgColor, // chatBgColor → backgroundColor (chat background)
+        accentColor: chatbotConfig.chatBorderColor, // chatBorderColor → accentColor (borders, secondary)
+        textColor: chatbotConfig.botMsgColor, // botMsgColor → textColor (text content)
+        // Keep other properties
+        welcomeMessage: chatbotConfig.welcomeMessage,
+        placeholder: chatbotConfig.placeholder,
+        borderRadius: chatbotConfig.borderRadius || 12,
+        fontSize: chatbotConfig.fontSize || 14,
+        fontFamily: chatbotConfig.fontFamily || "Inter",
+        theme: chatbotConfig.theme || "modern",
+        // Add missing properties that ChatbotPreview expects
+        position: "bottom-right",
+        showTypingIndicator: true,
+        enableSounds: false,
+        animationSpeed: "normal",
+      })
+    );
 
     return `<iframe 
       src="https://lux-llm-prod.vercel.app/api/embed-preview/${
@@ -344,19 +350,21 @@ export default function ExportPage() {
       console.log("Created embed with configuration:", data);
 
       // Also save to localStorage as backup
-      localStorage.setItem(`embed-${newEmbedCode}`, JSON.stringify({
-        embedCode: newEmbedCode,
-        chatbotConfig: chatbotConfig,
-        createdAt: new Date().toISOString(),
-        name: embedName,
-        description: description,
-        maxRequestsPerHour: parseInt(maxRequestsPerHour),
-        maxRequestsPerDay: parseInt(maxRequestsPerDay),
-      }));
+      localStorage.setItem(
+        `embed-${newEmbedCode}`,
+        JSON.stringify({
+          embedCode: newEmbedCode,
+          chatbotConfig: chatbotConfig,
+          createdAt: new Date().toISOString(),
+          name: embedName,
+          description: description,
+          maxRequestsPerHour: parseInt(maxRequestsPerHour),
+          maxRequestsPerDay: parseInt(maxRequestsPerDay),
+        })
+      );
 
       // Hide success message after 5 seconds
       setTimeout(() => setShowSuccess(false), 5000);
-
     } catch (error) {
       console.error("Error creating embed:", error);
       alert("Failed to create embed. Please try again.");
@@ -448,7 +456,9 @@ export default function ExportPage() {
                           <div className="flex items-center gap-2">
                             <div
                               className="w-4 h-4 rounded border"
-                              style={{ backgroundColor: chatbotConfig.userMsgColor }}
+                              style={{
+                                backgroundColor: chatbotConfig.userMsgColor,
+                              }}
                             />
                             <span className="text-foreground font-mono text-sm">
                               {chatbotConfig.userMsgColor}
@@ -462,7 +472,9 @@ export default function ExportPage() {
                           <div className="flex items-center gap-2">
                             <div
                               className="w-4 h-4 rounded border"
-                              style={{ backgroundColor: chatbotConfig.chatBgColor }}
+                              style={{
+                                backgroundColor: chatbotConfig.chatBgColor,
+                              }}
                             />
                             <span className="text-foreground font-mono text-sm">
                               {chatbotConfig.chatBgColor}
@@ -481,7 +493,8 @@ export default function ExportPage() {
                     </>
                   ) : (
                     <p className="text-muted-foreground">
-                      No chatbot configuration found. Please customize your chatbot first.
+                      No chatbot configuration found. Please customize your
+                      chatbot first.
                     </p>
                   )}
                 </CardContent>
@@ -496,9 +509,12 @@ export default function ExportPage() {
                         <span className="text-white text-xs">✓</span>
                       </div>
                       <div>
-                        <p className="font-medium">Embed Created Successfully!</p>
+                        <p className="font-medium">
+                          Embed Created Successfully!
+                        </p>
                         <p className="text-sm text-green-600">
-                          Your script and iframe embed codes are now available on the right.
+                          Your script and iframe embed codes are now available
+                          on the right.
                         </p>
                       </div>
                     </div>
@@ -524,7 +540,7 @@ export default function ExportPage() {
                     </label>
                     <Input
                       value={embedName}
-                      onChange={(e) => setEmbedName(e.target.value)}
+                      onChange={e => setEmbedName(e.target.value)}
                       placeholder="My Website Chatbot"
                     />
                   </div>
@@ -541,7 +557,8 @@ export default function ExportPage() {
                       className="bg-muted cursor-not-allowed"
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      Description is automatically set from your editor configuration and cannot be changed here.
+                      Description is automatically set from your editor
+                      configuration and cannot be changed here.
                     </p>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -552,7 +569,7 @@ export default function ExportPage() {
                       <Input
                         type="number"
                         value={maxRequestsPerHour}
-                        onChange={(e) => setMaxRequestsPerHour(e.target.value)}
+                        onChange={e => setMaxRequestsPerHour(e.target.value)}
                         placeholder="100"
                       />
                     </div>
@@ -563,7 +580,7 @@ export default function ExportPage() {
                       <Input
                         type="number"
                         value={maxRequestsPerDay}
-                        onChange={(e) => setMaxRequestsPerDay(e.target.value)}
+                        onChange={e => setMaxRequestsPerDay(e.target.value)}
                         placeholder="1000"
                       />
                     </div>
@@ -601,7 +618,9 @@ export default function ExportPage() {
                         </code>
                       </pre>
                       <Button
-                        onClick={() => copyToClipboard(generateEmbedScript(), "script")}
+                        onClick={() =>
+                          copyToClipboard(generateEmbedScript(), "script")
+                        }
                         size="sm"
                         className="absolute top-2 right-2"
                         variant="outline"
@@ -635,7 +654,8 @@ export default function ExportPage() {
                       </p>
                       <div className="bg-muted p-4 rounded-lg border-2 border-dashed border-muted-foreground/20">
                         <p className="text-sm text-muted-foreground">
-                          Your script embed will appear here after creating an embed
+                          Your script embed will appear here after creating an
+                          embed
                         </p>
                       </div>
                     </div>
@@ -663,7 +683,9 @@ export default function ExportPage() {
                         </code>
                       </pre>
                       <Button
-                        onClick={() => copyToClipboard(generateIframeEmbed(), "iframe")}
+                        onClick={() =>
+                          copyToClipboard(generateIframeEmbed(), "iframe")
+                        }
                         size="sm"
                         className="absolute top-2 right-2"
                         variant="outline"
@@ -697,67 +719,10 @@ export default function ExportPage() {
                       </p>
                       <div className="bg-muted p-4 rounded-lg border-2 border-dashed border-muted-foreground/20">
                         <p className="text-sm text-muted-foreground">
-                          Your iframe embed will appear here after creating an embed
+                          Your iframe embed will appear here after creating an
+                          embed
                         </p>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Test Your Embed */}
-              {embedCode && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Eye className="w-5 h-5 text-primary" />
-                      Test Your Embed
-                    </CardTitle>
-                    <CardDescription>
-                      Preview how your chatbot will look on websites
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <p className="text-sm text-muted-foreground">
-                        Click the button below to open a preview page where you can test your chatbot.
-                      </p>
-                      <Button
-                        onClick={() => {
-                          if (chatbotConfig) {
-                            const configParam = encodeURIComponent(JSON.stringify({
-                              name: chatbotConfig.name,
-                              systemPrompt: chatbotConfig.systemPrompt,
-                              avatar: chatbotConfig.avatar || "",
-                              // Map colors to match embed script interface (CORRECT mapping)
-                              primaryColor: chatbotConfig.userMsgColor,        // userMsgColor → primaryColor (headers, buttons)
-                              backgroundColor: chatbotConfig.chatBgColor,      // chatBgColor → backgroundColor (chat background)
-                              accentColor: chatbotConfig.chatBorderColor,      // chatBorderColor → accentColor (borders, secondary)
-                              textColor: chatbotConfig.botMsgColor,            // botMsgColor → textColor (text content)
-                              // Keep other properties
-                              welcomeMessage: chatbotConfig.welcomeMessage,
-                              placeholder: chatbotConfig.placeholder,
-                              borderRadius: chatbotConfig.borderRadius || 12,
-                              fontSize: chatbotConfig.fontSize || 14,
-                              fontFamily: chatbotConfig.fontFamily || "Inter",
-                              theme: chatbotConfig.theme || "modern",
-                              // Add missing properties that ChatbotPreview expects
-                              position: "bottom-right",
-                              showTypingIndicator: true,
-                              enableSounds: false,
-                              animationSpeed: "normal"
-                            }));
-                            window.open(`/api/embed-preview/${embedCode}?config=${configParam}`, '_blank');
-                          } else {
-                            window.open(`/api/embed-preview/${embedCode}`, '_blank');
-                          }
-                        }}
-                        className="w-full"
-                        variant="outline"
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        Open Preview
-                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -778,16 +743,21 @@ export default function ExportPage() {
                   <CardContent>
                     <div className="space-y-4">
                       <p className="text-sm text-muted-foreground">
-                        Experience your chatbot in a real website environment. This demo shows exactly how your chatbot will appear and function when embedded on any website.
+                        Experience your chatbot in a real website environment.
+                        This demo shows exactly how your chatbot will appear and
+                        function when embedded on any website.
                       </p>
                       <Button
                         onClick={() => {
                           // Save current config to localStorage for the demo website
                           if (chatbotConfig) {
-                            localStorage.setItem('exportChatbotConfig', JSON.stringify(chatbotConfig));
+                            localStorage.setItem(
+                              "exportChatbotConfig",
+                              JSON.stringify(chatbotConfig)
+                            );
                           }
                           // Open the demo website
-                          window.open('/demo-website.html', '_blank');
+                          window.open("/demo-website.html", "_blank");
                         }}
                         className="w-full"
                         variant="default"
@@ -823,7 +793,12 @@ export default function ExportPage() {
                         className="pr-20"
                       />
                       <Button
-                        onClick={() => copyToClipboard("https://lux-llm-prod.vercel.app/api/public-chat", "api")}
+                        onClick={() =>
+                          copyToClipboard(
+                            "https://lux-llm-prod.vercel.app/api/public-chat",
+                            "api"
+                          )
+                        }
                         size="sm"
                         className="absolute right-1 top-1"
                         variant="outline"
@@ -845,11 +820,15 @@ export default function ExportPage() {
                       Request Body
                     </label>
                     <pre className="bg-muted p-3 rounded text-xs font-mono">
-                      {JSON.stringify({
-                        message: "Hello",
-                        embedCode: embedCode || "your-embed-code",
-                        sessionId: "unique-session-id"
-                      }, null, 2)}
+                      {JSON.stringify(
+                        {
+                          message: "Hello",
+                          embedCode: embedCode || "your-embed-code",
+                          sessionId: "unique-session-id",
+                        },
+                        null,
+                        2
+                      )}
                     </pre>
                   </div>
                 </CardContent>
@@ -877,10 +856,15 @@ export default function ExportPage() {
                 { name: "Vue.js", icon: "💚" },
                 { name: "Angular", icon: "🅰️" },
                 { name: "HTML", icon: "📄" },
-              ].map((platform) => (
-                <Card key={platform.name} className="text-center p-4 hover:shadow-md transition-shadow cursor-pointer">
+              ].map(platform => (
+                <Card
+                  key={platform.name}
+                  className="text-center p-4 hover:shadow-md transition-shadow cursor-pointer"
+                >
                   <div className="text-2xl mb-2">{platform.icon}</div>
-                  <h3 className="font-medium text-foreground">{platform.name}</h3>
+                  <h3 className="font-medium text-foreground">
+                    {platform.name}
+                  </h3>
                 </Card>
               ))}
             </div>
