@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import {
   Card,
   CardContent,
@@ -177,50 +178,52 @@ export function MyAgents() {
   // Preview handler removed
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {!isLoaded
-              ? "Loading..."
-              : !isSignedIn
-              ? "Authentication Required"
-              : "My Agents"}
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            {!isLoaded
-              ? "Please wait..."
-              : !isSignedIn
-              ? "Sign in to access your agents"
-              : "Manage and monitor your AI agents"}
-          </p>
+    <section className="pb-24 bg-background min-h-screen">
+      <div className="container mx-auto px-4">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl font-thin tracking-tight text-foreground">
+              {!isLoaded
+                ? "Loading..."
+                : !isSignedIn
+                ? "Authentication Required"
+                : "My Agents"}
+            </h1>
+            <p className="text-muted-foreground mt-2 font-thin">
+              {!isLoaded
+                ? "Please wait..."
+                : !isSignedIn
+                ? "Sign in to access your agents"
+                : "Manage and monitor your AI agents"}
+            </p>
+          </div>
+          {isLoaded && isSignedIn && (
+            <Button
+              onClick={() => navigate("/build/templates")}
+              className="w-fit"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create New Agent
+            </Button>
+          )}
         </div>
+
+        {/* Search - Only show when authenticated */}
         {isLoaded && isSignedIn && (
-          <Button
-            onClick={() => navigate("/build/templates")}
-            className="w-fit"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create New Agent
-          </Button>
+          <div className="relative mb-8">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search agents..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="pl-10 max-w-md"
+            />
+          </div>
         )}
-      </div>
 
-      {/* Search - Only show when authenticated */}
-      {isLoaded && isSignedIn && (
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            placeholder="Search agents..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            className="pl-10 max-w-md"
-          />
-        </div>
-      )}
-
-      {/* Agents Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Agents Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {!isLoaded ? (
           <div className="col-span-full text-center py-12">
             <div className="flex flex-col items-center gap-4">
@@ -261,103 +264,117 @@ export function MyAgents() {
             </Button>
           </div>
         ) : (
-          filteredAgents.map(agent => (
-            <Card
+                    filteredAgents.map((agent, index) => (
+            <motion.article
               key={agent.id}
-              className="hover:shadow-card transition-all duration-300"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: index * 0.02 }}
+              className="group relative rounded-2xl border bg-card/20 text-card-foreground p-6 shadow-sm hover:shadow-md transition cursor-pointer"
             >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-primary/10 w-fit">
-                      <Bot className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <Badge
-                        variant={
-                          agent.status === "active" ? "default" : "secondary"
-                        }
-                        className="text-xs"
-                      >
-                        {agent.status}
-                      </Badge>
-                    </div>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleEdit(agent)}>
-                        <Edit className="h-4 w-4 mr-2" />
-                        Edit
-                      </DropdownMenuItem>
-                      {/* Preview and Activate removed */}
-                      <DropdownMenuItem
-                        onClick={() => handleDelete(agent.id)}
-                        className="text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+              {/* Top badge and icon */}
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs bg-muted/50 text-muted-foreground px-2 py-0.5 rounded-full">
+                  {agent.status || "Active"}
+                </span>
+                <div className="text-xl text-muted-foreground transition-colors duration-200 group-hover:text-primary">
+                  <Bot className="h-5 w-5" />
                 </div>
-                <CardTitle className="text-lg">{agent.name}</CardTitle>
-                <CardDescription className="text-sm">
-                  {agent.description || "No description available"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Messages:</span>
-                    <span className="font-medium">
-                      {agent.messages?.toLocaleString() || "0"}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Rating:</span>
-                    <span className="font-medium">
-                      {agent.rating !== undefined
-                        ? `${agent.rating}/5.0`
-                        : "N/A"}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Last Active:</span>
-                    <span className="font-medium">
-                      {agent.lastActive || "Never"}
-                    </span>
-                  </div>
-                  <div className="flex gap-2 pt-2">
-                    <Button
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => handleEdit(agent)}
+              </div>
+
+              {/* Title */}
+              <h3 className="text-lg font-thin text-foreground mb-3 group-hover:text-primary transition-colors duration-200">
+                {agent.name}
+              </h3>
+
+              {/* Description */}
+              <p className="text-sm font-thin text-muted-foreground mb-4">
+                {agent.description || "No description available"}
+              </p>
+
+              {/* Stats */}
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Messages:</span>
+                  <span className="font-medium">
+                    {agent.messages?.toLocaleString() || "0"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Rating:</span>
+                  <span className="font-medium">
+                    {agent.rating !== undefined
+                      ? `${agent.rating}/5.0`
+                      : "N/A"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Last Active:</span>
+                  <span className="font-medium">
+                    {agent.lastActive || "Never"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEdit(agent);
+                    }}
+                    className="border-border text-xs px-3 py-1 h-7"
+                  >
+                    <Edit className="h-3 w-3 mr-1" />
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/export/${agent.id}`);
+                    }}
+                    className="border-border text-xs px-3 py-1 h-7"
+                  >
+                    <Clipboard className="h-3 w-3 mr-1" />
+                    Export
+                  </Button>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      <Edit className="h-4 w-4 mr-1" />
+                      <MoreVertical className="h-3 w-3" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleEdit(agent)}>
+                      <Edit className="h-4 w-4 mr-2" />
                       Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate(`/export/${agent.id}`)}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleDelete(agent.id)}
+                      className="text-destructive"
                     >
-                      <Clipboard className="h-4 w-4 mr-1" />
-                      Export
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </motion.article>
           ))
         )}
+        </div>
       </div>
-
-      {/* Preview Dialog removed */}
-    </div>
+    </section>
   );
 }
