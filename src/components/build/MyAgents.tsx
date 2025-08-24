@@ -224,155 +224,157 @@ export function MyAgents() {
 
         {/* Agents Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {!isLoaded ? (
-          <div className="col-span-full text-center py-12">
-            <div className="flex flex-col items-center gap-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <p className="text-lg font-medium">Loading authentication...</p>
+          {!isLoaded ? (
+            <div className="col-span-full text-center py-12">
+              <div className="flex flex-col items-center gap-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <p className="text-lg font-medium">Loading authentication...</p>
+              </div>
             </div>
-          </div>
-        ) : !isSignedIn ? (
-          <div className="col-span-full text-center py-12">
-            <div className="flex flex-col items-center gap-4">
+          ) : !isSignedIn ? (
+            <div className="col-span-full text-center py-12">
+              <div className="flex flex-col items-center gap-4">
+                <Bot className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-lg font-medium">
+                  Please sign in to view your agents
+                </p>
+                <Button onClick={() => navigate("/auth/sign-in")}>
+                  Sign In
+                </Button>
+              </div>
+            </div>
+          ) : loading ? (
+            <div className="col-span-full text-center py-12">
+              <div className="flex flex-col items-center gap-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <p className="text-lg font-medium">Loading agents...</p>
+                <Button variant="outline" onClick={loadAgents} className="mt-2">
+                  Retry
+                </Button>
+              </div>
+            </div>
+          ) : filteredAgents.length === 0 ? (
+            <div className="col-span-full text-center py-12">
               <Bot className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-lg font-medium">
-                Please sign in to view your agents
+              <p className="text-lg font-medium">No agents found</p>
+              <p className="text-muted-foreground mb-4">
+                Create your first AI agent to get started
               </p>
-              <Button onClick={() => navigate("/auth/sign-in")}>Sign In</Button>
-            </div>
-          </div>
-        ) : loading ? (
-          <div className="col-span-full text-center py-12">
-            <div className="flex flex-col items-center gap-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <p className="text-lg font-medium">Loading agents...</p>
-              <Button variant="outline" onClick={loadAgents} className="mt-2">
-                Retry
+              <Button onClick={() => navigate("/build/templates")}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create New Agent
               </Button>
             </div>
-          </div>
-        ) : filteredAgents.length === 0 ? (
-          <div className="col-span-full text-center py-12">
-            <Bot className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-lg font-medium">No agents found</p>
-            <p className="text-muted-foreground mb-4">
-              Create your first AI agent to get started
-            </p>
-            <Button onClick={() => navigate("/build/templates")}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create New Agent
-            </Button>
-          </div>
-        ) : (
-                    filteredAgents.map((agent, index) => (
-            <motion.article
-              key={agent.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2, delay: index * 0.02 }}
-              className="group relative rounded-2xl border bg-card/20 text-card-foreground p-6 shadow-sm hover:shadow-md transition cursor-pointer"
-            >
-              {/* Top badge and icon */}
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs bg-muted/50 text-muted-foreground px-2 py-0.5 rounded-full">
-                  {agent.status || "Active"}
-                </span>
-                <div className="text-xl text-muted-foreground transition-colors duration-200 group-hover:text-primary">
-                  <Bot className="h-5 w-5" />
-                </div>
-              </div>
-
-              {/* Title */}
-              <h3 className="text-lg font-thin text-foreground mb-3 group-hover:text-primary transition-colors duration-200">
-                {agent.name}
-              </h3>
-
-              {/* Description */}
-              <p className="text-sm font-thin text-muted-foreground mb-4">
-                {agent.description || "No description available"}
-              </p>
-
-              {/* Stats */}
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Messages:</span>
-                  <span className="font-medium">
-                    {agent.messages?.toLocaleString() || "0"}
+          ) : (
+            filteredAgents.map((agent, index) => (
+              <motion.article
+                key={agent.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2, delay: index * 0.02 }}
+                className="group relative rounded-2xl border bg-card/20 text-card-foreground p-6 shadow-sm hover:shadow-md transition cursor-pointer"
+              >
+                {/* Top badge and icon */}
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs bg-muted/50 text-muted-foreground px-2 py-0.5 rounded-full">
+                    {agent.status || "Active"}
                   </span>
+                  <div className="text-xl text-muted-foreground transition-colors duration-200 group-hover:text-primary">
+                    <Bot className="h-5 w-5" />
+                  </div>
                 </div>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Rating:</span>
-                  <span className="font-medium">
-                    {agent.rating !== undefined
-                      ? `${agent.rating}/5.0`
-                      : "N/A"}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Last Active:</span>
-                  <span className="font-medium">
-                    {agent.lastActive || "Never"}
-                  </span>
-                </div>
-              </div>
 
-              {/* Actions */}
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEdit(agent);
-                    }}
-                    className="border-border text-xs px-3 py-1 h-7"
-                  >
-                    <Edit className="h-3 w-3 mr-1" />
-                    Edit
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/export/${agent.id}`);
-                    }}
-                    className="border-border text-xs px-3 py-1 h-7"
-                  >
-                    <Clipboard className="h-3 w-3 mr-1" />
-                    Export
-                  </Button>
+                {/* Title */}
+                <h3 className="text-lg font-thin text-foreground mb-3 group-hover:text-primary transition-colors duration-200">
+                  {agent.name}
+                </h3>
+
+                {/* Description */}
+                <p className="text-sm font-thin text-muted-foreground mb-4">
+                  {agent.description || "No description available"}
+                </p>
+
+                {/* Stats */}
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Messages:</span>
+                    <span className="font-medium">
+                      {agent.messages?.toLocaleString() || "0"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Rating:</span>
+                    <span className="font-medium">
+                      {agent.rating !== undefined
+                        ? `${agent.rating}/5.0`
+                        : "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Last Active:</span>
+                    <span className="font-medium">
+                      {agent.lastActive || "Never"}
+                    </span>
+                  </div>
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
-                      onClick={(e) => e.stopPropagation()}
+
+                {/* Actions */}
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={e => {
+                        e.stopPropagation();
+                        handleEdit(agent);
+                      }}
+                      className="border-border text-xs px-3 py-1 h-7"
                     >
-                      <MoreVertical className="h-3 w-3" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleEdit(agent)}>
-                      <Edit className="h-4 w-4 mr-2" />
+                      <Edit className="h-3 w-3 mr-1" />
                       Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleDelete(agent.id)}
-                      className="text-destructive"
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={e => {
+                        e.stopPropagation();
+                        navigate(`/export/${agent.id}`);
+                      }}
+                      className="border-border text-xs px-3 py-1 h-7"
                     >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </motion.article>
-          ))
-        )}
+                      <Clipboard className="h-3 w-3 mr-1" />
+                      Export
+                    </Button>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+                        onClick={e => e.stopPropagation()}
+                      >
+                        <MoreVertical className="h-3 w-3" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleEdit(agent)}>
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleDelete(agent.id)}
+                        className="text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </motion.article>
+            ))
+          )}
         </div>
       </div>
     </section>

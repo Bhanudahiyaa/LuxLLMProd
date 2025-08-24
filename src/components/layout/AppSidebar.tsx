@@ -30,7 +30,7 @@ const buildItems = [
 
 const manageItems = [
   { title: "My Agents", url: "/build/agents", icon: Bot },
-  { title: "Customize", url: "/build/settings", icon: Settings },
+  { title: "Customize", url: "/build/templates", icon: Settings },
   { title: "Export", url: "/export", icon: Code },
 ];
 
