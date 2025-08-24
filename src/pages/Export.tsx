@@ -60,6 +60,7 @@ export default function ExportPage() {
   );
   const [embedCode, setEmbedCode] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     // Load chatbot customizations from database first, then localStorage
@@ -339,6 +340,7 @@ export default function ExportPage() {
       }
 
       setEmbedCode(newEmbedCode);
+      setShowSuccess(true);
       console.log("Created embed with configuration:", data);
 
       // Also save to localStorage as backup
@@ -351,6 +353,9 @@ export default function ExportPage() {
         maxRequestsPerHour: parseInt(maxRequestsPerHour),
         maxRequestsPerDay: parseInt(maxRequestsPerDay),
       }));
+
+      // Hide success message after 5 seconds
+      setTimeout(() => setShowSuccess(false), 5000);
 
     } catch (error) {
       console.error("Error creating embed:", error);
@@ -482,6 +487,25 @@ export default function ExportPage() {
                 </CardContent>
               </Card>
 
+              {/* Success Message */}
+              {showSuccess && (
+                <Card className="border-green-200 bg-green-50">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-3 text-green-800">
+                      <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <div>
+                        <p className="font-medium">Embed Created Successfully!</p>
+                        <p className="text-sm text-green-600">
+                          Your script and iframe embed codes are now available on the right.
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Create Embed */}
               <Card>
                 <CardHeader>
@@ -557,75 +581,129 @@ export default function ExportPage() {
 
             {/* Right Column */}
             <div className="space-y-8">
-              {/* Script Embed */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Code className="w-5 h-5 text-primary" />
-                    Script Embed
-                  </CardTitle>
-                  <CardDescription>
-                    Add this script tag to your website's HTML
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="relative">
-                    <pre className="bg-muted p-4 rounded-lg border text-sm font-mono overflow-x-auto">
-                      <code className="text-foreground">
-                        {generateEmbedScript()}
-                      </code>
-                    </pre>
-                    <Button
-                      onClick={() => copyToClipboard(generateEmbedScript(), "script")}
-                      size="sm"
-                      className="absolute top-2 right-2"
-                      variant="outline"
-                    >
-                      {copied === "script" ? (
-                        <Copy className="w-4 h-4" />
-                      ) : (
-                        <Copy className="w-4 h-4" />
-                      )}
-                      {copied === "script" ? "Copied!" : "Copy"}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Script Embed - Only show after creating embed */}
+              {embedCode ? (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Code className="w-5 h-5 text-primary" />
+                      Script Embed
+                    </CardTitle>
+                    <CardDescription>
+                      Add this script tag to your website's HTML
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="relative">
+                      <pre className="bg-muted p-4 rounded-lg border text-sm font-mono overflow-x-auto">
+                        <code className="text-foreground">
+                          {generateEmbedScript()}
+                        </code>
+                      </pre>
+                      <Button
+                        onClick={() => copyToClipboard(generateEmbedScript(), "script")}
+                        size="sm"
+                        className="absolute top-2 right-2"
+                        variant="outline"
+                      >
+                        {copied === "script" ? (
+                          <Copy className="w-4 h-4" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                        {copied === "script" ? "Copied!" : "Copy"}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Code className="w-5 h-5 text-primary" />
+                      Script Embed
+                    </CardTitle>
+                    <CardDescription>
+                      Create an embed first to generate your script tag
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-8">
+                      <Code className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground mb-4">
+                        Press "Create Embed" to generate your custom script tag
+                      </p>
+                      <div className="bg-muted p-4 rounded-lg border-2 border-dashed border-muted-foreground/20">
+                        <p className="text-sm text-muted-foreground">
+                          Your script embed will appear here after creating an embed
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
-              {/* Iframe Embed */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Globe className="w-5 h-5 text-primary" />
-                    Iframe Embed
-                  </CardTitle>
-                  <CardDescription>
-                    Embed the chatbot as an iframe element
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="relative">
-                    <pre className="bg-muted p-4 rounded-lg border text-sm font-mono overflow-x-auto">
-                      <code className="text-foreground">
-                        {generateIframeEmbed()}
-                      </code>
-                    </pre>
-                    <Button
-                      onClick={() => copyToClipboard(generateIframeEmbed(), "iframe")}
-                      size="sm"
-                      className="absolute top-2 right-2"
-                      variant="outline"
-                    >
-                      {copied === "iframe" ? (
-                        <Copy className="w-4 h-4" />
-                      ) : (
-                        <Copy className="w-4 h-4" />
-                      )}
-                      {copied === "iframe" ? "Copied!" : "Copy"}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Iframe Embed - Only show after creating embed */}
+              {embedCode ? (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Globe className="w-5 h-5 text-primary" />
+                      Iframe Embed
+                    </CardTitle>
+                    <CardDescription>
+                      Embed the chatbot as an iframe element
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="relative">
+                      <pre className="bg-muted p-4 rounded-lg border text-sm font-mono overflow-x-auto">
+                        <code className="text-foreground">
+                          {generateIframeEmbed()}
+                        </code>
+                      </pre>
+                      <Button
+                        onClick={() => copyToClipboard(generateIframeEmbed(), "iframe")}
+                        size="sm"
+                        className="absolute top-2 right-2"
+                        variant="outline"
+                      >
+                        {copied === "iframe" ? (
+                          <Copy className="w-4 h-4" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                        {copied === "iframe" ? "Copied!" : "Copy"}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Globe className="w-5 h-5 text-primary" />
+                      Iframe Embed
+                    </CardTitle>
+                    <CardDescription>
+                      Create an embed first to generate your iframe code
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-8">
+                      <Globe className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground mb-4">
+                        Press "Create Embed" to generate your custom iframe code
+                      </p>
+                      <div className="bg-muted p-4 rounded-lg border-2 border-dashed border-muted-foreground/20">
+                        <p className="text-sm text-muted-foreground">
+                          Your iframe embed will appear here after creating an embed
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Test Your Embed */}
               {embedCode && (
