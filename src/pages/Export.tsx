@@ -22,6 +22,14 @@ import {
   Palette,
   Download,
   Lock,
+  Check,
+  CheckCircle,
+  MessageSquare,
+  Zap,
+  Sparkles,
+  Bot,
+  X,
+  ExternalLink,
 } from "lucide-react";
 import { useAuth } from "@clerk/clerk-react";
 import { useChatbotSettingsService } from "@/hooks/chatbotSettingsService";
@@ -30,25 +38,7 @@ import { useEmbedService } from "@/hooks/embedService";
 import { getThemeById, themePresets } from "@/lib/themes";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import Navigation from "@/components/Navigation";
-
-// Template descriptions mapping
-const TEMPLATE_DESCRIPTIONS: { [key: string]: string } = {
-  "Customer Support Bot":
-    "Handle customer queries instantly with a friendly AI assistant that provides 24/7 support.",
-  "Portfolio Bot":
-    "Introduce yourself and your work with an interactive portfolio chatbot that showcases your skills.",
-  "Request Handler Bot":
-    "Automate form submissions and handle structured requests with intelligent processing.",
-  "FAQ Assistant":
-    "Answer common questions about your product or service with instant, accurate responses.",
-  "Feedback Collector":
-    "Collect and organize user feedback conversationally to improve your products and services.",
-};
-
-// Helper function to get template description
-const getTemplateDescription = (agentName: string): string => {
-  return TEMPLATE_DESCRIPTIONS[agentName] || "AI chatbot for your website";
-};
+import { motion } from "framer-motion";
 
 interface ChatbotConfig {
   name: string;
@@ -86,6 +76,7 @@ export default function ExportPage() {
   const [embedCode, setEmbedCode] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [selectedPlatform, setSelectedPlatform] = useState<any>(null);
 
   useEffect(() => {
     // Load chatbot customizations from specific agent if agentId is provided
@@ -101,8 +92,7 @@ export default function ExportPage() {
 
             const config: ChatbotConfig = {
               name: agent.name || "Portfolio Bot",
-              description:
-                agent.description || getTemplateDescription(agent.name),
+              description: agent.description || "AI chatbot for my website",
               systemPrompt:
                 agent.system_prompt || "You are a helpful AI assistant.",
               avatar: agent.avatar_url || "",
@@ -120,9 +110,7 @@ export default function ExportPage() {
 
             setChatbotConfig(config);
             setEmbedName(agent.name || "Portfolio Bot");
-            setDescription(
-              agent.description || getTemplateDescription(agent.name)
-            );
+            setDescription(agent.description || "AI chatbot for my website");
             console.log("Using agent configuration:", config);
             return;
           } else {
@@ -143,9 +131,7 @@ export default function ExportPage() {
 
             const config: ChatbotConfig = {
               name: dbSettings.name || "Portfolio Bot",
-              description: getTemplateDescription(
-                dbSettings.name || "Portfolio Bot"
-              ),
+              description: "AI chatbot for my website",
               systemPrompt:
                 dbSettings.system_prompt || "You are a helpful AI assistant.",
               avatar: dbSettings.avatar_url || "",
@@ -163,9 +149,7 @@ export default function ExportPage() {
 
             setChatbotConfig(config);
             setEmbedName(dbSettings.name || "Portfolio Bot");
-            setDescription(
-              getTemplateDescription(dbSettings.name || "Portfolio Bot")
-            );
+            setDescription("AI chatbot for my website");
             console.log("Using database configuration:", config);
             return;
           }
@@ -192,8 +176,7 @@ export default function ExportPage() {
             config = {
               name: exportData.name || "Portfolio Bot",
               description:
-                exportData.description ||
-                getTemplateDescription(exportData.name || "Portfolio Bot"),
+                exportData.description || "AI chatbot for my website",
               systemPrompt:
                 exportData.system_prompt || "You are a helpful AI assistant.",
               avatar: exportData.avatar_url || "",
@@ -213,8 +196,7 @@ export default function ExportPage() {
 
             setEmbedName(exportData.name || "Portfolio Bot");
             setDescription(
-              exportData.description ||
-                getTemplateDescription(exportData.name || "Portfolio Bot")
+              exportData.description || "AI chatbot for my website"
             );
 
             console.log(
@@ -229,29 +211,29 @@ export default function ExportPage() {
         if (!config && selectedAgent) {
           try {
             const agent = JSON.parse(selectedAgent);
-                      config = {
-            name: agent.name || "Portfolio Bot",
-            description:
-              agent.description || getTemplateDescription(agent.name || "Portfolio Bot"),
-            systemPrompt:
-              agent.system_prompt || "You are a helpful AI assistant.",
-            avatar: agent.avatar_url || "",
-            chatBgColor: agent.chat_bg || "#ffffff",
-            chatBorderColor: agent.border_color || "#e5e7eb",
-            userMsgColor: agent.user_msg_color || "#3b82f6",
-            botMsgColor: agent.bot_msg_color || "#1f2937",
-            welcomeMessage:
-              agent.welcome_message || "Hello! How can I help you today?",
-            placeholder: agent.placeholder || "Type your message...",
-            borderRadius: agent.border_radius || 12,
-            fontSize: agent.font_size || 14,
-            fontFamily: agent.font_family || "Inter",
-            theme: agent.theme || "modern",
-          };
-          setEmbedName(agent.name || "Portfolio Bot");
-          setDescription(
-            agent.description || getTemplateDescription(agent.name || "Portfolio Bot")
-          );
+            config = {
+              name: agent.name || "Portfolio Bot",
+              description:
+                agent.description || "Customer support chatbot for my website",
+              systemPrompt:
+                agent.system_prompt || "You are a helpful AI assistant.",
+              avatar: agent.avatar_url || "",
+              chatBgColor: agent.chat_bg || "#ffffff",
+              chatBorderColor: agent.border_color || "#e5e7eb",
+              userMsgColor: agent.user_msg_color || "#3b82f6",
+              botMsgColor: agent.bot_msg_color || "#1f2937",
+              welcomeMessage:
+                agent.welcome_message || "Hello! How can I help you today?",
+              placeholder: agent.placeholder || "Type your message...",
+              borderRadius: agent.border_radius || 12,
+              fontSize: agent.font_size || 14,
+              fontFamily: agent.font_family || "Inter",
+              theme: agent.theme || "modern",
+            };
+            setEmbedName(agent.name || "Portfolio Bot");
+            setDescription(
+              agent.description || "Customer support chatbot for my website"
+            );
           } catch (e) {
             console.log("Error parsing selected agent:", e);
           }
@@ -260,22 +242,22 @@ export default function ExportPage() {
         if (!config && customizations) {
           try {
             const colors = JSON.parse(customizations);
-                      config = {
-            name: "Portfolio Bot",
-            description: getTemplateDescription("Portfolio Bot"),
-            systemPrompt: "You are a helpful AI assistant.",
-            avatar: "",
-            chatBgColor: colors.chat_bg || "#ffffff",
-            chatBorderColor: colors.border_color || "#e5e7eb",
-            userMsgColor: colors.user_msg_color || "#3b82f6",
-            botMsgColor: colors.bot_msg_color || "#1f2937",
-            welcomeMessage: "Hello! How can I help you today?",
-            placeholder: "Type your message...",
-            borderRadius: 12,
-            fontSize: 14,
-            fontFamily: "Inter",
-            theme: "modern",
-          };
+            config = {
+              name: "Portfolio Bot",
+              description: "Customer support chatbot for my website",
+              systemPrompt: "You are a helpful AI assistant.",
+              avatar: "",
+              chatBgColor: colors.chat_bg || "#ffffff",
+              chatBorderColor: colors.border_color || "#e5e7eb",
+              userMsgColor: colors.user_msg_color || "#3b82f6",
+              botMsgColor: colors.bot_msg_color || "#1f2937",
+              welcomeMessage: "Hello! How can I help you today?",
+              placeholder: "Type your message...",
+              borderRadius: 12,
+              fontSize: 14,
+              fontFamily: "Inter",
+              theme: "modern",
+            };
           } catch (e) {
             console.log("Error parsing customizations:", e);
           }
@@ -295,7 +277,7 @@ export default function ExportPage() {
     loadChatbotConfig();
   }, [agentId, getAgentById, getChatbotSettings]);
 
-  const generateEmbedScript = () => {
+  const generateScriptEmbed = () => {
     if (!chatbotConfig) return "";
 
     // Generate a simple script tag that loads the embed script with configuration
@@ -381,6 +363,161 @@ export default function ExportPage() {
     await navigator.clipboard.writeText(text);
     setCopied(type);
     setTimeout(() => setCopied(null), 2000);
+  };
+
+  const getIntegrationInstructions = (platformName: string) => {
+    const instructions: { [key: string]: string[] } = {
+      WordPress: [
+        "Install and activate the 'Custom HTML' plugin",
+        "Add a new HTML block to your page or post",
+        "Paste the embed script in the HTML block",
+        "Save and publish your page",
+      ],
+      Shopify: [
+        "Go to your Shopify admin panel",
+        "Navigate to Online Store > Themes",
+        "Click 'Actions' > 'Edit code'",
+        "Find the theme.liquid file and paste the script before </head>",
+        "Save the changes",
+      ],
+      Webflow: [
+        "Open your Webflow project",
+        "Add an 'Embed' element to your page",
+        "Paste the embed script in the embed code field",
+        "Publish your site",
+      ],
+      React: [
+        "Create a new component for the chatbot",
+        "Import the embed script in your component",
+        "Use useEffect to load the script when component mounts",
+        "Add the component to your desired page",
+      ],
+      "Next.js": [
+        "Create a new component for the chatbot",
+        "Use Next.js Script component to load the embed",
+        "Add the component to your page or layout",
+        "Ensure proper client-side rendering",
+      ],
+      "Vue.js": [
+        "Create a new Vue component",
+        "Use mounted() lifecycle hook to load script",
+        "Add the component to your template",
+        "Handle any Vue-specific styling conflicts",
+      ],
+      Angular: [
+        "Create a new Angular component",
+        "Use AfterViewInit lifecycle hook",
+        "Dynamically load the script",
+        "Handle Angular zone.js considerations",
+      ],
+      HTML: [
+        "Open your HTML file in a text editor",
+        "Paste the embed script in the <head> section",
+        "Save the file and open in a browser",
+        "The chatbot should appear on your page",
+      ],
+      Notion: [
+        "Create a new code block in your Notion page",
+        "Paste the embed script",
+        "Note: Limited styling options in Notion",
+        "Works best with simple implementations",
+      ],
+      Bubble: [
+        "Open your Bubble project",
+        "Add an HTML element to your page",
+        "Paste the embed script in the HTML field",
+        "Configure the element positioning and styling",
+      ],
+      Framer: [
+        "Open your Framer project",
+        "Add a 'Code' element to your page",
+        "Paste the embed script in the code field",
+        "Position and style the element as needed",
+      ],
+      Squarespace: [
+        "Go to your Squarespace admin panel",
+        "Navigate to Pages > Add Section",
+        "Choose 'Code' section type",
+        "Paste the embed script and save",
+      ],
+      Wix: [
+        "Open your Wix editor",
+        "Add an 'HTML' element to your page",
+        "Paste the embed script in the HTML field",
+        "Position and resize the element",
+      ],
+      Ghost: [
+        "Access your Ghost admin panel",
+        "Go to Code Injection",
+        "Paste the script in the Site Header field",
+        "Save and refresh your site",
+      ],
+      Drupal: [
+        "Go to Structure > Block Layout",
+        "Add a new Custom Block",
+        "Set block type to 'Custom HTML'",
+        "Paste the embed script and save",
+      ],
+      Joomla: [
+        "Go to Extensions > Modules",
+        "Create a new Custom HTML module",
+        "Paste the embed script in the HTML field",
+        "Assign to desired position and publish",
+      ],
+      Magento: [
+        "Go to Content > Blocks",
+        "Create a new block",
+        "Set content type to HTML",
+        "Paste the embed script and save",
+      ],
+      WooCommerce: [
+        "Go to Appearance > Widgets",
+        "Add a 'Custom HTML' widget",
+        "Paste the embed script in the HTML field",
+        "Add to desired widget area",
+      ],
+      Svelte: [
+        "Create a new Svelte component",
+        "Use onMount lifecycle function",
+        "Dynamically load the script",
+        "Add the component to your page",
+      ],
+      "Nuxt.js": [
+        "Create a new component for the chatbot",
+        "Use Nuxt's clientOnly component wrapper",
+        "Load the script in mounted() hook",
+        "Add to your page or layout",
+      ],
+    };
+    return (
+      instructions[platformName] || ["Integration instructions coming soon..."]
+    );
+  };
+
+  const getPlatformUrl = (platformName: string) => {
+    const urls: { [key: string]: string } = {
+      WordPress: "https://wordpress.org",
+      Shopify: "https://shopify.com",
+      Webflow: "https://webflow.com",
+      React: "https://reactjs.org",
+      "Next.js": "https://nextjs.org",
+      "Vue.js": "https://vuejs.org",
+      Angular: "https://angular.io",
+      HTML: "https://developer.mozilla.org/en-US/docs/Web/HTML",
+      Notion: "https://notion.so",
+      Bubble: "https://bubble.io",
+      Framer: "https://framer.com",
+      Squarespace: "https://squarespace.com",
+      Wix: "https://wix.com",
+      Ghost: "https://ghost.org",
+      Drupal: "https://drupal.org",
+      Joomla: "https://joomla.org",
+      Magento: "https://magento.com",
+      WooCommerce: "https://woocommerce.com",
+      Svelte: "https://svelte.dev",
+      "Nuxt.js": "https://nuxtjs.org",
+    };
+    return urls[platformName] || "#";
   };
 
   const handleCreateEmbed = async () => {
@@ -485,136 +622,128 @@ export default function ExportPage() {
         {/* Page Content */}
         <main className="flex-1 p-6">
           {/* Page Header */}
-          <div className="mb-10">
-            <h1 className="text-3xl font-thin text-foreground mb-3">
-              Export Chatbot
-            </h1>
-            <p className="text-sm font-thin text-muted-foreground max-w-2xl">
-              Seamlessly integrate your AI chatbot into any website.
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Code className="w-8 h-8 text-primary" />
+              <h1 className="text-3xl font-bold text-foreground">
+                Export Chatbot
+              </h1>
+            </div>
+            <p className="text-muted-foreground text-lg">
+              Seamlessly integrate your AI chatbot into any website with our
+              elegant embed solutions.
             </p>
           </div>
 
+          {/* Two Column Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column */}
-            <div className="space-y-8">
-              {/* Chatbot Preview */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Eye className="w-5 h-5 text-primary" />
+            <div className="space-y-6">
+              {/* Current Settings */}
+              <motion.article className="group relative rounded-2xl border bg-card/20 text-card-foreground p-6 shadow-sm hover:shadow-md transition">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs bg-muted/50 text-muted-foreground px-2 py-0.5 rounded-full">
                     Current Settings
-                  </CardTitle>
-                  <CardDescription>
+                  </span>
+                  <div className="text-muted-foreground transition-colors duration-200 group-hover:text-green-500">
+                    <Palette size={20} />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-lg font-thin text-foreground mb-3 group-hover:text-primary transition-colors duration-200">
+                    Current Settings
+                  </h3>
+                  <p className="text-sm font-thin text-muted-foreground mb-4">
                     Your chatbot configuration from the editor
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {chatbotConfig ? (
-                    <>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-sm font-medium text-muted-foreground">
-                            Name
-                          </label>
-                          <p className="text-foreground font-medium">
-                            {chatbotConfig.name}
-                          </p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-muted-foreground">
-                            Theme
-                          </label>
-                          <p className="text-foreground font-medium">
-                            {chatbotConfig.theme || "Modern"}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-sm font-medium text-muted-foreground">
-                            Primary Color
-                          </label>
-                          <div className="flex items-center gap-2">
-                            <div
-                              className="w-4 h-4 rounded border"
-                              style={{
-                                backgroundColor: chatbotConfig.userMsgColor,
-                              }}
-                            />
-                            <span className="text-foreground font-mono text-sm">
-                              {chatbotConfig.userMsgColor}
-                            </span>
-                          </div>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-muted-foreground">
-                            Background
-                          </label>
-                          <div className="flex items-center gap-2">
-                            <div
-                              className="w-4 h-4 rounded border"
-                              style={{
-                                backgroundColor: chatbotConfig.chatBgColor,
-                              }}
-                            />
-                            <span className="text-foreground font-mono text-sm">
-                              {chatbotConfig.chatBgColor}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground">
-                          Welcome Message
-                        </label>
-                        <p className="text-foreground text-sm">
-                          {chatbotConfig.welcomeMessage}
-                        </p>
-                      </div>
-                    </>
-                  ) : (
-                    <p className="text-muted-foreground">
-                      No chatbot configuration found. Please customize your
-                      chatbot first.
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Success Message */}
-              {showSuccess && (
-                <Card className="border-green-200 bg-green-50">
-                  <CardContent className="pt-6">
-                    <div className="flex items-center gap-3 text-green-800">
-                      <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs">✓</span>
-                      </div>
-                      <div>
-                        <p className="font-medium">
-                          Embed Created Successfully!
-                        </p>
-                        <p className="text-sm text-green-600">
-                          Your script and iframe embed codes are now available
-                          on the right.
-                        </p>
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-foreground">
+                        Name
+                      </label>
+                      <Input
+                        value={chatbotConfig?.name || ""}
+                        readOnly
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground">
+                        Theme
+                      </label>
+                      <Input value="modern" readOnly className="mt-1" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-foreground">
+                        Primary Color
+                      </label>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <div
+                          className="w-6 h-6 rounded border"
+                          style={{
+                            backgroundColor:
+                              chatbotConfig?.userMsgColor || "#10b981",
+                          }}
+                        />
+                        <Input
+                          value={chatbotConfig?.userMsgColor || "#10b981"}
+                          readOnly
+                          className="flex-1"
+                        />
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              )}
+                    <div>
+                      <label className="text-sm font-medium text-foreground">
+                        Background
+                      </label>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <div
+                          className="w-6 h-6 rounded border"
+                          style={{
+                            backgroundColor:
+                              chatbotConfig?.chatBgColor || "#ffffff",
+                          }}
+                        />
+                        <Input
+                          value={chatbotConfig?.chatBgColor || "#ffffff"}
+                          readOnly
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground">
+                      Welcome Message
+                    </label>
+                    <Input
+                      value="Hello! How can I help you today?"
+                      readOnly
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+              </motion.article>
 
               {/* Create Embed */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Plus className="w-5 h-5 text-primary" />
+              <motion.article className="group relative rounded-2xl border bg-card/20 text-card-foreground p-6 shadow-sm hover:shadow-md transition">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs bg-muted/50 text-muted-foreground px-2 py-0.5 rounded-full">
                     Create Embed
-                  </CardTitle>
-                  <CardDescription>
+                  </span>
+                  <div className="text-muted-foreground transition-colors duration-200 group-hover:text-green-500">
+                    <Zap size={20} />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-lg font-thin text-foreground mb-3 group-hover:text-primary transition-colors duration-200">
+                    Generate Embed Code
+                  </h3>
+                  <p className="text-sm font-thin text-muted-foreground mb-4">
                     Generate a unique embed code for your chatbot
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
+                  </p>
                   <div>
                     <label className="text-sm font-medium text-foreground">
                       Embed Name
@@ -622,21 +751,14 @@ export default function ExportPage() {
                     <Input
                       value={embedName}
                       onChange={e => setEmbedName(e.target.value)}
-                      placeholder="My Website Chatbot"
+                      className="mt-1"
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                    <label className="text-sm font-medium text-foreground">
                       Description
-                      <Lock className="w-4 h-4 text-muted-foreground" />
                     </label>
-                    <Textarea
-                      value={description}
-                      disabled
-                      placeholder="Description loaded from editor settings"
-                      rows={3}
-                      className="bg-muted cursor-not-allowed"
-                    />
+                    <Input value={description} readOnly className="mt-1" />
                     <p className="text-xs text-muted-foreground mt-1">
                       Description is automatically set from your editor
                       configuration and cannot be changed here.
@@ -651,7 +773,7 @@ export default function ExportPage() {
                         type="number"
                         value={maxRequestsPerHour}
                         onChange={e => setMaxRequestsPerHour(e.target.value)}
-                        placeholder="100"
+                        className="mt-1"
                       />
                     </div>
                     <div>
@@ -662,7 +784,7 @@ export default function ExportPage() {
                         type="number"
                         value={maxRequestsPerDay}
                         onChange={e => setMaxRequestsPerDay(e.target.value)}
-                        placeholder="1000"
+                        className="mt-1"
                       />
                     </div>
                   </div>
@@ -670,199 +792,37 @@ export default function ExportPage() {
                     onClick={handleCreateEmbed}
                     disabled={isCreating || !chatbotConfig}
                     className="w-full"
+                    variant="default"
                   >
-                    {isCreating ? "Creating..." : "Create Embed"}
+                    {isCreating ? (
+                      "Creating..."
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Create Embed
+                      </>
+                    )}
                   </Button>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Right Column */}
-            <div className="space-y-8">
-              {/* Script Embed - Only show after creating embed */}
-              {embedCode ? (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Code className="w-5 h-5 text-primary" />
-                      Script Embed
-                    </CardTitle>
-                    <CardDescription>
-                      Add this script tag to your website's HTML
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="relative">
-                      <pre className="bg-muted p-4 rounded-lg border text-sm font-mono overflow-x-auto">
-                        <code className="text-foreground">
-                          {generateEmbedScript()}
-                        </code>
-                      </pre>
-                      <Button
-                        onClick={() =>
-                          copyToClipboard(generateEmbedScript(), "script")
-                        }
-                        size="sm"
-                        className="absolute top-2 right-2"
-                        variant="outline"
-                      >
-                        {copied === "script" ? (
-                          <Copy className="w-4 h-4" />
-                        ) : (
-                          <Copy className="w-4 h-4" />
-                        )}
-                        {copied === "script" ? "Copied!" : "Copy"}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Code className="w-5 h-5 text-primary" />
-                      Script Embed
-                    </CardTitle>
-                    <CardDescription>
-                      Create an embed first to generate your script tag
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-8">
-                      <Code className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                      <p className="text-muted-foreground mb-4">
-                        Press "Create Embed" to generate your custom script tag
-                      </p>
-                      <div className="bg-muted p-4 rounded-lg border-2 border-dashed border-muted-foreground/20">
-                        <p className="text-sm text-muted-foreground">
-                          Your script embed will appear here after creating an
-                          embed
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Iframe Embed - Only show after creating embed */}
-              {embedCode ? (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Globe className="w-5 h-5 text-primary" />
-                      Iframe Embed
-                    </CardTitle>
-                    <CardDescription>
-                      Embed the chatbot as an iframe element
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="relative">
-                      <pre className="bg-muted p-4 rounded-lg border text-sm font-mono overflow-x-auto">
-                        <code className="text-foreground">
-                          {generateIframeEmbed()}
-                        </code>
-                      </pre>
-                      <Button
-                        onClick={() =>
-                          copyToClipboard(generateIframeEmbed(), "iframe")
-                        }
-                        size="sm"
-                        className="absolute top-2 right-2"
-                        variant="outline"
-                      >
-                        {copied === "iframe" ? (
-                          <Copy className="w-4 h-4" />
-                        ) : (
-                          <Copy className="w-4 h-4" />
-                        )}
-                        {copied === "iframe" ? "Copied!" : "Copy"}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Globe className="w-5 h-5 text-primary" />
-                      Iframe Embed
-                    </CardTitle>
-                    <CardDescription>
-                      Create an embed first to generate your iframe code
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-8">
-                      <Globe className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                      <p className="text-muted-foreground mb-4">
-                        Press "Create Embed" to generate your custom iframe code
-                      </p>
-                      <div className="bg-muted p-4 rounded-lg border-2 border-dashed border-muted-foreground/20">
-                        <p className="text-sm text-muted-foreground">
-                          Your iframe embed will appear here after creating an
-                          embed
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* See Live on Website */}
-              {embedCode && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Globe className="w-5 h-5 text-primary" />
-                      See Live on Website
-                    </CardTitle>
-                    <CardDescription>
-                      See your chatbot working on a real demo website
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <p className="text-sm text-muted-foreground">
-                        Experience your chatbot in a real website environment.
-                        This demo shows exactly how your chatbot will appear and
-                        function when embedded on any website.
-                      </p>
-                      <Button
-                        onClick={() => {
-                          // Save current config to localStorage for the demo website
-                          if (chatbotConfig) {
-                            localStorage.setItem(
-                              "exportChatbotConfig",
-                              JSON.stringify(chatbotConfig)
-                            );
-                          }
-                          // Open the demo website
-                          window.open("/demo-website.html", "_blank");
-                        }}
-                        className="w-full"
-                        variant="default"
-                      >
-                        <Globe className="w-4 h-4 mr-2" />
-                        See Live Demo
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                </div>
+              </motion.article>
 
               {/* API Configuration */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Settings className="w-5 h-5 text-primary" />
+              <motion.article className="group relative rounded-2xl border bg-card/20 text-card-foreground p-6 shadow-sm hover:shadow-md transition">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs bg-muted/50 text-muted-foreground px-2 py-0.5 rounded-full">
+                    API Config
+                  </span>
+                  <div className="text-muted-foreground transition-colors duration-200 group-hover:text-green-500">
+                    <Settings size={20} />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-lg font-thin text-foreground mb-3 group-hover:text-primary transition-colors duration-200">
                     API Configuration
-                  </CardTitle>
-                  <CardDescription>
+                  </h3>
+                  <p className="text-sm font-thin text-muted-foreground mb-4">
                     Your chatbot's API endpoint and configuration
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
+                  </p>
                   <div>
                     <label className="text-sm font-medium text-foreground">
                       API Endpoint
@@ -900,7 +860,7 @@ export default function ExportPage() {
                     <label className="text-sm font-medium text-muted-foreground">
                       Request Body
                     </label>
-                    <pre className="bg-muted p-3 rounded text-xs font-mono">
+                    <pre className="bg-muted p-4 rounded text-xs font-mono">
                       {JSON.stringify(
                         {
                           message: "Hello",
@@ -912,44 +872,453 @@ export default function ExportPage() {
                       )}
                     </pre>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </motion.article>
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-6">
+              {/* Script Embed */}
+              <motion.article className="group relative rounded-2xl border bg-card/20 text-card-foreground p-6 shadow-sm hover:shadow-md transition">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs bg-muted/50 text-muted-foreground px-2 py-0.5 rounded-full">
+                    Script Embed
+                  </span>
+                  <div className="text-muted-foreground transition-colors duration-200 group-hover:text-green-500">
+                    <Code size={20} />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-lg font-thin text-foreground mb-3 group-hover:text-primary transition-colors duration-200">
+                    Script Embed
+                  </h3>
+                  <p className="text-sm font-thin text-muted-foreground mb-4">
+                    Add this script tag to your website's HTML.
+                  </p>
+                  {embedCode ? (
+                    <div className="relative">
+                      <pre className="bg-muted p-4 rounded-lg border text-sm font-mono overflow-x-auto">
+                        <code className="text-foreground">
+                          {generateScriptEmbed()}
+                        </code>
+                      </pre>
+                      <Button
+                        onClick={() =>
+                          copyToClipboard(generateScriptEmbed(), "script")
+                        }
+                        size="sm"
+                        className="absolute top-2 right-2"
+                        variant="outline"
+                      >
+                        {copied === "script" ? (
+                          <Check className="w-4 h-4" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                        {copied === "script" ? "Copied!" : "Copy"}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Code className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground mb-4">
+                        Press "Create Embed" to generate your custom script tag
+                      </p>
+                      <div className="bg-muted p-4 rounded-lg border-2 border-dashed border-muted-foreground/20">
+                        <p className="text-sm text-muted-foreground">
+                          Your script embed will appear here after creating an
+                          embed
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.article>
+
+              {/* Iframe Embed */}
+              <motion.article className="group relative rounded-2xl border bg-card/20 text-card-foreground p-6 shadow-sm hover:shadow-md transition">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs bg-muted/50 text-muted-foreground px-2 py-0.5 rounded-full">
+                    Iframe Embed
+                  </span>
+                  <div className="text-muted-foreground transition-colors duration-200 group-hover:text-green-500">
+                    <Globe size={20} />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-lg font-thin text-foreground mb-3 group-hover:text-primary transition-colors duration-200">
+                    Iframe Embed
+                  </h3>
+                  <p className="text-sm font-thin text-muted-foreground mb-4">
+                    Embed the chatbot as an iframe element.
+                  </p>
+                  {embedCode ? (
+                    <div className="relative">
+                      <pre className="bg-muted p-4 rounded-lg border text-sm font-mono overflow-x-auto">
+                        <code className="text-foreground">
+                          {generateIframeEmbed()}
+                        </code>
+                      </pre>
+                      <Button
+                        onClick={() =>
+                          copyToClipboard(generateIframeEmbed(), "iframe")
+                        }
+                        size="sm"
+                        className="absolute top-2 right-2"
+                        variant="outline"
+                      >
+                        {copied === "iframe" ? (
+                          <Check className="w-4 h-4" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                        {copied === "iframe" ? "Copied!" : "Copy"}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Globe className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground mb-4">
+                        Press "Create Embed" to generate your custom iframe code
+                      </p>
+                      <div className="bg-muted p-4 rounded-lg border-2 border-dashed border-muted-foreground/20">
+                        <p className="text-sm text-muted-foreground">
+                          Your iframe embed will appear here after creating an
+                          embed
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.article>
+
+              {/* See Live Demo */}
+              <motion.article className="group relative rounded-2xl border bg-card/20 text-card-foreground p-6 shadow-sm hover:shadow-md transition">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs bg-muted/50 text-muted-foreground px-2 py-0.5 rounded-full">
+                    Live Demo
+                  </span>
+                  <div className="text-muted-foreground transition-colors duration-200 group-hover:text-green-500">
+                    <Globe size={20} />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-lg font-thin text-foreground mb-3 group-hover:text-primary transition-colors duration-200">
+                    See Live Demo
+                  </h3>
+                  <p className="text-sm font-thin text-muted-foreground mb-4">
+                    See your chatbot working on a real demo website
+                  </p>
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      Experience your chatbot in a real website environment.
+                      This demo shows exactly how your chatbot will appear and
+                      function when embedded on any website.
+                    </p>
+                    <Button
+                      onClick={() => {
+                        if (chatbotConfig) {
+                          localStorage.setItem(
+                            "exportChatbotConfig",
+                            JSON.stringify(chatbotConfig)
+                          );
+                        }
+                        window.open("/demo-website.html", "_blank");
+                      }}
+                      className="w-full"
+                      variant="default"
+                    >
+                      <Globe className="w-4 h-4 mr-2" />
+                      See Live Demo
+                    </Button>
+                  </div>
+                </div>
+              </motion.article>
             </div>
           </div>
 
-          {/* Platform Integrations */}
-          <div className="mt-12">
-            <div className="mb-8">
-              <h2 className="text-2xl font-thin text-foreground mb-3">
+          {/* Success Message - Appear after creating embed */}
+          {embedCode && (
+            <motion.article className="group relative rounded-2xl border bg-card/20 text-card-foreground p-6 shadow-sm hover:shadow-md transition mb-6 mt-8">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs bg-muted/50 text-muted-foreground px-2 py-0.5 rounded-full">
+                  Success
+                </span>
+                <div className="text-muted-foreground transition-colors duration-200 group-hover:text-green-500">
+                  <CheckCircle size={20} />
+                </div>
+              </div>
+              <div className="space-y-4">
+                <h3 className="text-lg font-thin text-foreground mb-3 group-hover:text-primary transition-colors duration-200">
+                  Embed Created Successfully
+                </h3>
+                <p className="text-sm font-thin text-muted-foreground mb-4">
+                  Your chatbot is now ready to be embedded on any website
+                </p>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-sm text-foreground">
+                    Embed created successfully! Your chatbot is ready to use.
+                  </span>
+                </div>
+              </div>
+            </motion.article>
+          )}
+
+          {/* Platform Integrations - Full Width at Bottom */}
+          <motion.article className="group relative rounded-2xl border bg-card/20 text-card-foreground p-6 shadow-sm hover:shadow-md transition">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs bg-muted/50 text-muted-foreground px-2 py-0.5 rounded-full">
+                Integrations
+              </span>
+              <div className="text-muted-foreground transition-colors duration-200 group-hover:text-green-500">
+                <Users size={20} />
+              </div>
+            </div>
+            <div className="space-y-4">
+              <h3 className="text-lg font-thin text-foreground mb-3 group-hover:text-primary transition-colors duration-200">
                 Platform Integrations
-              </h2>
-              <p className="text-sm font-thin text-muted-foreground max-w-2xl">
-                Get step-by-step instructions for popular platforms
+              </h3>
+              <p className="text-sm font-thin text-muted-foreground mb-4">
+                Choose your platform for detailed integration instructions
               </p>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[
+                  {
+                    name: "WordPress",
+                    type: "CMS",
+                    difficulty: "Easy",
+                  },
+                  {
+                    name: "Shopify",
+                    type: "E-commerce",
+                    difficulty: "Easy",
+                  },
+                  {
+                    name: "Webflow",
+                    type: "No-Code",
+                    difficulty: "Easy",
+                  },
+                  {
+                    name: "React",
+                    type: "Framework",
+                    difficulty: "Medium",
+                  },
+                  {
+                    name: "Next.js",
+                    type: "Framework",
+                    difficulty: "Medium",
+                  },
+                  {
+                    name: "Vue.js",
+                    type: "Framework",
+                    difficulty: "Medium",
+                  },
+                  {
+                    name: "Angular",
+                    type: "Framework",
+                    difficulty: "Hard",
+                  },
+                  {
+                    name: "HTML",
+                    type: "Static",
+                    difficulty: "Easy",
+                  },
+                  {
+                    name: "Notion",
+                    type: "No-Code",
+                    difficulty: "Medium",
+                  },
+                  {
+                    name: "Bubble",
+                    type: "No-Code",
+                    difficulty: "Easy",
+                  },
+                  {
+                    name: "Framer",
+                    type: "No-Code",
+                    difficulty: "Easy",
+                  },
+                  {
+                    name: "Squarespace",
+                    type: "CMS",
+                    difficulty: "Easy",
+                  },
+                  {
+                    name: "Wix",
+                    type: "No-Code",
+                    difficulty: "Easy",
+                  },
+                  {
+                    name: "Ghost",
+                    type: "CMS",
+                    difficulty: "Medium",
+                  },
+                  {
+                    name: "Drupal",
+                    type: "CMS",
+                    difficulty: "Hard",
+                  },
+                  {
+                    name: "Joomla",
+                    type: "CMS",
+                    difficulty: "Medium",
+                  },
+                  {
+                    name: "Magento",
+                    type: "E-commerce",
+                    difficulty: "Hard",
+                  },
+                  {
+                    name: "WooCommerce",
+                    type: "E-commerce",
+                    difficulty: "Medium",
+                  },
+                  {
+                    name: "Svelte",
+                    type: "Framework",
+                    difficulty: "Medium",
+                  },
+                  {
+                    name: "Nuxt.js",
+                    type: "Framework",
+                    difficulty: "Medium",
+                  },
+                ].map((platform, index) => (
+                  <motion.article
+                    key={platform.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: index * 0.02 }}
+                    onClick={() => setSelectedPlatform(platform)}
+                    className="group relative rounded-2xl border bg-card/20 text-card-foreground p-6 shadow-sm hover:shadow-md transition cursor-pointer"
+                  >
+                    {/* Top badge and icon */}
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-xs bg-muted/50 text-muted-foreground px-2 py-0.5 rounded-full">
+                        {platform.type}
+                      </span>
+                      <div className="text-xl text-muted-foreground transition-colors duration-200 group-hover:text-primary">
+                        <Globe className="h-5 w-5" />
+                      </div>
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="text-lg font-thin text-foreground mb-3 group-hover:text-primary transition-colors duration-200">
+                      {platform.name}
+                    </h3>
+
+                    {/* Difficulty badge */}
+                    <div className="mb-4">
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full ${
+                          platform.difficulty === "Easy"
+                            ? "bg-green-100 text-green-700"
+                            : platform.difficulty === "Medium"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {platform.difficulty}
+                      </span>
+                    </div>
+
+                    {/* Action text */}
+                    <p className="text-sm font-thin text-muted-foreground">
+                      Click for integration guide
+                    </p>
+                  </motion.article>
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { name: "WordPress", icon: "🌐" },
-                { name: "Shopify", icon: "🛍️" },
-                { name: "Webflow", icon: "🎨" },
-                { name: "React", icon: "⚛️" },
-                { name: "Next.js", icon: "🚀" },
-                { name: "Vue.js", icon: "💚" },
-                { name: "Angular", icon: "🅰️" },
-                { name: "HTML", icon: "📄" },
-              ].map(platform => (
-                <Card
-                  key={platform.name}
-                  className="text-center p-4 hover:shadow-md transition-shadow cursor-pointer"
-                >
-                  <div className="text-2xl mb-2">{platform.icon}</div>
-                  <h3 className="font-medium text-foreground">
-                    {platform.name}
-                  </h3>
-                </Card>
-              ))}
+          </motion.article>
+
+          {/* Integration Modal */}
+          {selectedPlatform && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <div className="bg-background rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-xl font-semibold text-foreground">
+                        {selectedPlatform.name} Integration
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        Step-by-step guide to integrate your chatbot with{" "}
+                        {selectedPlatform.name}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setSelectedPlatform(null)}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    <span className="text-xs px-2 py-1 bg-muted rounded-full text-muted-foreground">
+                      {selectedPlatform.type}
+                    </span>
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${
+                        selectedPlatform.difficulty === "Easy"
+                          ? "bg-green-100 text-green-700"
+                          : selectedPlatform.difficulty === "Medium"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {selectedPlatform.difficulty}
+                    </span>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-foreground flex items-center gap-2">
+                      <Code size={16} />
+                      Instructions
+                    </h4>
+                    <div className="space-y-3">
+                      {getIntegrationInstructions(selectedPlatform.name).map(
+                        (instruction, index) => (
+                          <div key={index} className="flex items-start gap-3">
+                            <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-sm flex items-center justify-center font-medium flex-shrink-0 mt-0.5">
+                              {index + 1}
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {instruction}
+                            </p>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 mt-6">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() =>
+                        window.open(
+                          getPlatformUrl(selectedPlatform.name),
+                          "_blank"
+                        )
+                      }
+                    >
+                      <ExternalLink size={16} className="mr-2" />
+                      Visit {selectedPlatform.name}
+                    </Button>
+                    <Button
+                      className="flex-1"
+                      onClick={() => setSelectedPlatform(null)}
+                    >
+                      Start Integration
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </main>
       </div>
     </div>
